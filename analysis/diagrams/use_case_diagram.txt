@@ -1,0 +1,29 @@
+@startuml
+title Bubbles Use Case Diagram
+left to right direction
+skinparam packageStyle rectangle
+actor :Member:
+actor :Committee Member:
+actor :Committee Member1: as "Committee Member"
+actor :Time\n[monthly]:
+
+rectangle "Bubbles Equipment Management System" {
+    :Member: -- (1. Request Equipment)
+    :Member: -- (2. Return Equipment)
+    :Committee Member: -- (4. Use Equipment)
+    :Committee Member: -- (5. Purchase Equipment)
+    :Committee Member: -- (6. Condemn Equipment)
+    :Committee Member: -- (7. Send Equipment for Service)
+    :Committee Member: -- (3. Send Equipment for Repair)
+    :Time\n[monthly]: -- (8. Generate Equipment Report)
+    (2. Return Equipment) ---- :Committee Member1:
+    (8. Generate Equipment Report) ---- :Committee Member1:
+    (9. Rent Out Equipment) -- :Committee Member1:
+    (1. Request Equipment) <.. (9. Rent Out Equipment) : <<includes>>
+    (5. Purchase Equipment) ..> (10. Manage Equipment Details) : <<includes>>
+    (6. Condemn Equipment) ..> (10. Manage Equipment Details) : <<includes>>
+    (7. Send Equipment for Service) ..> (10. Manage Equipment Details) : <<includes>>
+    (3. Send Equipment for Repair) ..> (10. Manage Equipment Details) : <<includes>>
+    (9. Rent Out Equipment) .> (10. Manage Equipment Details) : <<includes>>
+}
+@enduml
