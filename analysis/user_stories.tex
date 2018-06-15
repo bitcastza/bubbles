@@ -1,0 +1,158 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage[section]{placeins}
+\usepackage{enumitem}
+
+\newcounter{stockAvailabilityCheck}
+\newcounter{checkCustomerDetails}
+
+\begin{document}
+\title{User Stories at UCT Underwater Club}
+\author{Kyle Robbertze}
+\date{June 2018}
+\maketitle
+
+\section{Actor Table}
+\begin{tabular}{| p{0.2\textwidth} | p{0.2\textwidth} | p{0.6\textwidth} |}
+  \hline
+  \textbf{Actor Role} & \textbf{Level} & \textbf{Description} \\\hline
+  Member & Primary & A member of the UCT Underwater Club \\\hline
+  Committee Member & Primary & An elected member of the UCT Underwater Club
+  committee \\\hline
+\end{tabular}
+
+\section{Use Cases}
+\begin{tabular}{| p{0.12\textwidth} | p{0.3\textwidth} | p{0.3\textwidth} | p{0.3\textwidth} |}
+  \hline
+  \textbf{Number} & \textbf{Primary Actors} & \textbf{Name} & \textbf{Priority
+  Level} \\\hline
+  001 & Member & Request Equipment & High \\\hline
+  002 & Member & Return Equipment & High \\\hline
+  003 & Committee Member & Send Equipment for Repair & Low \\\hline
+  004 & Committee Member & Use Equipment & High \\\hline
+  005 & Committee Member & Purchase Equipment & Medium \\\hline
+  006 & Committee Member & Condemn Equipment & Medium \\\hline
+  007 & Committee Member & Send Equipment for Service & Low \\\hline
+  008 & Time [Monthly] & Generate Equipment Report & Medium \\\hline
+\end{tabular}
+
+\newpage
+
+\section{Use Case Diagram}
+Figure~\ref{fig:UseCaseDiagram} shows the use cases identified for the equipment
+management system.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{build/use_case_diagram}
+  \caption{Use case diagram for the Bubbles equipment management system}
+  \label{fig:UseCaseDiagram}
+\end{figure}
+
+\section{Use Case Narratives}
+\begin{tabular}{|p{0.21\textwidth}|p{0.3\textwidth}|p{0.24\textwidth}|p{0.25\textwidth}|}
+  \hline
+  \textbf{Use Case:} & Request Equipment & \textbf{ID:} 001 & \textbf{Level:} High
+  \\\hline
+  \textbf{Actors:} & \multicolumn{3}{|l|}{Member} \\\hline
+  \textbf{Stakeholders and Interests} &
+  \multicolumn{3}{|p{0.79\textwidth}|}{
+    Committee - to collect equipment statistics
+  } \\\hline
+  \textbf{Brief Description:} & \multicolumn{3}{|p{0.79\textwidth}|}{
+    A member requests the equipment they require and the related sizes} \\\hline
+  \textbf{Preconditions:}
+  & \multicolumn{3}{|p{0.79\textwidth}|}{} \\\hline
+  \multirow{2}{0.2\textwidth}{\textbf{Post Conditions:}}
+  & \multicolumn{3}{|p{0.79\textwidth}|}{Equipment rented out to the member} \\
+  & \multicolumn{3}{|p{0.79\textwidth}|}{
+    Equipment logged as rented out} \\\hline
+  \textbf{Related Use Cases:}
+  & \multicolumn{3}{|p{0.79\textwidth}|}{includes: Rent Out Equipment} \\\hline
+\end{tabular}
+
+\begin{longtable}{|p{0.5\textwidth}|p{0.5\textwidth}|}\hline
+  \multicolumn{2}{|p{1.095\textwidth}|}{\textbf{Typical Course of Events}} \\\hline
+  \textbf{Actor Action} & \textbf{System Response} \\\hline
+  \begin{enumerate}[series=typical]
+    \item Customer phones in with a completed order form
+  \end{enumerate} & \\\hline
+  \begin{enumerate}[resume=typical]
+    \item Marketing clerk enters the customer number into the system
+    \label{step:EnterCustomerDetails}
+  \end{enumerate}
+  &
+  \begin{enumerate}[resume=typical]
+    \item System checks the customer's details and current credit status.
+      \setcounter{checkCustomerDetails}{\value{enumi}}
+    \item If credit status is OK, the system prompts the Marketing Clerk to
+      capture the order items.
+      \label{step:CaptureItem}
+  \end{enumerate} \\\hline
+  \begin{enumerate}[resume=typical]
+    \item Marketing Clerk captures an item and quantity in the system
+  \end{enumerate}
+  &
+  \begin{enumerate}[resume=typical]
+    \item If this is the first item requested, the system creates an order
+    \item The system obtains the price and description of the item and checks
+      the availability of stock (includes: Check Stock Availability)
+      \label{step:StockAvailabilityCheck}
+      \setcounter{stockAvailabilityCheck}{\value{enumi}}
+    \item System checks the product entitlement to ensure the customer is
+      entitled to order the product.
+    \item The system adds the line item to the order
+  \end{enumerate} \\\hline
+  \begin{enumerate}[resume=typical]
+    \item If there are more items return to step~\ref{step:CaptureItem}
+  \end{enumerate}
+  & \\\hline
+  \begin{enumerate}[resume=typical]
+    \item Marketing Clerk confirms the order with the customer
+  \end{enumerate}
+  &
+  \begin{enumerate}[resume=typical]
+    \item System updates reserved stock balances, updates order status to `On
+      Hold', confirms credit status is OK and updates order status to `Order
+      Confirmed'.
+  \end{enumerate} \\\hline
+\end{longtable}
+
+\begin{longtable}{|p{0.5\textwidth}|p{0.5\textwidth}|}\hline
+  \multicolumn{2}{|p{1.095\textwidth}|}{\textbf{Alternative Courses of Events}} \\\hline
+  \textbf{Actor Action} & \textbf{System Response} \\\hline
+  &
+  \begin{enumerate}[start=\value{checkCustomerDetails}]
+    \item
+      \begin{enumerate}[series=abnormal0]
+        \item Customer not registered. Extends: Register Details.
+        \item Go back to step~\ref{step:EnterCustomerDetails}
+      \end{enumerate}
+  \end{enumerate} \\\hline
+  &
+  \begin{enumerate}[start=\value{stockAvailabilityCheck}]
+    \item
+      \begin{enumerate}[series=abnormal1]
+        \item Item is out of stock, so the system prompts the Marketing clerk
+          for an alternative item from a list of possible alternatives.
+          (extends: Find Substitute Item)
+      \end{enumerate}
+  \end{enumerate} \\\hline
+  \begin{enumerate}[start=\value{stockAvailabilityCheck}]
+    \item
+      \begin{enumerate}[resume=abnormal1]
+        \item Marketing clerk selects an alternative item
+      \end{enumerate}
+  \end{enumerate}
+  &
+  \begin{enumerate}[start=\value{stockAvailabilityCheck}]
+    \item
+      \begin{enumerate}[resume=abnormal1]
+        \item Return to step~\ref{step:StockAvailabilityCheck}
+      \end{enumerate}
+  \end{enumerate} \\\hline
+\end{longtable}
+\end{document}
