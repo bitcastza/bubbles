@@ -1,1 +1,6 @@
-analysis/build/
+/analysis/build/
+/pyenv/
+__pycache__/
+*.pyc
+*.sqlite3
+bubbles/local_settings.py
