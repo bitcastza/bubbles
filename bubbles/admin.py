@@ -21,6 +21,7 @@ from django.contrib.auth.admin import GroupAdmin, UserAdmin
 class BubblesAdminSite(admin.AdminSite):
     index_title = None
     index_template = 'bubbles/admin/bubbles/index.html'
+    app_index_template = 'bubbles/admin/bubbles/index.html'
 
     def index(self, request, extra_context=None):
         """
@@ -30,6 +31,10 @@ class BubblesAdminSite(admin.AdminSite):
         extra_context = extra_context or {}
         return super(BubblesAdminSite, self).index(request, extra_context=extra_context)
 
+    def each_context(self, request):
+        context = super(BubblesAdminSite, self).each_context(request)
+        context['apps_length'] = len(self.get_app_list(request))
+        return context
 
 admin_site = BubblesAdminSite(name='Bubbles Administration')
 admin_site.register(Group, GroupAdmin)

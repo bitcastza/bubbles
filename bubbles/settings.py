@@ -48,6 +48,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'bubbles',
     'bubbles.inventory',
+    'bubbles.rentals',
     'bubbles.registration',
     'sakaiauthenticator',
     'django.contrib.admin',

@@ -5,27 +5,37 @@
 {% endblock extra_head %}
 
 {% block navuser %}
-    <ul class="nav navbar-nav navbar-right">
-      <li>
-        <a href="/">
-          <span class="glyphicon glyphicon-globe"></span> View Site</a>
-      </li>
-      <li>
-        <a href="{% url 'registration:logout' %}">
-          <span class="glyphicon glyphicon-log-out"></span> Log Out</a>
-      </li>
-    </ul>
+<ul class="nav navbar-nav navbar-right">
+  <li>
+    <a href="/">
+      <span class="glyphicon glyphicon-globe"></span> View Site</a>
+  </li>
+  <li>
+    <a href="{% url 'registration:logout' %}">
+      <span class="glyphicon glyphicon-log-out"></span> Log Out</a>
+  </li>
+</ul>
 {% endblock %}
 
 {% block pre_content %}
+{% block breadcrumbs %}
+{% if title %}
+<div class="breadcrumbs well well-sm">
+  <a href="{% url 'admin:index' %}">Home</a>
+  <span class="glyphicon glyphicon-menu-right"></span> {{ title }}
+</div>
+{% endif %}
+{% endblock %}
 {% block messages %}
-    {% if messages %}
-    <ul class="messagelist">{% for message in messages %}
-      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
-    {% endfor %}</ul>
-    {% endif %}
+{% if messages %}
+<ul class="messagelist">{% for message in messages %}
+  <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+  {% endfor %}</ul>
+{% endif %}
 {% endblock messages %}
 {% endblock pre_content %}
+
+{% block content_title %}{% endblock %}
 
 {% block content %}
 {% block object-tools %}{% endblock object-tools %}

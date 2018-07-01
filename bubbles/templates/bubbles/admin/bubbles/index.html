@@ -3,35 +3,45 @@
 {% block content %}
 {% if app_list %}
 {% for app in app_list %}
-<div class="col-sm-6">
-  <table class="table table-responsive table-striped">
-    <caption>
-      <h2><a href="{{ app.app_url }}" class="section" title="Models in the {{ app.name }} application">{{ app.name }}</a></h2>
-    </caption>
-    {% for model in app.models %}
-    <tbody>
-      <tr>
-        {% if model.admin_url %}
-        <td class="admin-app-table-name"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+{% if forloop.counter0|divisibleby:2 %}
+<div class="row">
+  {% endif %}
+  <div class="col-sm-6">
+    <table class="table table-responsive table-striped">
+      <caption>
+        {% if request.path != app.app_url %}
+        <h2><a href="{{ app.app_url }}" class="section" title="Models in the {{ app.name }} application">{{ app.name }}</a></h2>
         {% else %}
-        <td class="admin-app-table-name">{{ model.name }}</th>
+        <h2>{{ app.name }}</h2>
         {% endif %}
-        {% if model.add_url %}
-        <td class="admin-app-table-btn"><a href="{{ model.add_url }}" role="button" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Add</a></td>
-        {% else %}
-        <td class="admin-app-table-btn">&nbsp;</td>
-        {% endif %}
+      </caption>
+      {% for model in app.models %}
+      <tbody>
+        <tr>
+          {% if model.admin_url %}
+          <td class="admin-app-table-name"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+          {% else %}
+          <td class="admin-app-table-name">{{ model.name }}</th>
+          {% endif %}
+          {% if model.add_url %}
+          <td class="admin-app-table-btn"><a href="{{ model.add_url }}" role="button" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Add</a></td>
+          {% else %}
+          <td class="admin-app-table-btn">&nbsp;</td>
+          {% endif %}
 
-        {% if model.admin_url %}
-        <td class="admin-app-table-btn"><a href="{{ model.admin_url }}" class="btn btn-primary"><span class="glyphicon glyphicon-pencil"></span> Manage</a></td>
-        {% else %}
-        <td style="width: 25%">&nbsp;</td>
-        {% endif %}
-      </tr>
-    </tbody>
-    {% endfor %}
-  </table>
+          {% if model.admin_url %}
+          <td class="admin-app-table-btn"><a href="{{ model.admin_url }}" class="btn btn-primary"><span class="glyphicon glyphicon-pencil"></span> Manage</a></td>
+          {% else %}
+          <td style="width: 25%">&nbsp;</td>
+          {% endif %}
+        </tr>
+      </tbody>
+      {% endfor %}
+    </table>
+  </div>
+  {% if not forloop.counter0|divisibleby:2 %}
 </div>
+{% endif %}
 {% endfor %}
 {% else %}
 <p>You don't have permission to edit anything.</p>
@@ -39,33 +49,38 @@
 {% endblock %}
 
 {% block sidebar %}
-<div id="content-related">
-  <div class="module" id="recent-actions-module">
-    <h2>Recent actions</h2>
-    <h3>My actions</h3>
-    {% load log %}
-    {% get_admin_log 10 as admin_log for_user user %}
-    {% if not admin_log %}
-    <p>None available</p>
-    {% else %}
-    <ul class="actionlist">
-      {% for entry in admin_log %}
-      <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
-        {% if entry.is_deletion or not entry.get_admin_url %}
-        {{ entry.object_repr }}
-        {% else %}
-        <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
-        {% endif %}
-        <br/>
-        {% if entry.content_type %}
-        <span class="mini quiet">{% filter capfirst %}{{ entry.content_type }}{% endfilter %}</span>
-        {% else %}
-        <span class="mini quiet">Unknown content</span>
-        {% endif %}
-      </li>
-      {% endfor %}
-    </ul>
-    {% endif %}
-  </div>
+{% if apps_length|divisibleby:2 %}
+<div class="row">
+{% endif %}
+<div class="col-sm-6">
+  <h2>Recent actions</h2>
+  <h3>My actions</h3>
+  {% load log %}
+  {% get_admin_log 10 as admin_log for_user user %}
+  {% if not admin_log %}
+  <p>None available</p>
+  {% else %}
+  <ul class="actionlist">
+    {% for entry in admin_log %}
+    <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+      {% if entry.is_deletion or not entry.get_admin_url %}
+      {{ entry.object_repr }}
+      {% else %}
+      <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+      {% endif %}
+      <br/>
+      {% if entry.content_type %}
+      <span class="mini quiet">{% filter capfirst %}{{ entry.content_type }}{% endfilter %}</span>
+      {% else %}
+      <span class="mini quiet">Unknown content</span>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
 </div>
+</div>
+{% if apps_length|divisibleby:2 %}
+</div>
+{% endif %}
 {% endblock %}
