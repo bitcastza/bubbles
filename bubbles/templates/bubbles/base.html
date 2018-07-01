@@ -12,9 +12,13 @@
   <body>
     {% include "bubbles/nav.html" %}
     <div id="main" class="container {% block container_class %}{% endblock %}">
+      {% block pre_content %} {% endblock %}
+      {% block pretitle %}{% endblock %}
+      {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
       {% block content %}
       <h1>Bubbles</h1>
       {% endblock %}
+      {% block post_content %}{% endblock %}
     </div>
     <script src="{% static 'vendor/jquery/dist/jquery.min.js' %}"></script>
     <script src="{% static 'vendor/bootstrap/dist/js/bootstrap.min.js' %}"></script>

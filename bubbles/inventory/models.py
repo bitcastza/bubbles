@@ -2,11 +2,13 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 class Item(models.Model):
+    AVAILABLE = 'A'
     IN_USE = 'U'
     BROKEN = 'B'
     REPAIR = 'R'
     CONDEMNED = 'C'
     STATE_CHOICES = (
+        (AVAILABLE, _('Available')),
         (IN_USE, _('In use')),
         (BROKEN, _('Broken')),
         (REPAIR, _('Repair')),

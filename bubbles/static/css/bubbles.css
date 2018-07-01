@@ -6,3 +6,11 @@
 .heading-btn {
   margin-top: 20px;
 }
+
+.admin-app-table-name {
+  width: 50%;
+}
+
+.admin-app-table-btn {
+  width: 25%;
+}

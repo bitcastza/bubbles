@@ -1,0 +1,39 @@
+{% extends "bubbles/base.html" %}
+
+{% block extra_head %}
+{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock blockbots%}
+{% endblock extra_head %}
+
+{% block navuser %}
+    <ul class="nav navbar-nav navbar-right">
+      <li>
+        <a href="/">
+          <span class="glyphicon glyphicon-globe"></span> View Site</a>
+      </li>
+      <li>
+        <a href="{% url 'registration:logout' %}">
+          <span class="glyphicon glyphicon-log-out"></span> Log Out</a>
+      </li>
+    </ul>
+{% endblock %}
+
+{% block pre_content %}
+{% block messages %}
+    {% if messages %}
+    <ul class="messagelist">{% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+    {% endfor %}</ul>
+    {% endif %}
+{% endblock messages %}
+{% endblock pre_content %}
+
+{% block content %}
+{% block object-tools %}{% endblock object-tools %}
+{{ content }}
+{% endblock content %}
+
+{% block post_content %}
+{% block sidebar %}{% endblock sidebar %}
+<br class="clear" />
+{% endblock post_content %}
+

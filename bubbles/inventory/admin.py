@@ -1,13 +1,13 @@
-from django.contrib import admin
+from bubbles.admin import admin_site
 
 from . import models
 
-admin.site.register(models.Item)
-admin.site.register(models.BCD)
-admin.site.register(models.Booties)
-admin.site.register(models.Cylinder)
-admin.site.register(models.Fins)
-admin.site.register(models.Regulator)
-admin.site.register(models.Weight)
-admin.site.register(models.WeightBelt)
-admin.site.register(models.Wetsuit)
+admin_site.register(models.Item)
+admin_site.register(models.BCD)
+admin_site.register(models.Booties)
+admin_site.register(models.Cylinder)
+admin_site.register(models.Fins)
+admin_site.register(models.Regulator)
+admin_site.register(models.Weight)
+admin_site.register(models.WeightBelt)
+admin_site.register(models.Wetsuit)
