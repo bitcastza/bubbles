@@ -13,22 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
-from django.contrib import admin
 from bubbles.admin import admin_site
 
 from . import models
-
-class InventoryAdminSite(admin.AdminSite):
-    index_title = None
-    index_template = 'bubbles/admin/bubbles/index.html'
-
-    def index(self, request, extra_context=None):
-        """
-        Display the main admin index page, which lists all of the installed
-        apps that have been registered in this site.
-        """
-        extra_context = extra_context or {}
-        return super(BubblesAdminSite, self).index(request, extra_context=extra_context)
 
 admin_site.register(models.Item)
 admin_site.register(models.BCD)
