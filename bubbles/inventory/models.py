@@ -34,6 +34,10 @@ class Item(models.Model):
     manufacturer = models.CharField(_('Manufacturer'), max_length=255)
     date_of_purchase = models.DateField(_('Date of purchase'))
     state = models.CharField(_('State'), max_length=1, choices=STATE_CHOICES, default=STATE_CHOICES[0])
+    description = models.CharField(_('Description'), max_length=255)
+
+    def __str__(self):
+        return '{} {} - {} ({})'.format(self.description, self.number, self.manufacturer, self.date_of_purchase)
 
 class BCD(Item):
     SMALL = 'S'
@@ -49,7 +53,6 @@ class BCD(Item):
 
     last_service = models.DateField(_('Last service'))
     size = models.CharField(_('Size'), max_length=2, choices=SIZE_CHOICES)
-
 
     class Meta:
         verbose_name = 'BCD'
@@ -93,6 +96,7 @@ class Fins(Item):
     )
 
     size = models.CharField(_('Size'), max_length=2, choices=SIZE_CHOICES)
+    descriptio = 'Fins'
 
     class Meta:
         verbose_name_plural = 'Fins'

@@ -28,14 +28,15 @@
 {% endblock %}
 {% block messages %}
 {% if messages %}
-<ul class="messagelist">{% for message in messages %}
-  <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
-  {% endfor %}</ul>
+{% for message in messages %}
+<div class="alert alert-success altert-dismissible fade in">
+  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+  {{ message|capfirst }}
+</div>
+{% endfor %}
 {% endif %}
 {% endblock messages %}
 {% endblock pre_content %}
-
-{% block content_title %}{% endblock %}
 
 {% block content %}
 {% block object-tools %}{% endblock object-tools %}

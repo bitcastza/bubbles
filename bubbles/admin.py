@@ -20,8 +20,8 @@ from django.contrib.auth.admin import GroupAdmin, UserAdmin
 
 class BubblesAdminSite(admin.AdminSite):
     index_title = None
-    index_template = 'bubbles/admin/bubbles/index.html'
-    app_index_template = 'bubbles/admin/bubbles/index.html'
+    index_template = 'admin/bubbles/index.html'
+    app_index_template = 'admin/bubbles/index.html'
 
     def index(self, request, extra_context=None):
         """
