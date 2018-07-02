@@ -11,8 +11,6 @@
       <caption>
         {% if request.path != app.app_url %}
         <h2><a href="{{ app.app_url }}" class="section" title="Models in the {{ app.name }} application">{{ app.name }}</a></h2>
-        {% else %}
-        <h2>{{ app.name }}</h2>
         {% endif %}
       </caption>
       <tbody>
