@@ -13,6 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
-from django.contrib import admin
+from bubbles.admin import admin_site
 
-# Register your models here.
+from . import models
+
+admin_site.register(models.Rental)
+admin_site.register(models.RentalItem)
