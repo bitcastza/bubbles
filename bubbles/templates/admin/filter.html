@@ -1,0 +1,7 @@
+<div class="panel-body">
+  <div class="list-group">
+    {% for choice in choices %}
+    <a class="list-group-item {% if choice.selected %}active{% endif %}" href="{{ choice.query_string|iriencode }}" title="{{ choice.display }}">{{ choice.display }}</a></li>
+  {% endfor %}
+  </div>
+</div>
