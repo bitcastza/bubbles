@@ -1,17 +1,19 @@
-{% load i18n static %}
+{% load static %}
 {% if cl.search_fields %}
-<div id="toolbar"><form id="changelist-search" method="get">
-<div><!-- DIV needed for valid HTML -->
-<input type="text" size="40" name="{{ search_var }}" value="{{ cl.query }}" id="searchbar" autofocus />
-<button type="submit" class="btn btn-default" value="">
-  <span class="glyphicon glyphicon-search"></span>
-</button>
-{% if show_result_count %}
-    <span class="small quiet">{% blocktrans count counter=cl.result_count %}{{ counter }} result{% plural %}{{ counter }} results{% endblocktrans %} (<a href="?{% if cl.is_popup %}_popup=1{% endif %}">{% if cl.show_full_result_count %}{% blocktrans with full_result_count=cl.full_result_count %}{{ full_result_count }} total{% endblocktrans %}{% else %}{% trans "Show all" %}{% endif %}</a>)</span>
-{% endif %}
-{% for pair in cl.params.items %}
-    {% if pair.0 != search_var %}<input type="hidden" name="{{ pair.0 }}" value="{{ pair.1 }}"/>{% endif %}
-{% endfor %}
+<div id="toolbar">
+  <form id="changelist-search" method="get">
+    <div class="input-group"><!-- DIV needed for valid HTML -->
+      <input type="text" size="40" class="form-control" placeholder="Search" name="{{ search_var }}" value="{{ cl.query }}" id="searchbar" autofocus>
+      <div class="input-group-btn">
+        <button type="submit" class="btn btn-default"><i class="glyphicon glyphicon-search"></i></button>
+      </div>
+      {% if show_result_count %}
+      <span class="small quiet">{{ cl.result_count }} result (<a href="?{% if cl.is_popup %}_popup=1{% endif %}">{% if cl.show_full_result_count %}{{ cl.full_result_count }} total{% else %}Show all{% endif %}</a>)</span>
+      {% endif %}
+      {% for pair in cl.params.items %}
+      {% if pair.0 != search_var %}<input type="hidden" name="{{ pair.0 }}" value="{{ pair.1 }}"/>{% endif %}
+      {% endfor %}
+    </div>
+  </form>
 </div>
-</form></div>
 {% endif %}
