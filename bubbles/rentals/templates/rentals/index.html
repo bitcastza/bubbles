@@ -1,0 +1,29 @@
+{% extends "bubbles/base.html" %}
+
+{% block content %}
+<div class="row">
+  {% if rentals %}
+  <div class="col-sm-6">
+    <h1>My Rentals</h1>
+    <table class="table" id="rental-table">
+      <thead>
+        <tr>
+          <th scope="col">Item</th>
+          <th scope="col">Number</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rental in rentals %}
+        {% for rentalitem in rental.rentalitem_set.all %}
+        <tr>
+          <td>{{ rentalitem.item.description }}</td>
+          <td>{{ rentalitem.item.number }}</td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

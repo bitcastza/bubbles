@@ -34,7 +34,7 @@ from django.urls import include, path
 from .admin import admin_site
 
 urlpatterns = [
-    path('', include('bubbles.inventory.urls')),
+    path('', include('bubbles.rentals.urls')),
     path('admin/', admin_site.urls),
     path('accounts/', include('bubbles.registration.urls')),
 ]

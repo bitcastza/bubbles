@@ -13,16 +13,24 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
-from django.contrib.auth.decorators import login_required
-from django.db.models import Q
-from django.shortcuts import render
+"""bubbles URL Configuration
 
-from .models import Rental
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/2.0/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.urls import path
+from . import views
 
-@login_required
-def index(request):
-    rental_set = Rental.objects.filter(user=request.user)
-    context = {}
-    if (len(rental_set) != 0):
-        context['rentals'] = rental_set
-    return render(request, 'rentals/index.html', context)
+urlpatterns = [
+    path('', views.index, name='index')
+]
