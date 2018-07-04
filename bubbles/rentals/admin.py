@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
+from django.db.models import DateField, DurationField, IntegerField
 from django.contrib import admin
+from django.forms import DateInput, NumberInput, TextInput
 from django.utils.translation import gettext_lazy as _
 
 from bubbles.admin import admin_site
@@ -45,6 +47,13 @@ class RentalPeriodAdmin(admin.ModelAdmin):
                     'deposit',
                     'cost_per_item')
     date_hierarchy = 'start_date'
+    formfield_overrides = {
+        DateField: {'widget': DateInput(attrs={'class': 'date-input form-control'})},
+        IntegerField: {
+            'widget': NumberInput(attrs={'class': 'vIntegerField form-control'})
+        },
+        DurationField: {'widget': TextInput(attrs={'class': 'form-control'})},
+    }
 
 @admin.register(models.RentalItem, site=admin_site)
 class RentalItemAdmin(admin.ModelAdmin):
