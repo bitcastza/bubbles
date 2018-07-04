@@ -38,10 +38,12 @@ class ItemAdmin(admin.ModelAdmin):
 class SizeAdmin(admin.ModelAdmin):
     list_display = ('number', 'manufacturer', 'size', 'state')
     list_filter = ('state', 'size', 'manufacturer')
+    exclude = ['description']
 
 @admin.register(models.BCD, site=admin_site)
 class BCDAdmin(SizeAdmin):
     list_display = ('number', 'manufacturer', 'size', 'next_service', 'state')
+    exclude = ['description']
 
 @admin.register(models.Cylinder, site=admin_site)
 class CylinderAdmin(admin.ModelAdmin):
@@ -52,6 +54,7 @@ class CylinderAdmin(admin.ModelAdmin):
                     'last_viz',
                     'state',)
     list_filter = ('state', 'manufacturer', 'capacity')
+    exclude = ['description']
 
 @admin.register(models.Regulator, site=admin_site)
 class RegulatorAdmin(admin.ModelAdmin):
@@ -60,6 +63,7 @@ class RegulatorAdmin(admin.ModelAdmin):
                    'next_service',
                    'state')
     list_filter = ('state', 'manufacturer')
+    exclude = ['description']
 
 admin_site.register(models.Booties, SizeAdmin)
 admin_site.register(models.Fins, SizeAdmin)

@@ -60,6 +60,9 @@ class BCD(Item):
     def next_service(self):
         return self.last_service + timedelta(weeks=54)
 
+    def clean(self):
+        self.description = "BCD"
+
     class Meta:
         verbose_name = 'BCD'
 
@@ -77,6 +80,9 @@ class Booties(Item):
 
     size = models.CharField(_('Size'), max_length=2, choices=SIZE_CHOICES)
 
+    def clean(self):
+        self.description = "Booties"
+
     class Meta:
         verbose_name_plural = 'Booties'
 
@@ -93,6 +99,9 @@ class Cylinder(Item):
     def next_service(self):
         return self.last_viz + self.viz_period
 
+    def clean(self):
+        self.description = "Cylinder"
+
 class Fins(Item):
     SMALL = 'S'
     MEDIUM = 'M'
@@ -106,7 +115,9 @@ class Fins(Item):
     )
 
     size = models.CharField(_('Size'), max_length=2, choices=SIZE_CHOICES)
-    descriptio = 'Fins'
+
+    def clean(self):
+        self.description = "Fins"
 
     class Meta:
         verbose_name_plural = 'Fins'
@@ -117,6 +128,9 @@ class Regulator(Item):
     @property
     def next_service(self):
         return self.last_service + timedelta(weeks=54)
+
+    def clean(self):
+        self.description = "Regulator"
 
 class Weight(models.Model):
     total_weight = models.IntegerField(_('Total weight'))
@@ -150,3 +164,6 @@ class Wetsuit(Item):
     )
 
     size = models.CharField(_('Size'), max_length=2, choices=SIZE_CHOICES)
+
+    def clean(self):
+        self.description = "Wetsuit"
