@@ -18,7 +18,21 @@ from django.db import models
 from bubbles.inventory.models import *
 from django.utils.translation import gettext_lazy as _
 
+class RentalPeriod(models.Model):
+    start_date = models.DateField(_('Start date'))
+    period = models.DurationField(_('Rental duration'))
+    default_deposit = models.IntegerField(_('Deposit'))
+    default_cost_per_item = models.IntegerField(_('Cost per item'))
+
 class Rental(models.Model):
+    REQUESTED = 'REQ'
+    RENTED = 'REN'
+    RETURNED = 'RET'
+    STATE_CHOICES = (
+        (REQUESTED, _('Requested')),
+        (RENTED, _('Rented')),
+        (RETURNED, _('Returned')),
+    )
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
     approved_by = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -26,11 +40,14 @@ class Rental(models.Model):
                                     limit_choices_to={'is_staff': True},
                                     related_name='approved_rentals_set',
                                     null=True, blank=True)
-    start_date = models.DateField(_('Start date'))
-    period = models.DurationField(_('Rental duration'))
+    state = models.CharField(_('State'),
+                             max_length=3,
+                             choices=STATE_CHOICES,
+                             default=REQUESTED)
     deposit = models.IntegerField(_('Deposit'))
     notes = models.TextField(_('Notes'), null=True, blank=True)
     deposit_returned = models.BooleanField(_('Deposit returned'), default=True)
+    rental_period = models.ForeignKey(RentalPeriod, on_delete=models.CASCADE)
 
     def get_end_date(self):
         return self.start_date + self.period
