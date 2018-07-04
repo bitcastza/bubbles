@@ -60,8 +60,8 @@ class CylinderAdmin(admin.ModelAdmin):
 class RegulatorAdmin(admin.ModelAdmin):
     list_display = ('number',
                     'manufacturer',
-                   'next_service',
-                   'state')
+                    'next_service',
+                    'state')
     list_filter = ('state', 'manufacturer')
     exclude = ['description']
 
