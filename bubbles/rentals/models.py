@@ -30,8 +30,8 @@ class RentalPeriod(models.Model):
 
     def __str__(self):
         end_date = self.end_date;
-        return "{} - {}".format(self.start_date.strftime("%Y/%m/%d"),
-                                end_date.strftime("%Y/%m/%d"))
+        return "{} - {}".format(self.start_date,
+                                end_date)
 
 class Rental(models.Model):
     REQUESTED = 'REQ'
