@@ -31,6 +31,9 @@ Including another URLconf
 from django.urls import path
 from . import views
 
+app_name = 'rentals'
+
 urlpatterns = [
-    path('', views.index, name='index')
+    path('', views.index, name='index'),
+    path('request/', views.request_equipment, name='request_equipment')
 ]

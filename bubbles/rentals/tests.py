@@ -36,7 +36,7 @@ class RentalTests(TestCase):
 class IndexViewTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.path = reverse('index')
+        cls.path = reverse('rentals:index')
         cls.factory = RequestFactory()
         cls.request = cls.factory.get(cls.path)
         cls.user = User.objects.create_user(username='jacob')
@@ -46,13 +46,26 @@ class IndexViewTests(TestCase):
         response = index(self.request)
         self.assertEqual(response.status_code, 302)
 
-    def test_logged_in_rentals(self):
+    def test_logged_in_no_rentals(self):
         self.request.user = self.user
         
         response = index(self.request)
         self.assertNotContains(response, "rental-table")
 
-    def test_logged_in_no_rentals(self):
+    def test_admin_rent(self):
+        user = User.objects.create_user(username='admin', is_staff=True)
+        self.request.user = user
+        
+        response = index(self.request)
+        self.assertContains(response, "Rent Equipment")
+
+    def test_user_rent(self):
+        self.request.user = self.user
+        
+        response = index(self.request)
+        self.assertContains(response, "Request Equipment")
+
+    def test_logged_in_rentals(self):
         self.request.user = self.user
         start_date = datetime.date(year=2018, month=7, day=2)
         duration = datetime.timedelta(days=5)

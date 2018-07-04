@@ -1,0 +1,58 @@
+{% extends "bubbles/base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<script src="{% static 'js/equipment_request_table.js' %}"></script>
+{% endblock %}
+{% block title %}Request Equipment{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-sm-6">
+    <form action="#">
+      <div class="form-group">
+        <table class="table table-striped table-responsive" id="request-table">
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">Size</th>
+              <th scope="col">Remove</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        <div class="dropdown">
+          <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-plus"></span>
+            Add Item
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" id="add-dropdown">
+            {% for type in item_types %}
+            <li id="{{ type.description }}"><a href="#">{{ type.description }}</a></li>
+            {% endfor %}
+          </ul>
+        </div> 
+      </div>
+      <div class="form-group">
+        <button class="btn btn-primary" id="submit-btn" type="submit">Submit</button>
+      </div>
+    </form>
+    <div class="hidden" id="size-options">
+      {% for item, sizes in item_size_map.items %}
+      <div id="{{ item }}">
+        {% if sizes|length == 0 %}
+        {% else %}
+        <ul class="sizes">
+        {% for size in sizes %}
+        <li>{{ size }}</li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

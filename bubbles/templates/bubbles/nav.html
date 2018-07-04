@@ -7,6 +7,12 @@
     {% endblock %}
     {% block navuser %}
     <ul class="nav navbar-nav navbar-right">
+      {% if user.is_authenticated %}
+      <li>
+        <a href="{% url 'rentals:request_equipment' %}">
+          <span class="glyphicon glyphicon-plus"></span> {% if user.is_staff %}Rent{% else %}Request{% endif %} Equipment</a>
+      </li>
+      {% endif %}
       {% if user.is_staff %}
       <li>
         <a href="{% url 'admin:index' %}">

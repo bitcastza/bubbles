@@ -14,9 +14,11 @@
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.core.exceptions import FieldDoesNotExist
 from django.shortcuts import render
+from django.utils.translation import gettext_lazy as _
 
+from bubbles.inventory.models import Item, BCD, Booties, Fins, Wetsuit
 from .models import Rental
 
 @login_required
@@ -26,3 +28,23 @@ def index(request):
     if (len(rental_set) != 0):
         context['rentals'] = rental_set
     return render(request, 'rentals/index.html', context)
+
+def get_sizes(item_type):
+    sizes_set = item_type.objects.values('size').distinct()
+    sizes = [i['size'] for i in sizes_set]
+    return sizes
+
+@login_required
+def request_equipment(request):
+    item_types = Item.objects.values('description').distinct()
+    item_size_map = {}
+    item_size_map['BCD'] = get_sizes(BCD)
+    item_size_map['Booties'] = get_sizes(Booties)
+    item_size_map['Fins'] = get_sizes(Fins)
+    item_size_map['Wetsuit'] = get_sizes(Wetsuit)
+    context = {
+        'item_types': item_types,
+        'item_size_map': item_size_map,
+    }
+    return render(request, 'rentals/request_equipment.html', context)
+

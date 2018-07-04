@@ -5,7 +5,7 @@
   {% if rentals %}
   <div class="col-sm-6">
     <h1>My Rentals</h1>
-    <table class="table" id="rental-table">
+    <table class="table table-striped table-responsive" id="rental-table">
       <thead>
         <tr>
           <th scope="col">Item</th>
@@ -25,5 +25,8 @@
     </table>
   </div>
   {% endif %}
+  <div class="col-sm-6">
+    <iframe width="650" height="450" src="https://embed.windy.com/embed2.html?lat=-34.247&lon=18.532&zoom=11&level=surface&overlay=waves&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=true&detailLat=-34.186&detailLon=18.443&metricWind=default&metricTemp=default&radarRange=-1" frameborder="0"></iframe> 
+  </div>
 </div>
 {% endblock %}
