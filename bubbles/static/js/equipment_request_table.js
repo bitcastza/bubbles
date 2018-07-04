@@ -25,7 +25,7 @@ $(document).ready(function() {
   }
   $('#add-dropdown li').on('click', function() {
     currentItem = this;
-    var sizeOptions;
+    var sizeOptions = "N/A";
     $('#size-options').children('div').each(function() {
       if (this.id != $(currentItem).text()) {
         return;
