@@ -41,7 +41,6 @@
 </div>
 {% endif %}
 {% block search %}{% search_form cl %}{% endblock %}
-{% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
 
 <div class="row">
   <div class="col-sm-8">
@@ -58,6 +57,8 @@
       {% block pagination %}{% pagination cl %}{% endblock %}
     </form>
   </div>
+
+  {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
 
   {% block filters %}
   {% if cl.has_filters %}
@@ -78,6 +79,8 @@
       {% endfor %}
     </div>
   </div>
+{% endif %}
+{% if cl.date_hierarchy or cl.has_filters %}
 </div>
 {% endif %}
 {% endblock %}
