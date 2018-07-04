@@ -19,19 +19,18 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
-from .models import Rental
+from .models import Rental, RentalPeriod
 from .views import index
 
-class RentalTests(TestCase):
+class RentalPeriodTests(TestCase):
     def test_get_due_date(self):
-        renter = User.objects.create(username='test')
         start_date = datetime.date(year=2018, month=7, day=2)
         duration = datetime.timedelta(days=5)
-        rental = Rental.objects.create(user=renter,
-                                       start_date=start_date,
-                                       period=duration,
-                                       deposit=0)
-        self.assertEqual(rental.get_end_date(), start_date + duration)
+        rental_period = RentalPeriod.objects.create(start_date=start_date,
+                                                   period=duration,
+                                                   default_deposit=0, 
+                                                   default_cost_per_item=0)
+        self.assertEqual(rental_period.end_date, start_date + duration)
 
 class IndexViewTests(TestCase):
     @classmethod
@@ -69,9 +68,14 @@ class IndexViewTests(TestCase):
         self.request.user = self.user
         start_date = datetime.date(year=2018, month=7, day=2)
         duration = datetime.timedelta(days=5)
+        rental_period = RentalPeriod.objects.create(start_date=start_date,
+                                                    period=duration,
+                                                    default_deposit=0,
+                                                    default_cost_per_item=0)
         rental = Rental.objects.create(user=self.user,
-                                       start_date=start_date,
-                                       period=duration,
+                                       approved_by=self.user,
+                                       state=Rental.REQUESTED,
+                                       rental_period=rental_period,
                                        deposit=0)
         response = index(self.request)
         self.assertContains(response, "rental-table")

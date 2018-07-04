@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
+from datetime import timedelta
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -34,10 +36,10 @@ class Item(models.Model):
     manufacturer = models.CharField(_('Manufacturer'), max_length=255)
     date_of_purchase = models.DateField(_('Date of purchase'))
     state = models.CharField(_('State'), max_length=1, choices=STATE_CHOICES, default=STATE_CHOICES[0])
-    description = models.CharField(_('Description'), max_length=255)
+    description = models.CharField(_('Type'), max_length=255)
 
     def __str__(self):
-        return '{} {} - {} ({})'.format(self.description, self.number, self.manufacturer, self.date_of_purchase)
+        return '{} {} ({})'.format(self.manufacturer, self.description, self.number)
 
 class BCD(Item):
     SMALL = 'S'
@@ -53,6 +55,10 @@ class BCD(Item):
 
     last_service = models.DateField(_('Last service'))
     size = models.CharField(_('Size'), max_length=2, choices=SIZE_CHOICES)
+
+    @property
+    def next_service(self):
+        return self.last_service + timedelta(weeks=54)
 
     class Meta:
         verbose_name = 'BCD'
@@ -80,8 +86,12 @@ class Cylinder(Item):
     capacity = models.DecimalField(_('Capacity'), max_digits=4, decimal_places=2)
     last_viz = models.DateField(_('Last visual inspection'))
     last_hydro = models.DateField(_('Last hydro-static inspection'))
-    viz_period = models.IntegerField(_('Visual inspection validity period'), default=1)
-    hydro_period = models.IntegerField(_('Hydro-static test validity period'), default=2)
+    viz_period = models.DurationField(_('Visual inspection validity period'), default=1)
+    hydro_period = models.DurationField(_('Hydro-static test validity period'), default=2)
+
+    @property
+    def next_service(self):
+        return self.last_viz + self.viz_period
 
 class Fins(Item):
     SMALL = 'S'
@@ -103,6 +113,10 @@ class Fins(Item):
 
 class Regulator(Item):
     last_service = models.DateField(_('Last service'))
+
+    @property
+    def next_service(self):
+        return self.last_service + timedelta(weeks=54)
 
 class Weight(models.Model):
     total_weight = models.IntegerField(_('Total weight'))

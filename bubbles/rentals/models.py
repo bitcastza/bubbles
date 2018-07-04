@@ -24,6 +24,15 @@ class RentalPeriod(models.Model):
     default_deposit = models.IntegerField(_('Deposit'))
     default_cost_per_item = models.IntegerField(_('Cost per item'))
 
+    @property
+    def end_date(self):
+        return self.start_date + self.period
+
+    def __str__(self):
+        end_date = self.end_date;
+        return "{} - {}".format(self.start_date.strftime("%Y/%m/%d"),
+                                end_date.strftime("%Y/%m/%d"))
+
 class Rental(models.Model):
     REQUESTED = 'REQ'
     RENTED = 'REN'
@@ -49,10 +58,13 @@ class Rental(models.Model):
     deposit_returned = models.BooleanField(_('Deposit returned'), default=True)
     rental_period = models.ForeignKey(RentalPeriod, on_delete=models.CASCADE)
 
-    def get_end_date(self):
-        return self.start_date + self.period
+    def __str__(self):
+        return "Rental by {} for {}".format(self.user, self.rental_period)
 
 class RentalItem(models.Model):
     rental = models.ForeignKey(Rental, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     cost = models.IntegerField(_('Cost'), default=0)
+
+    def __str__(self):
+        return "{} to {}".format(self.item, self.rental.user)

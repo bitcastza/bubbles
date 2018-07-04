@@ -13,16 +13,56 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
+from django.contrib import admin
+from django.db.models import Q
 from bubbles.admin import admin_site
 
 from . import models
 
-admin_site.register(models.Item)
-admin_site.register(models.BCD)
-admin_site.register(models.Booties)
-admin_site.register(models.Cylinder)
-admin_site.register(models.Fins)
-admin_site.register(models.Regulator)
+@admin.register(models.Item, site=admin_site)
+class ItemAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        q_filter = ~Q(description__exact='BCD') & \
+                ~Q(description__exact='Booties') & \
+                ~Q(description__exact='Cylinder') & \
+                ~Q(description__exact='Fins') & \
+                ~Q(description__exact='Regulator') & \
+                ~Q(description__exact='Wetsuit')
+        qs = super().get_queryset(request)
+        return qs.filter(q_filter)
+
+    list_display = ('description', 'number', 'manufacturer', 'state')
+    list_filter = ('state', 'description')
+    list_display_links = ('number',)
+
+class SizeAdmin(admin.ModelAdmin):
+    list_display = ('number', 'manufacturer', 'size', 'state')
+    list_filter = ('state', 'size', 'manufacturer')
+
+@admin.register(models.BCD, site=admin_site)
+class BCDAdmin(SizeAdmin):
+    list_display = ('number', 'manufacturer', 'size', 'next_service', 'state')
+
+@admin.register(models.Cylinder, site=admin_site)
+class CylinderAdmin(admin.ModelAdmin):
+    list_display = ('number',
+                    'manufacturer',
+                    'serial_num',
+                    'capacity',
+                    'last_viz',
+                    'state',)
+    list_filter = ('state', 'manufacturer', 'capacity')
+
+@admin.register(models.Regulator, site=admin_site)
+class RegulatorAdmin(admin.ModelAdmin):
+    list_display = ('number',
+                    'manufacturer',
+                   'next_service',
+                   'state')
+    list_filter = ('state', 'manufacturer')
+
+admin_site.register(models.Booties, SizeAdmin)
+admin_site.register(models.Fins, SizeAdmin)
 admin_site.register(models.Weight)
 admin_site.register(models.WeightBelt)
-admin_site.register(models.Wetsuit)
+admin_site.register(models.Wetsuit, SizeAdmin)
