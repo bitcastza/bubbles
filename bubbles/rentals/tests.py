@@ -20,7 +20,7 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
 from .models import Rental, RentalPeriod
-from .views import index
+from .views import index, rent_equipment
 
 class RentalPeriodTests(TestCase):
     def test_get_due_date(self):
@@ -79,3 +79,23 @@ class IndexViewTests(TestCase):
                                        deposit=0)
         response = index(self.request)
         self.assertContains(response, "rental-table")
+
+class RentEquipmentViewTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.path = reverse('rentals:request_equipment')
+        cls.factory = RequestFactory()
+        cls.request = cls.factory.get(cls.path)
+        cls.user = User.objects.create_user(username='jacob', is_staff=True)
+
+    def test_not_logged_in(self):
+        self.request.user = AnonymousUser()
+        response = rent_equipment(self.request)
+        self.assertEqual(response.status_code, 302)
+
+    def test_logged_in_not_staff(self):
+        user = User.objects.create_user(username='test')
+        self.request.user = user
+        
+        response = rent_equipment(self.request)
+        self.assertEqual(response.status_code, 302)

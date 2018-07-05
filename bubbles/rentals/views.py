@@ -15,7 +15,7 @@
 ###########################################################################
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import FieldDoesNotExist
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.translation import gettext_lazy as _
 
 from bubbles.inventory.models import Item, BCD, Booties, Cylinder, Fins, Wetsuit
@@ -47,5 +47,14 @@ def request_equipment(request):
         'item_types': item_types,
         'item_size_map': item_size_map,
     }
+    return render(request, 'rentals/request_equipment.html', context)
+
+@login_required
+def rent_equipment(request, rental_request=None):
+    if not request.user.is_staff:
+        return redirect('rentals:request_equipment')
+    context = {}
+    if (rental_request):
+        context['rental'] = Rental.objects.get(id=rental_request)
     return render(request, 'rentals/request_equipment.html', context)
 

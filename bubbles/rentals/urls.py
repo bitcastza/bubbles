@@ -35,5 +35,7 @@ app_name = 'rentals'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('request/', views.request_equipment, name='request_equipment')
+    path('request/', views.request_equipment, name='request_equipment'),
+    path('rent/', views.rent_equipment, name='rent_equipment'),
+    path('rent/<int:rental_request>/', views.rent_equipment, name='rent_equipment'),
 ]
