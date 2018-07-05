@@ -20,6 +20,10 @@ from django.contrib.auth.admin import GroupAdmin, UserAdmin
 
 from bubbles.rentals.models import Rental
 
+def get_next_service_set(item_type):
+    current_date = datetime.timezone.now()
+    return item_type.objects.filter(next_service__before=current_date)
+
 class BubblesAdminSite(admin.AdminSite):
     index_title = None
     index_template = 'admin/bubbles/index.html'
@@ -33,8 +37,12 @@ class BubblesAdminSite(admin.AdminSite):
         extra_context = extra_context or {}
         rental_requests = Rental.objects.filter(state__exact=Rental.REQUESTED)
         rental_returns = Rental.objects.filter(state__exact=Rental.RENTED)
+        bcd_service_set = get_next_service_set(BCD)
+        cylinder_service_set = get_next_service_set(Cylinder)
+        regulator_service_set = get_next_service_set(Regulator)
         extra_context['rental_requests'] = rental_requests
         extra_context['rental_returns'] = rental_returns
+        context['need_servicing'] = regulator_service_set
         return super(BubblesAdminSite, self).index(request, extra_context=extra_context)
 
     def each_context(self, request):

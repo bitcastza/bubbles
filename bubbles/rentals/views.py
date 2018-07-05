@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
+import datetime
+
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import FieldDoesNotExist
 from django.shortcuts import render, redirect
@@ -21,9 +23,11 @@ from django.utils.translation import gettext_lazy as _
 from bubbles.inventory.models import Item, BCD, Booties, Cylinder, Fins, Wetsuit
 from .models import Rental
 
+
 @login_required
 def index(request):
     rental_set = Rental.objects.filter(user=request.user)
+
     context = {}
     if (len(rental_set) != 0):
         context['rentals'] = rental_set

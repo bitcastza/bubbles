@@ -25,6 +25,31 @@
   {% endif %}
 </div>
 {% endif %}
+{% if need_servicing %}
+<div class="row">
+  <div class="col-sm-12">
+    <table>
+      <caption><h2>Equipment Needing Service</h2></caption>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Number</th>
+          <th>Last Serviced</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in need_servicing %}
+        <tr>
+          <td>{{ item.description }}</td>
+          <td>{{ item.number }}</td>
+          <td>{{ item.last_service }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
 {% if app_list %}
 {% for app in app_list %}
 {% if forloop.counter0|divisibleby:2 %}
