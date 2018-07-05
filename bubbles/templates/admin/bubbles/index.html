@@ -1,6 +1,30 @@
 {% extends "admin/bubbles/admin_base.html" %}
 
 {% block content %}
+{% if rental_requests or rental_returns %}
+<div class="row">
+  {% if rental_requests %}
+  <div class="col-sm-6">
+    <h1>Rental Queue</h1>
+    <ul class="list-group">
+      {% for rental in rental_requests %}
+      <li class="list-group-item">{{ rental.user }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  {% if rental_returns %}
+  <div class="col-sm-6">
+    <h1>Rental Returns</h1>
+    <ul class="list-group">
+      {% for rental in rental_returns %}
+      <li class="list-group-item">{{ rental.user }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
 {% if app_list %}
 {% for app in app_list %}
 {% if forloop.counter0|divisibleby:2 %}

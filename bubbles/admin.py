@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 
+from bubbles.rentals.models import Rental
+
 class BubblesAdminSite(admin.AdminSite):
     index_title = None
     index_template = 'admin/bubbles/index.html'
@@ -29,6 +31,10 @@ class BubblesAdminSite(admin.AdminSite):
         apps that have been registered in this site.
         """
         extra_context = extra_context or {}
+        rental_requests = Rental.objects.filter(state__exact=Rental.REQUESTED)
+        rental_returns = Rental.objects.filter(state__exact=Rental.RENTED)
+        extra_context['rental_requests'] = rental_requests
+        extra_context['rental_returns'] = rental_returns
         return super(BubblesAdminSite, self).index(request, extra_context=extra_context)
 
     def each_context(self, request):
