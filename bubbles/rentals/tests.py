@@ -22,16 +22,6 @@ from django.urls import reverse
 from .models import Rental, RentalPeriod
 from .views import index, rent_equipment
 
-class RentalPeriodTests(TestCase):
-    def test_get_due_date(self):
-        start_date = datetime.date(year=2018, month=7, day=2)
-        duration = datetime.timedelta(days=5)
-        rental_period = RentalPeriod.objects.create(start_date=start_date,
-                                                   period=duration,
-                                                   default_deposit=0, 
-                                                   default_cost_per_item=0)
-        self.assertEqual(rental_period.end_date, start_date + duration)
-
 class IndexViewTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -67,9 +57,9 @@ class IndexViewTests(TestCase):
     def test_logged_in_rentals(self):
         self.request.user = self.user
         start_date = datetime.date(year=2018, month=7, day=2)
-        duration = datetime.timedelta(days=5)
+        end_date = start_date + datetime.timedelta(days=5)
         rental_period = RentalPeriod.objects.create(start_date=start_date,
-                                                    period=duration,
+                                                    end_date=end_date,
                                                     default_deposit=0,
                                                     default_cost_per_item=0)
         rental = Rental.objects.create(user=self.user,

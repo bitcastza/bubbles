@@ -20,18 +20,13 @@ from django.utils.translation import gettext_lazy as _
 
 class RentalPeriod(models.Model):
     start_date = models.DateField(_('Start date'))
-    period = models.DurationField(_('Rental duration'))
+    end_date = models.DateField(_('End date'))
     default_deposit = models.IntegerField(_('Deposit'))
     default_cost_per_item = models.IntegerField(_('Cost per item'))
 
-    @property
-    def end_date(self):
-        return self.start_date + self.period
-
     def __str__(self):
-        end_date = self.end_date;
         return "{} - {}".format(self.start_date,
-                                end_date)
+                                self.end_date)
 
 class Rental(models.Model):
     REQUESTED = 'REQ'
