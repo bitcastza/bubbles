@@ -60,5 +60,5 @@ def rent_equipment(request, rental_request=None):
     context = {}
     if (rental_request):
         context['rental'] = Rental.objects.get(id=rental_request)
-    return render(request, 'rentals/request_equipment.html', context)
+    return render(request, 'rentals/rent_equipment.html', context)
 

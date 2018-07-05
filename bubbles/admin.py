@@ -13,16 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
+import datetime
 
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 
+from bubbles.inventory.models import BCD, Cylinder, Regulator
 from bubbles.rentals.models import Rental
 
 def get_next_service_set(item_type):
-    current_date = datetime.timezone.now()
-    return item_type.objects.filter(next_service__before=current_date)
+    current_date = datetime.date.today()
+    items = [x for x in item_type.objects.all() if x.next_service < current_date]
+    return items
 
 class BubblesAdminSite(admin.AdminSite):
     index_title = None
@@ -42,7 +45,8 @@ class BubblesAdminSite(admin.AdminSite):
         regulator_service_set = get_next_service_set(Regulator)
         extra_context['rental_requests'] = rental_requests
         extra_context['rental_returns'] = rental_returns
-        context['need_servicing'] = regulator_service_set
+        # TODO: combine lists
+        extra_context['need_servicing'] = bcd_service_set
         return super(BubblesAdminSite, self).index(request, extra_context=extra_context)
 
     def each_context(self, request):

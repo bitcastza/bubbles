@@ -9,8 +9,13 @@
     <ul class="nav navbar-nav navbar-right">
       {% if user.is_authenticated %}
       <li>
+        {% if user.is_staff %}
+        <a href="{% url 'rentals:rent_equipment' %}">
+          <span class="glyphicon glyphicon-plus"></span> Rent Equipment</a>
+        {% else %}
         <a href="{% url 'rentals:request_equipment' %}">
-          <span class="glyphicon glyphicon-plus"></span> {% if user.is_staff %}Rent{% else %}Request{% endif %} Equipment</a>
+          <span class="glyphicon glyphicon-plus"></span> Request Equipment</a>
+        {% endif %}
       </li>
       {% endif %}
       {% if user.is_staff %}
