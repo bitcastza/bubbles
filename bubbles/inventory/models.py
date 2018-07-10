@@ -32,7 +32,17 @@ class Item(models.Model):
         (CONDEMNED, _('Condemned')),
     )
 
-    number = models.CharField(_('Number'), max_length=5)
+    def get_next_number():
+        results = Item.objects.all().order_by('-number')
+        for result in results:
+            try:
+                current_number = int(result.number)
+                return current_number + 1
+            except:
+                pass
+        return None
+
+    number = models.CharField(_('Number'), max_length=5, default=get_next_number)
     manufacturer = models.CharField(_('Manufacturer'), max_length=255)
     date_of_purchase = models.DateField(_('Date of purchase'))
     state = models.CharField(_('State'), max_length=1, choices=STATE_CHOICES, default=STATE_CHOICES[0])
@@ -58,7 +68,7 @@ class BCD(Item):
 
     @property
     def next_service(self):
-        return self.last_service + timedelta(weeks=54)
+        return self.last_service + timedelta(weeks=52)
 
     def clean(self):
         self.description = "BCD"
@@ -127,7 +137,7 @@ class Regulator(Item):
 
     @property
     def next_service(self):
-        return self.last_service + timedelta(weeks=54)
+        return self.last_service + timedelta(weeks=52)
 
     def clean(self):
         self.description = "Regulator"
