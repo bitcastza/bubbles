@@ -19,6 +19,9 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 class Item(models.Model):
+    """
+    Represents an item of equipment
+    """
     AVAILABLE = 'A'
     IN_USE = 'U'
     BROKEN = 'B'
@@ -33,6 +36,12 @@ class Item(models.Model):
     )
 
     def get_next_number():
+        """
+        Calculates the next number for an item
+
+        :returns: a number if one can be calculated or None if there are no
+                  numbers for the item type.
+        """
         results = Item.objects.all().order_by('-number')
         for result in results:
             try:
