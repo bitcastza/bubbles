@@ -14,10 +14,23 @@
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
 from django.contrib import admin
-from django.db.models import Q
+from django.db.models import DateField, DecimalField, DurationField, CharField, IntegerField, Q, TextField
+from django.forms import DateInput, NumberInput, TextInput
+
 from bubbles.admin import admin_site
 
 from . import models
+
+INVENTORY_FORMFIELD_OVERRIDES = {
+    DateField: {'widget': DateInput(attrs={'class': 'date-input form-control'})},
+    IntegerField: {
+        'widget': NumberInput(attrs={'class': 'vIntegerField form-control'})
+    },
+    DurationField: {'widget': TextInput(attrs={'class': 'form-control'})},
+    TextField: {'widget': TextInput(attrs={'class': 'vTextField form-control'})},
+    CharField: {'widget': TextInput(attrs={'class': 'vTextField form-control'})},
+    DecimalField: {'widget': NumberInput(attrs={'class': 'form-control'})},
+}
 
 @admin.register(models.Item, site=admin_site)
 class ItemAdmin(admin.ModelAdmin):
@@ -34,16 +47,19 @@ class ItemAdmin(admin.ModelAdmin):
     list_display = ('description', 'number', 'manufacturer', 'state')
     list_filter = ('state', 'description')
     list_display_links = ('number',)
+    formfield_overrides = INVENTORY_FORMFIELD_OVERRIDES
 
 class SizeAdmin(admin.ModelAdmin):
     list_display = ('number', 'manufacturer', 'size', 'state')
     list_filter = ('state', 'size', 'manufacturer')
     exclude = ['description']
+    formfield_overrides = INVENTORY_FORMFIELD_OVERRIDES
 
 @admin.register(models.BCD, site=admin_site)
 class BCDAdmin(SizeAdmin):
     list_display = ('number', 'manufacturer', 'size', 'next_service', 'state')
     exclude = ['description']
+    formfield_overrides = INVENTORY_FORMFIELD_OVERRIDES
 
 @admin.register(models.Cylinder, site=admin_site)
 class CylinderAdmin(admin.ModelAdmin):
@@ -55,6 +71,7 @@ class CylinderAdmin(admin.ModelAdmin):
                     'state',)
     list_filter = ('state', 'manufacturer', 'capacity')
     exclude = ['description']
+    formfield_overrides = INVENTORY_FORMFIELD_OVERRIDES
 
 @admin.register(models.Regulator, site=admin_site)
 class RegulatorAdmin(admin.ModelAdmin):
@@ -64,6 +81,7 @@ class RegulatorAdmin(admin.ModelAdmin):
                     'state')
     list_filter = ('state', 'manufacturer')
     exclude = ['description']
+    formfield_overrides = INVENTORY_FORMFIELD_OVERRIDES
 
 admin_site.register(models.Booties, SizeAdmin)
 admin_site.register(models.Fins, SizeAdmin)
