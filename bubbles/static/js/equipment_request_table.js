@@ -49,7 +49,7 @@ $(document).ready(function() {
       sizeOptions +
       '</div>' +
       '<td class="item-entry">' +
-      '<a href="#"><i class="glyphicon glyphicon-remove item-remove"></i></a>'+
+      '<a href="#"><i class="glyphicon glyphicon-remove item-remove"></i></a>' +
       '</td>' +
       '</tr>');
     $('#submit-btn').show()

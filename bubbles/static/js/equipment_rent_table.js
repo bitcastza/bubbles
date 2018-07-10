@@ -19,10 +19,22 @@ function isItems() {
   return numItems > 0;
 }
 
+function addItemRemoveListener() {
+  $('.item-remove').on('click', function() {
+    var enableType = $('td:first-child', $(this).parents('tr')).text();
+    $('#' + enableType).show();
+    $(this).parents('tr').remove();
+    if (!isItems()) {
+      $('#submit-btn').hide();
+    }
+  });
+}
+
 $(document).ready(function() {
   if (!isItems()) {
     $('#submit-btn').hide();
   }
+  addItemRemoveListener();
   $('#add-dropdown li').on('click', function() {
     currentItem = this;
     var sizeOptions = "N/A";
@@ -50,7 +62,8 @@ $(document).ready(function() {
       '</div>' +
       '<td>' +
       '<div class="form-group">' +
-      '<input type="text" class="form-control" name="{{ item.description }}-number" value="{{ item.number }}" id="{{item.descriptio }}-number"/>' +
+      '<input type="text" class="form-control" name="' + $(this).text() +
+      '-number" id="' + $(this).text() + '-number"/>' +
       '</div>' +
       '</td>' +
       '<td class="item-entry">' +
@@ -59,13 +72,6 @@ $(document).ready(function() {
       '</tr>');
     $('#submit-btn').show()
     $('#' + $(this).text()).hide();
-    $('.item-remove').on('click', function() {
-      var enableType = $('td:first-child', $(this).parents('tr')).text();
-      $('#' + enableType).show();
-      $(this).parents('tr').remove();
-      if (!isItems()) {
-        $('#submit-btn').hide();
-      }
-    });
+    addItemRemoveListener();
   });
 });
