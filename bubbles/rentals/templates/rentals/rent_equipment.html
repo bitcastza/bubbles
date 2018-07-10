@@ -22,17 +22,21 @@
           </thead>
           <tbody>
             {% if rental %}
-            {% for item in rental.rentalitem_set %}
+            {% for rental_item in rental.rentalitem_set.all %}
             <tr>
-              <td>{{ item.description }}</td>
-              <td>{{ item.size }}</td>
+              <td>{{ rental_item.item.description }}</td>
+              <td>{{ rental_item.item.size }}</td>
               <td>
                 <div class="form-group">
-                  <input type="text" class="form-control" name="{{ item.description }}-number" value="{{ item.number }}" id="{{item.descriptio }}-number"/>
+                  <input type="text" class="form-control" name="{{ item.description }}-number" value="{{ item.number }}" id="{{item.description }}-number"/>
                 </div>
               </td>
-              {% endfor %}
-              {% endif %}
+              <td class="item-entry">
+                <a href="#"><i class="glyphicon glyphicon-remove item-remove"></i></a>
+              </td>
+            </tr>
+            {% endfor %}
+            {% endif %}
           </tbody>
         </table>
         <div class="dropdown">
