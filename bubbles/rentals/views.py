@@ -38,15 +38,19 @@ def get_sizes(item_type, size_tag='size'):
     sizes = [i[size_tag] for i in sizes_set]
     return sizes
 
-@login_required
-def request_equipment(request):
-    item_types = Item.objects.filter(state__exact=Item.AVAILABLE).values('description').distinct()
+def get_item_size_map():
     item_size_map = {}
     item_size_map['BCD'] = get_sizes(BCD)
     item_size_map['Booties'] = get_sizes(Booties)
     item_size_map['Cylinder'] = get_sizes(Cylinder, 'capacity')
     item_size_map['Fins'] = get_sizes(Fins)
     item_size_map['Wetsuit'] = get_sizes(Wetsuit)
+    return item_size_map
+
+@login_required
+def request_equipment(request):
+    item_types = Item.objects.filter(state__exact=Item.AVAILABLE).values('description').distinct()
+    item_size_map = get_item_size_map()
     context = {
         'item_types': item_types,
         'item_size_map': item_size_map,
@@ -57,8 +61,12 @@ def request_equipment(request):
 def rent_equipment(request, rental_request=None):
     if not request.user.is_staff:
         return redirect('rentals:request_equipment')
-    context = {}
+    item_size_map = get_item_size_map()
+    item_types = Item.objects.filter(state__exact=Item.AVAILABLE).values('description').distinct()
+    context = {
+        'item_size_map': item_size_map,
+        'item_types': item_types,
+    }
     if (rental_request):
         context['rental'] = Rental.objects.get(id=rental_request)
     return render(request, 'rentals/rent_equipment.html', context)
-
