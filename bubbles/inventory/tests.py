@@ -33,10 +33,11 @@ class BCDTests(TestCase):
         self.assertEqual(bcd.next_service, next_service)
 
 class CylinderTests(TestCase):
-    def test_next_service(self):
+    @classmethod
+    def setUpTestData(cls):
         last_viz = datetime.date(year=2018, month=7, day=2)
-        next_service = datetime.date(year=2019, month=7, day=1)
-        cylinder = Cylinder.objects.create(number='1',
+        cls.next_service = datetime.date(year=2019, month=7, day=1)
+        cls.cylinder = Cylinder.objects.create(number='1',
                                  manufacturer='test',
                                  date_of_purchase=last_viz,
                                  state=Item.AVAILABLE,
@@ -45,11 +46,31 @@ class CylinderTests(TestCase):
                                  material='steel',
                                  capacity=12,
                                  last_viz=last_viz,
-                                 last_hydro=last_viz,
-                                 viz_period=datetime.timedelta(weeks=52),
-                                 hydro_period=datetime.timedelta(weeks=108))
+                                 last_hydro=last_viz)
 
-        self.assertEqual(cylinder.next_service, next_service)
+    def setUp(self):
+        self.cylinder.refresh_from_db()
+
+    def test_next_service_viz(self):
+        self.assertEqual(self.cylinder.next_service, self.next_service)
+
+    def test_next_service_hydro(self):
+        last_service = datetime.date(year=2018, month=8, day=1)
+        self.cylinder.last_hydro = last_service
+        self.cylinder.hydro_period = datetime.timedelta(weeks=1)
+
+        self.assertEqual(self.cylinder.next_service,
+                         last_service + self.cylinder.hydro_period)
+
+    def test_last_service_hydro(self):
+        last_service = datetime.date(year=2018, month=8, day=1)
+        self.cylinder.last_hydro = last_service
+        self.assertEqual(self.cylinder.last_service, last_service)
+
+    def test_last_service_viz(self):
+        last_service = datetime.date(year=2018, month=8, day=1)
+        self.cylinder.last_viz = last_service
+        self.assertEqual(self.cylinder.last_service, last_service)
 
 class BCDTests(TestCase):
     def test_next_service(self):

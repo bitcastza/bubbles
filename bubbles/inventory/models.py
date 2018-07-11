@@ -111,12 +111,16 @@ class Cylinder(Item):
     capacity = models.DecimalField(_('Capacity'), max_digits=4, decimal_places=2)
     last_viz = models.DateField(_('Last visual inspection'))
     last_hydro = models.DateField(_('Last hydro-static inspection'))
-    viz_period = models.DurationField(_('Visual inspection validity period'), default=1)
-    hydro_period = models.DurationField(_('Hydro-static test validity period'), default=2)
+    viz_period = models.DurationField(_('Visual inspection validity period'), default=timedelta(weeks=52))
+    hydro_period = models.DurationField(_('Hydro-static test validity period'), default=timedelta(weeks=104))
 
     @property
     def next_service(self):
-        return self.last_viz + self.viz_period
+        return min(self.last_viz + self.viz_period, self.last_hydro + self.hydro_period)
+
+    @property
+    def last_service(self):
+        return max(self.last_viz, self.last_hydro)
 
     def clean(self):
         self.description = "Cylinder"
