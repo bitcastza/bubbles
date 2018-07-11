@@ -1,0 +1,24 @@
+<tr>
+  <td>
+    <input type="text" class="form-control" name="{{ widget.rental_item.item.description }}" value="{{ widget.rental_item.item.description }}" id="{{ widget.rental_item.item.description }}-description" readonly/>
+  </td>
+  {% if widget.rental_item.item.size %}
+  <td>
+    <select class="form-control" id="{{ widget.rental_item.item.description }}-size" name="{{ widget.rental_item.item.description }}">
+      <option>{{ widget.rental_item.item.size }}</option>
+    </select>
+  </td>
+  {% else %}
+  <td>N/A</td>
+  {% endif %}
+  {% if widget.show_number %}
+  <td>
+    <div class="form-group">
+      <input type="text" class="form-control" name="{{ widget.rental_item.item.description }}" value="{{ widget.rental_item.item.number }}" id="{{widget.rental_item.item.description }}-number"/>
+    </div>
+  </td>
+  {% endif %}
+  <td class="item-entry">
+    <a href="#"><i class="glyphicon glyphicon-remove item-remove"></i></a>
+  </td>
+</tr>

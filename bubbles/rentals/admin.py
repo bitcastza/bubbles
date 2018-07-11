@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.forms import DateInput, NumberInput, TextInput
 from django.utils.translation import gettext_lazy as _
 
-from bubbles.admin import admin_site
+from bubbles.admin import admin_site, BUBBLES_FORMFIELD_OVERRIDES
 
 from . import models
 
@@ -33,6 +33,7 @@ class RentalAdmin(admin.ModelAdmin):
     list_display = ('user', 'start_date', 'end_date', 'state')
     date_hierarchy = 'rental_period__start_date'
     list_filter = ('state',)
+    formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
 
 @admin.register(models.RentalPeriod, site=admin_site)
 class RentalPeriodAdmin(admin.ModelAdmin):
@@ -47,13 +48,7 @@ class RentalPeriodAdmin(admin.ModelAdmin):
                     'deposit',
                     'cost_per_item')
     date_hierarchy = 'start_date'
-    formfield_overrides = {
-        DateField: {'widget': DateInput(attrs={'class': 'date-input form-control'})},
-        IntegerField: {
-            'widget': NumberInput(attrs={'class': 'vIntegerField form-control'})
-        },
-        DurationField: {'widget': TextInput(attrs={'class': 'form-control'})},
-    }
+    formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
 
 @admin.register(models.RentalItem, site=admin_site)
 class RentalItemAdmin(admin.ModelAdmin):

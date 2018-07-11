@@ -19,9 +19,11 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import FieldDoesNotExist
 from django.shortcuts import render, redirect
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
 from bubbles.inventory.models import Item, BCD, Booties, Cylinder, Fins, Wetsuit
 from .models import Rental
+from .forms import RequestEquipmentForm, RentEquipmentForm
 
 
 @login_required
@@ -49,24 +51,40 @@ def get_item_size_map():
 
 @login_required
 def request_equipment(request):
-    item_types = Item.objects.filter(state__exact=Item.AVAILABLE).values('description').distinct()
-    item_size_map = get_item_size_map()
+    if request.method == 'POST':
+        form = RequestEquipmentForm(request.POST)
+    else:
+        form = RequestEquipmentForm()
+
     context = {
-        'item_types': item_types,
-        'item_size_map': item_size_map,
+        'form': form,
+        'url': reverse('rentals:request_equipment'),
+        'title': _('Request Equipment'),
     }
-    return render(request, 'rentals/request_equipment.html', context)
+
+    return render(request, 'rentals/rent_equipment.html', context)
 
 @login_required
 def rent_equipment(request, rental_request=None):
     if not request.user.is_staff:
         return redirect('rentals:request_equipment')
-    item_size_map = get_item_size_map()
-    item_types = Item.objects.filter(state__exact=Item.AVAILABLE).values('description').distinct()
+
+    url = reverse('rentals:rent_equipment')
+    if request.method == 'POST':
+        form = RentEquipmentForm(request.POST)
+        url = reverse('rentals:rent_equipment', args=(rental_request,))
+    else:
+        if rental_request:
+            url = reverse('rentals:rent_equipment', args=(rental_request,))
+            rental = Rental.objects.get(id=rental_request)
+            form = RentEquipmentForm({'equipment': rental})
+        else:
+            form = RentEquipmentForm()
+
     context = {
-        'item_size_map': item_size_map,
-        'item_types': item_types,
+        'form': form,
+        'url': url,
+        'title': _('Rent Equipment'),
     }
-    if (rental_request):
-        context['rental'] = Rental.objects.get(id=rental_request)
+
     return render(request, 'rentals/rent_equipment.html', context)

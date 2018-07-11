@@ -18,9 +18,23 @@ import datetime
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
+from django.db.models import DateField, DecimalField, DurationField, CharField,  IntegerField, TextField
+from django.forms import NumberInput, TextInput
 
+from .forms import CalendarWidget
 from bubbles.inventory.models import BCD, Cylinder, Regulator
 from bubbles.rentals.models import Rental
+
+BUBBLES_FORMFIELD_OVERRIDES = {
+    DateField: {'widget': CalendarWidget},
+    IntegerField: {
+        'widget': NumberInput(attrs={'class': 'vIntegerField form-control'})
+    },
+    DurationField: {'widget': TextInput(attrs={'class': 'form-control'})},
+    TextField: {'widget': TextInput(attrs={'class': 'vTextField form-control'})},
+    CharField: {'widget': TextInput(attrs={'class': 'vTextField form-control'})},
+    DecimalField: {'widget': NumberInput(attrs={'class': 'form-control'})},
+}
 
 def get_next_service_set(item_type):
     current_date = datetime.date.today()
@@ -45,8 +59,7 @@ class BubblesAdminSite(admin.AdminSite):
         regulator_service_set = get_next_service_set(Regulator)
         extra_context['rental_requests'] = rental_requests
         extra_context['rental_returns'] = rental_returns
-        # TODO: combine lists
-        extra_context['need_servicing'] = bcd_service_set
+        extra_context['need_servicing'] = bcd_service_set + cylinder_service_set + regulator_service_set
         return super(BubblesAdminSite, self).index(request, extra_context=extra_context)
 
     def each_context(self, request):

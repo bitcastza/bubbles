@@ -37,20 +37,20 @@ class IndexViewTests(TestCase):
 
     def test_logged_in_no_rentals(self):
         self.request.user = self.user
-        
+
         response = index(self.request)
         self.assertNotContains(response, "rental-table")
 
     def test_admin_rent(self):
         user = User.objects.create_user(username='admin', is_staff=True)
         self.request.user = user
-        
+
         response = index(self.request)
         self.assertContains(response, "Rent Equipment")
 
     def test_user_rent(self):
         self.request.user = self.user
-        
+
         response = index(self.request)
         self.assertContains(response, "Request Equipment")
 
@@ -86,6 +86,6 @@ class RentEquipmentViewTests(TestCase):
     def test_logged_in_not_staff(self):
         user = User.objects.create_user(username='test')
         self.request.user = user
-        
+
         response = rent_equipment(self.request)
         self.assertEqual(response.status_code, 302)

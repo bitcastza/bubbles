@@ -2,10 +2,6 @@
 {% load i18n admin_urls static admin_modify %}
 
 {% block extra_head %}
-<link href="{% static 'vendor/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet" media="screen">
-<script src="{% static 'vendor/moment/min/moment.min.js' %}"></script>
-<script src="{% static 'vendor/bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js' %}"></script>
-<script src="{% static 'js/use_datetimepicker.js' %}"></script>
 {{ block.super }}
 {{ media }}
 {% endblock %}
