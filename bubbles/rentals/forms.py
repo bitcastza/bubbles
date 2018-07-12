@@ -38,7 +38,6 @@ def get_item_size_map():
 
 class EquipmentTableWidget(widgets.MultiWidget):
     template_name = 'rentals/widgets/equipment_table_widget.html'
-    # TODO: Add cost to item row
 
     def __init__(self, widgets=[], **kwargs):
         super().__init__(widgets, **kwargs)
