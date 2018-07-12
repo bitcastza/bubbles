@@ -73,6 +73,8 @@ def rent_equipment(request, rental_request=None):
     if request.method == 'POST':
         form = RentEquipmentForm(request.POST)
         url = reverse('rentals:rent_equipment', args=(rental_request,))
+        if form.is_valid():
+            print(form.cleaned_data['equipment'])
     else:
         if rental_request:
             url = reverse('rentals:rent_equipment', args=(rental_request,))

@@ -17,8 +17,10 @@ import sys
 
 from django import forms
 from django.forms import fields, widgets
+from django.utils.translation import gettext_lazy as _
 
 from bubbles.inventory.models import BCD, Booties, Cylinder, Fins, Wetsuit, Item
+from .models import RentalItem
 
 def get_sizes(item_type, size_tag='size'):
     sizes_set = item_type.objects.filter(state__exact=Item.AVAILABLE).values(size_tag).distinct()
@@ -36,6 +38,7 @@ def get_item_size_map():
 
 class EquipmentTableWidget(widgets.MultiWidget):
     template_name = 'rentals/widgets/equipment_table_widget.html'
+    # TODO: Add cost to item row
 
     def __init__(self, widgets=[], **kwargs):
         super().__init__(widgets, **kwargs)
@@ -48,34 +51,36 @@ class EquipmentTableWidget(widgets.MultiWidget):
         context['widget']['show_number'] = self.show_number
         return context
 
-    def decompress(self, value):
-        return value
-
     def value_from_datadict(self, data, files, names):
-        try: # python created with data
+        self.widgets = []
+        try:
+            # Python created with data
             rental = data['equipment']
             self.add_items(rental.rentalitem_set.all())
-        except KeyError: # Response with POST data
+        except KeyError:
+            # Response with POST data
             for key in data:
                 if 'csrf' in key:
                     continue
                 value = data.getlist(key)
-                for i in range(0, len(value), 2):
+                for i in range(0, len(value), 3):
                     description = value[i]
                     number = value[i + 1]
-                    item_type = getattr(sys.modules['bubbles.rentals.models'], description)
-                    item = item_type.objects.get(description=description, number=number)
-                    self.add_item(item)
-                
+                    cost = value[i + 2]
+                    self.add_item(description, number, cost)
         return super().value_from_datadict(data, files, names)
 
-    def add_item(self, item):
-        widget = EquipmentRowWidget(item, show_number=self.show_number)
+    def add_item(self, item_description, item_number, item_cost=0):
+        widget = EquipmentRowWidget(item_description,
+                                    item_number=item_number,
+                                    item_cost=item_cost,
+                                    show_number=self.show_number)
         self.widgets.append(widget)
+
 
     def add_items(self, items):
         for item in items:
-            self.add_item(item)
+            self.add_item(item.item.description, item.item.number, item.cost)
 
     class Media:
         js = ('js/equipment_table.js',)
@@ -83,17 +88,24 @@ class EquipmentTableWidget(widgets.MultiWidget):
 class EquipmentRowWidget(widgets.Widget):
     template_name = 'rentals/widgets/equipment_item_widget.html'
     show_number = False
-    
-    def __init__(self, item, show_number=False, **kwargs):
+
+    def __init__(self, item_description, item_size=None, item_number='',
+                 item_cost=0, show_number=False, **kwargs):
         super().__init__(**kwargs)
-        self.item = item
+        self.item_description = item_description
+        self.item_size = item_size
+        self.item_number = item_number
+        self.item_cost = item_cost
         self.show_number = show_number
 
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         context['widget']['show_number'] = self.show_number
-        context['widget']['rental_item'] = self.item
+        context['widget']['item_description'] = self.item_description
+        context['widget']['item_size'] = self.item_size
+        context['widget']['item_number'] = self.item_number
+        context['widget']['item_cost'] = self.item_cost
         return context
 
 class EquipmentListField(fields.Field):
@@ -104,8 +116,29 @@ class EquipmentListField(fields.Field):
         self.widget.show_number = show_number
 
     def clean(self, value):
-        print(value)
-        return super().clean(value)
+        if value in self.empty_values:
+            return None
+        rental_items = []
+        errors = []
+        for i, widget in enumerate(self.widget.widgets):
+            # TODO: Currently assumes RentalItem exist.
+            try:
+                item = Item.objects.get(number=widget.item_number,
+                                        description=widget.item_description,
+                                        state=Item.AVAILABLE)
+            except:
+                errors.append(forms.ValidationError(_('%(type)s number %(num)s not found'),
+                                            code='invalid',
+                                            params={
+                                                'type': widget.item_description,
+                                                'num': widget.item_number,
+                                            }))
+                continue
+            rental_item = RentalItem.objects.get(item=item)
+            rental_items.append(rental_item)
+        if len(errors) > 0:
+            raise forms.ValidationError(errors)
+        return rental_items
 
 class RequestEquipmentForm(forms.Form):
     equipment = EquipmentListField()

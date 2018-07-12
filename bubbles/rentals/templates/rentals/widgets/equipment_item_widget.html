@@ -1,11 +1,11 @@
 <tr>
   <td>
-    <input type="text" class="form-control" name="{{ widget.rental_item.item.description }}" value="{{ widget.rental_item.item.description }}" id="{{ widget.rental_item.item.description }}-description" readonly/>
+    <input type="text" class="form-control" name="{{ widget.item_description }}" value="{{ widget.item_description }}" id="{{ widget.item_description }}-description" readonly/>
   </td>
-  {% if widget.rental_item.item.size %}
+  {% if widget.item_size %}
   <td>
-    <select class="form-control" id="{{ widget.rental_item.item.description }}-size" name="{{ widget.rental_item.item.description }}">
-      <option>{{ widget.rental_item.item.size }}</option>
+    <select class="form-control" id="{{ widget.item_description }}-size" name="{{ widget.item_description }}">
+      <option>{{ widget.item_size }}</option>
     </select>
   </td>
   {% else %}
@@ -14,7 +14,12 @@
   {% if widget.show_number %}
   <td>
     <div class="form-group">
-      <input type="text" class="form-control" name="{{ widget.rental_item.item.description }}" value="{{ widget.rental_item.item.number }}" id="{{widget.rental_item.item.description }}-number"/>
+      <input type="text" class="form-control" name="{{ widget.item_description }}" value="{{ widget.item_number }}" id="{{widget.item_description }}-number"/>
+    </div>
+  </td>
+  <td>
+    <div class="form-group">
+      <input type="text" class="form-control" name="{{ widget.item_description }}" value="{{ widget.item_cost }}" id="{{widget.item_description }}-cost"/>
     </div>
   </td>
   {% endif %}

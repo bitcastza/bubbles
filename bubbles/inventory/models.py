@@ -60,6 +60,11 @@ class Item(models.Model):
     def __str__(self):
         return '{} {} ({})'.format(self.manufacturer, self.description, self.number)
 
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return self.number == other.number and self.description == other.description
+        return NotImplemented
+
 class BCD(Item):
     SMALL = 'S'
     MEDIUM = 'M'

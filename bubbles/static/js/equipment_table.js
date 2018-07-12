@@ -71,6 +71,15 @@ $(document).ready(function() {
                 '<input type="text" class="form-control" name="' + description +
                 '" id="' + description + '-number"/>' +
                 '</div>' +
+                '</td>' +
+                '<td>' +
+                '<div class="form-group">' +
+                '<div class="input-group-prepend">' +
+                '<span class="input-group-text">R</span>' +
+                '</div>' +
+                '<input type="text" class="form-control" name="' + description +
+                '" id="' + description + '-cost"/>' +
+                '</div>' +
                 '</td>';
         }
         row += '<td class="item-entry">' +

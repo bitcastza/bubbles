@@ -63,3 +63,8 @@ class RentalItem(models.Model):
 
     def __str__(self):
         return "{} to {}".format(self.item, self.rental.user)
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return self.rental == other.rental and self.item == other.item and self.cost == other.cost
+        return NotImplemented
