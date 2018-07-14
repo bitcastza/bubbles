@@ -77,8 +77,8 @@ $(document).ready(function() {
                 '</td>' +
                 '<td>' +
                 '<div class="form-group">' +
-                '<input type="text" class="form-control" name="' + description +
-                '" id="' + description + '-cost" value="' + cost + '"/>' +
+                '<input type="number" class="form-control" name="' + description +
+                '" id="' + description + '-cost" value="' + cost + '" min="0"/>' +
                 '</div>' +
                 '</td>';
         }
