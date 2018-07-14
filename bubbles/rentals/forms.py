@@ -72,6 +72,9 @@ class EquipmentTableWidget(widgets.MultiWidget):
                     self.add_item(description, number, size, cost)
         return super().value_from_datadict(data, files, names)
 
+    def decompress(self, value):
+        return value
+
     def add_item(self, item_description, item_number, item_size, item_cost=0):
         widget = EquipmentRowWidget(item_description,
                                     item_number=item_number,
@@ -108,7 +111,6 @@ class EquipmentRowWidget(widgets.Widget):
         self.item_number = item_number
         self.item_cost = item_cost
         self.show_number = show_number
-
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
