@@ -16,6 +16,7 @@
 import sys
 
 from django import forms
+from django.core.exceptions import ObjectDoesNotExist
 from django.forms import fields, widgets
 from django.utils.translation import gettext_lazy as _
 
@@ -64,10 +65,10 @@ class EquipmentTableWidget(widgets.MultiWidget):
                 value = data.getlist(key)
                 for i in range(0, len(value), 4):
                     description = value[i]
-                    number = value[i + 1]
-                    size = value[i + 2]
+                    size = value[i + 1]
                     if size == "N/A":
                         size = None
+                    number = value[i + 2]
                     cost = value[i + 3]
                     self.add_item(description, number, size, cost)
         return super().value_from_datadict(data, files, names)
@@ -144,7 +145,30 @@ class EquipmentListField(fields.Field):
                 item = Item.objects.get(number=widget.item_number,
                                         description=widget.item_description,
                                         state=Item.AVAILABLE)
-            except:
+                i = getattr(item, item.description.lower())
+                try:
+                    if i.size != widget.item_size:
+                        errors.append(forms.ValidationError(
+                            _('%(type)s number %(num)s is not size %(size)s'),
+                            code='invalid',
+                            params={
+                                'type': widget.item_description,
+                                'num': widget.item_number,
+                                'size': widget.item_size,
+                            }))
+                except AttributeError:
+                    pass
+
+                if i.description == 'Cylinder' and i.capacity != widget.item_size:
+                    errors.append(forms.ValidationError(
+                        _('%(type)s number %(num)s is not size %(size)s'),
+                        code='invalid',
+                        params={
+                            'type': widget.item_description,
+                            'num': widget.item_number,
+                            'size': widget.item_size,
+                        }))
+            except ObjectDoesNotExist as e:
                 errors.append(forms.ValidationError(_('%(type)s number %(num)s not found'),
                                             code='invalid',
                                             params={
