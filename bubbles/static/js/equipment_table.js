@@ -39,15 +39,17 @@ $(document).ready(function() {
         currentItem = this;
         var sizeOptions = "N/A";
         $('#size-options').children('div').each(function() {
-            if (this.id != $(currentItem).text()) {
+            var description = $(currentItem).text();
+            if (this.id != description) {
                 return;
             }
             if ($(this).is(':empty')) {
                 sizeOptions = '<select class="form-control disabled" id="' +
-                    $(currentItem).text() + '-size"/>';
+                    description + '-size" name="' + description + '"/>';
             } else {
                 sizeOptions = '<select class="form-control" id="' +
-                    $(currentItem).text() + '-size">';
+                    description + '-size" name="' +
+                    description + '">';
                 $('#' + this.id + ' .sizes li').each(function() {
                     sizeOptions += '<option>' + $(this).text() + '</option>';
                 });
@@ -62,10 +64,11 @@ $(document).ready(function() {
             '" value="' + description + '" id="' + description +
             '" readonly/>' +
             '</td>' +
-            '<td><div class="form-group">' +
+            '<td class="size"><div class="form-group">' +
             sizeOptions +
             '</div>';
         if (showNumber) {
+            cost = $('#item-cost').text();
             row += '<td>' +
                 '<div class="form-group">' +
                 '<input type="text" class="form-control" name="' + description +
@@ -74,11 +77,8 @@ $(document).ready(function() {
                 '</td>' +
                 '<td>' +
                 '<div class="form-group">' +
-                '<div class="input-group-prepend">' +
-                '<span class="input-group-text">R</span>' +
-                '</div>' +
                 '<input type="text" class="form-control" name="' + description +
-                '" id="' + description + '-cost"/>' +
+                '" id="' + description + '-cost" value="' + cost + '"/>' +
                 '</div>' +
                 '</td>';
         }

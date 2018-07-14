@@ -42,6 +42,7 @@ class Item(models.Model):
         :returns: a number if one can be calculated or None if there are no
                   numbers for the item type.
         """
+        # TODO: Filter by description
         results = Item.objects.all().order_by('-number')
         for result in results:
             try:

@@ -62,26 +62,38 @@ class EquipmentTableWidget(widgets.MultiWidget):
                 if 'csrf' in key:
                     continue
                 value = data.getlist(key)
-                for i in range(0, len(value), 3):
+                for i in range(0, len(value), 4):
                     description = value[i]
                     number = value[i + 1]
-                    cost = value[i + 2]
-                    self.add_item(description, number, cost)
+                    size = value[i + 2]
+                    if size == "N/A":
+                        size = None
+                    cost = value[i + 3]
+                    self.add_item(description, number, size, cost)
         return super().value_from_datadict(data, files, names)
 
-    def add_item(self, item_description, item_number, item_cost=0):
+    def add_item(self, item_description, item_number, item_size, item_cost=0):
         widget = EquipmentRowWidget(item_description,
                                     item_number=item_number,
+                                    item_size=item_size,
                                     item_cost=item_cost,
                                     show_number=self.show_number)
         self.widgets.append(widget)
 
 
     def add_items(self, items):
-        for item in items:
-            self.add_item(item.item.description, item.item.number, item.cost)
+        for rental_item in items:
+            # Get subclass object
+            item = getattr(rental_item.item, rental_item.item.description.lower())
+            try :
+                self.add_item(item.description, item.number, item.size, rental_item.cost)
+            except AttributeError:
+                self.add_item(item.description, item.number, None, rental_item.cost)
 
     class Media:
+        css = {
+            'screen': ('css/equipment_table.css',),
+        }
         js = ('js/equipment_table.js',)
 
 class EquipmentRowWidget(widgets.Widget):
@@ -100,9 +112,14 @@ class EquipmentRowWidget(widgets.Widget):
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
+        try:
+            sizes = get_item_size_map()[self.item_description]
+        except KeyError:
+            sizes = None
         context['widget']['show_number'] = self.show_number
         context['widget']['item_description'] = self.item_description
         context['widget']['item_size'] = self.item_size
+        context['widget']['item_sizes'] = sizes
         context['widget']['item_number'] = self.item_number
         context['widget']['item_cost'] = self.item_cost
         return context

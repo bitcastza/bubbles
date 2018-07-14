@@ -3,9 +3,11 @@
     <input type="text" class="form-control" name="{{ widget.item_description }}" value="{{ widget.item_description }}" id="{{ widget.item_description }}-description" readonly/>
   </td>
   {% if widget.item_size %}
-  <td>
-    <select class="form-control" id="{{ widget.item_description }}-size" name="{{ widget.item_description }}">
-      <option>{{ widget.item_size }}</option>
+  <td class="size">
+    <select class="form-control" id="{{ widget.item_description }}-size" name="{{ widget.item_description }}" value="{{ widget.item_size }}">
+      {% for size in widget.item_sizes %}
+      <option>{{ size }}</option>
+      {% endfor %}
     </select>
   </td>
   {% else %}
