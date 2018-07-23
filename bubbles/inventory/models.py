@@ -15,8 +15,10 @@
 ###########################################################################
 from datetime import timedelta
 
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
 class Item(models.Model):
     """
@@ -57,6 +59,12 @@ class Item(models.Model):
     date_of_purchase = models.DateField(_('Date of purchase'))
     state = models.CharField(_('State'), max_length=1, choices=STATE_CHOICES, default=STATE_CHOICES[0])
     description = models.CharField(_('Type'), max_length=255)
+
+    def get_change_url(self):
+        content_type = ContentType.objects.get_for_model(self.__class__)
+        return reverse("admin:{}_{}_change".format(content_type.app_label,
+                                                   content_type.model),
+                                    args=(self.id,))
 
     def __str__(self):
         return '{} {} ({})'.format(self.manufacturer, self.description, self.number)

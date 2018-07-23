@@ -41,7 +41,7 @@
         {% for item in need_servicing %}
         <tr>
           <td>{{ item.description }}</td>
-          <td>{{ item.number }}</td>
+          <td><a href={{ item.get_change_url }}>{{ item.number }}</td>
           <td>{{ item.last_service }}</td>
         </tr>
         {% endfor %}
