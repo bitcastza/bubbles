@@ -20,9 +20,10 @@ from django.utils.translation import gettext_lazy as _
 
 class RentalPeriod(models.Model):
     start_date = models.DateField(_('Start date'))
-    end_date = models.DateField(_('End date'))
+    end_date = models.DateField(_('End date'), null=True)
     default_deposit = models.IntegerField(_('Deposit'))
     default_cost_per_item = models.IntegerField(_('Cost per item'))
+    hidden = models.BooleanField(default=False)
 
     def __str__(self):
         return "{} - {}".format(self.start_date,
@@ -54,15 +55,19 @@ class Rental(models.Model):
     rental_period = models.ForeignKey(RentalPeriod, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "Rental by {} for {}".format(self.user, self.rental_period)
+        if self.user:
+            return "Rental by {} for {}".format(self.user, self.rental_period)
+        return "rental for {}".format(self.rental_period)
 
 class RentalItem(models.Model):
-    rental = models.ForeignKey(Rental, on_delete=models.CASCADE)
+    rental = models.ForeignKey(Rental, on_delete=models.CASCADE, null=True)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     cost = models.IntegerField(_('Cost'), default=0)
 
     def __str__(self):
-        return "{} to {}".format(self.item, self.rental.user)
+        if self.rental.user:
+            return "{} to {}".format(self.item, self.rental.user)
+        return "{} to unknown".format(self.item)
 
     def __eq__(self, other):
         if type(other) == type(self):

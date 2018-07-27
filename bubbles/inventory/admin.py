@@ -22,6 +22,11 @@ from . import models
 
 @admin.register(models.Item, site=admin_site)
 class ItemAdmin(admin.ModelAdmin):
+    list_display = ('description', 'number', 'manufacturer', 'state')
+    list_filter = ('state', 'description')
+    list_display_links = ('number',)
+    formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
+
     def get_queryset(self, request):
         q_filter = ~Q(description__exact='BCD') & \
                 ~Q(description__exact='Booties') & \
@@ -31,11 +36,6 @@ class ItemAdmin(admin.ModelAdmin):
                 ~Q(description__exact='Wetsuit')
         qs = super().get_queryset(request)
         return qs.filter(q_filter)
-
-    list_display = ('description', 'number', 'manufacturer', 'state')
-    list_filter = ('state', 'description')
-    list_display_links = ('number',)
-    formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
 
 class SizeAdmin(admin.ModelAdmin):
     list_display = ('number', 'manufacturer', 'size', 'state')

@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
+import datetime
+import decimal
 import sys
 
 from django import forms
@@ -21,7 +23,7 @@ from django.forms import fields, widgets
 from django.utils.translation import gettext_lazy as _
 
 from bubbles.inventory.models import BCD, Booties, Cylinder, Fins, Wetsuit, Item
-from .models import RentalItem
+from .models import Rental, RentalItem, RentalPeriod
 
 def get_sizes(item_type, size_tag='size'):
     sizes_set = item_type.objects.filter(state__exact=Item.AVAILABLE).values(size_tag).distinct()
@@ -55,12 +57,14 @@ class EquipmentTableWidget(widgets.MultiWidget):
         self.widgets = []
         try:
             # Python created with data
-            rental = data['equipment']
-            self.add_items(rental.rentalitem_set.all())
+            rental_items = data['equipment']
+            self.add_items(rental_items)
         except KeyError:
             # Response with POST data
+            item_types = Item.objects.filter(state__exact=Item.AVAILABLE).values('description').distinct()
+            item_types = [i['description'] for i in item_types]
             for key in data:
-                if 'csrf' in key:
+                if key not in item_types:
                     continue
                 value = data.getlist(key)
                 for i in range(0, len(value), 4):
@@ -159,7 +163,7 @@ class EquipmentListField(fields.Field):
                 except AttributeError:
                     pass
 
-                if i.description == 'Cylinder' and i.capacity != widget.item_size:
+                if i.description == 'Cylinder' and i.capacity != decimal.Decimal(widget.item_size):
                     errors.append(forms.ValidationError(
                         _('%(type)s number %(num)s is not size %(size)s'),
                         code='invalid',
@@ -169,14 +173,18 @@ class EquipmentListField(fields.Field):
                             'size': widget.item_size,
                         }))
             except ObjectDoesNotExist as e:
-                errors.append(forms.ValidationError(_('%(type)s number %(num)s not found'),
-                                            code='invalid',
-                                            params={
-                                                'type': widget.item_description,
-                                                'num': widget.item_number,
-                                            }))
+                errors.append(forms.ValidationError(
+                    _('%(type)s number %(num)s not found'),
+                    code='invalid',
+                    params={
+                        'type': widget.item_description,
+                        'num': widget.item_number,
+                    }))
                 continue
-            rental_item = RentalItem.objects.get(item=item)
+            try:
+                rental_item = RentalItem.objects.get(item=item)
+            except ObjectDoesNotExist:
+                rental_item = RentalItem(item=item,cost=int(widget.item_cost))
             rental_items.append(rental_item)
         if len(errors) > 0:
             raise forms.ValidationError(errors)
@@ -187,3 +195,43 @@ class RequestEquipmentForm(forms.Form):
 
 class RentEquipmentForm(forms.Form):
     equipment = EquipmentListField(show_number=True)
+    date = datetime.date.today()
+    period_query_set = RentalPeriod.objects.filter(end_date__gt=date, hidden=False)
+    period = forms.ModelChoiceField(queryset=period_query_set,
+                                    required=False,
+                                    widget=widgets.Select(
+                                        attrs={'class': 'form-control'}))
+    deposit = forms.IntegerField(widget=widgets.NumberInput(attrs={'class': 'form-control'}))
+
+    def __init__(self, user, rental=None, **kwargs):
+        super().__init__(**kwargs)
+        self.user = user
+        self.rental = rental
+
+    def clean_period(self):
+        if self.cleaned_data['period'] == None:
+            if not self.user.is_staff:
+                raise forms.ValidationError(_('This field is required'), code='invalid')
+            else:
+                return RentalPeriod(start_date=datetime.date.today,
+                                    default_deposit=0,
+                                    default_cost_per_item=0,
+                                    hidden=True)
+        return self.cleaned_data['period']
+
+    def clean(self):
+        if self.rental == None:
+            state = Rental.REQUESTED
+            period = self.cleaned_data['period']
+            deposit = period.default_deposit
+            self.rental = Rental(user=self.user,
+                                 state=state,
+                                 deposit=deposit,
+                                 period=period)
+        try:
+            for rental_item in self.cleaned_data['equipment']:
+                rental_item.rental = self.rental;
+        except KeyError:
+            pass
+        return self.cleaned_data
+

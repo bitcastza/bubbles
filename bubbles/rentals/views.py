@@ -56,18 +56,33 @@ def rent_equipment(request, rental_request=None):
         return redirect('rentals:request_equipment')
 
     url = reverse('rentals:rent_equipment')
+    rental = Rental.objects.get(id=rental_request)
     if request.method == 'POST':
-        form = RentEquipmentForm(request.POST)
+        form = RentEquipmentForm(user=request.user, rental=rental, data=request.POST)
         url = reverse('rentals:rent_equipment', args=(rental_request,))
         if form.is_valid():
-            print(form.cleaned_data['equipment'])
+            form.cleaned_data['period'].save()
+            rental = form.rental
+            rental.state = Rental.RENTED
+            rental.approved_by = request.user
+            rental.save()
+            for rental_item in form.cleaned_data['equipment']:
+                rental_item.item.state = Item.IN_USE
+                rental_item.item.save()
+                rental_item.save()
+            return render(request, 'rentals/rental_confirmation.html')
     else:
         if rental_request:
             url = reverse('rentals:rent_equipment', args=(rental_request,))
-            rental = Rental.objects.get(id=rental_request)
-            form = RentEquipmentForm({'equipment': rental})
+            form = RentEquipmentForm(user=request.user,
+                                     rental=rental,
+                                     data={
+                                         'equipment': rental.rentalitem_set.all(),
+                                         'period': rental.rental_period,
+                                         'deposit': rental.deposit,
+                                     })
         else:
-            form = RentEquipmentForm()
+            form = RentEquipmentForm(user=request.user)
 
     context = {
         'form': form,

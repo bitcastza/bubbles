@@ -19,7 +19,8 @@ from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.db.models import DateField, DecimalField, DurationField, CharField,  IntegerField, TextField
-from django.forms import NumberInput, TextInput
+from django.forms import NumberInput, TextInput, ModelChoiceField
+from django.forms.widgets import Select
 
 from .forms import CalendarWidget
 from bubbles.inventory.models import BCD, Cylinder, Regulator
@@ -34,6 +35,7 @@ BUBBLES_FORMFIELD_OVERRIDES = {
     TextField: {'widget': TextInput(attrs={'class': 'vTextField form-control'})},
     CharField: {'widget': TextInput(attrs={'class': 'vTextField form-control'})},
     DecimalField: {'widget': NumberInput(attrs={'class': 'form-control'})},
+    ModelChoiceField: {'widget': Select(attrs={'class': 'form-control'})},
 }
 
 def get_next_service_set(item_type):
