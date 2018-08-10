@@ -44,13 +44,14 @@ class Item(models.Model):
         :returns: a number if one can be calculated or None if there are no
                   numbers for the item type.
         """
-        # TODO: Filter by description
+        # TODO: Filter by description and sort by numeric order
         results = Item.objects.all().order_by('-number')
         for result in results:
             try:
                 current_number = int(result.number)
                 return current_number + 1
-            except:
+            except ValueError:
+                # Find the first integer value, ignoring string types
                 pass
         return None
 
