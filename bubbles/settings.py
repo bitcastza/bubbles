@@ -138,7 +138,7 @@ USE_TZ = True
 
 SAKAI_URL = 'https://vula.uct.ac.za'
 USE_SAKAI_SITE = True
-SAKAI_SITE_URL = '/site/d6d8ab20-ffa4-4047-b1fd-e6d98847a949'
+SAKAI_SITE_ID = 'd6d8ab20-ffa4-4047-b1fd-e6d98847a949'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
