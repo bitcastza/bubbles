@@ -67,14 +67,20 @@ class EquipmentTableWidget(widgets.MultiWidget):
                 if key not in item_types:
                     continue
                 value = data.getlist(key)
-                for i in range(0, len(value), 4):
+                range_step = 2
+                if self.show_number:
+                    range_step = 4
+                for i in range(0, len(value), range_step):
                     description = value[i]
                     size = value[i + 1]
                     if size == "N/A":
                         size = None
-                    number = value[i + 2]
-                    cost = value[i + 3]
-                    self.add_item(description, number, size, cost)
+                    if self.show_number:
+                        number = value[i + 2]
+                        cost = value[i + 3]
+                        self.add_item(description, number, size, cost)
+                    else:
+                        self.add_item(description, -1, size, 0)
         return super().value_from_datadict(data, files, names)
 
     def decompress(self, value):
@@ -144,8 +150,10 @@ class EquipmentListField(fields.Field):
         rental_items = []
         errors = []
         for i, widget in enumerate(self.widget.widgets):
-            # TODO: Currently assumes RentalItem exist.
             try:
+                # TODO: Figure out what to do when requesting equipment, as that
+                # does not have a number. It is a description of a selection of
+                # items, not an item in particular
                 item = Item.objects.get(number=widget.item_number,
                                         description=widget.item_description,
                                         state=Item.AVAILABLE)
@@ -190,18 +198,13 @@ class EquipmentListField(fields.Field):
             raise forms.ValidationError(errors)
         return rental_items
 
-class RequestEquipmentForm(forms.Form):
-    equipment = EquipmentListField()
-
-class RentEquipmentForm(forms.Form):
-    equipment = EquipmentListField(show_number=True)
+class EquipmentForm(forms.Form):
     date = datetime.date.today()
     period_query_set = RentalPeriod.objects.filter(end_date__gt=date, hidden=False)
     period = forms.ModelChoiceField(queryset=period_query_set,
                                     required=False,
                                     widget=widgets.Select(
                                         attrs={'class': 'form-control'}))
-    deposit = forms.IntegerField(widget=widgets.NumberInput(attrs={'class': 'form-control'}))
 
     def __init__(self, user, rental=None, **kwargs):
         super().__init__(**kwargs)
@@ -227,7 +230,7 @@ class RentEquipmentForm(forms.Form):
             self.rental = Rental(user=self.user,
                                  state=state,
                                  deposit=deposit,
-                                 period=period)
+                                 rental_period=period)
         try:
             for rental_item in self.cleaned_data['equipment']:
                 rental_item.rental = self.rental;
@@ -235,3 +238,9 @@ class RentEquipmentForm(forms.Form):
             pass
         return self.cleaned_data
 
+class RequestEquipmentForm(EquipmentForm):
+    equipment = EquipmentListField()
+
+class RentEquipmentForm(EquipmentForm):
+    equipment = EquipmentListField(show_number=True)
+    deposit = forms.IntegerField(widget=widgets.NumberInput(attrs={'class': 'form-control'}))

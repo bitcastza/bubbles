@@ -19,6 +19,7 @@ function isItems() {
     return numItems > 0;
 }
 
+// TODO: Does not re-add the item to the dropdown after it is removed
 function addItemRemoveListener() {
     $('.item-remove').on('click', function() {
         var enableType = $('td:first-child', $(this).parents('tr')).val();
@@ -36,10 +37,12 @@ $(document).ready(function() {
     }
     addItemRemoveListener();
     $('#add-dropdown li').on('click', function() {
-        currentItem = this;
-        var sizeOptions = "N/A";
+        var currentItem = this;
+        var description = $(currentItem).text();
+        var sizeOptions = '<input type="text" '+
+            'class="form-control" id="' + description +
+            '-size" name="' + description + '" value="N/A" readonly>';
         $('#size-options').children('div').each(function() {
-            var description = $(currentItem).text();
             if (this.id != description) {
                 return;
             }

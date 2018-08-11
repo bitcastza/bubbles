@@ -11,7 +11,9 @@
     </select>
   </td>
   {% else %}
-  <td>N/A</td>
+  <td>
+    <input type="text" class="form-control" id="{{ widget.item_description }}-size" name="{{ widget.item_description }}" value="N/A" readonly>
+  </td>
   {% endif %}
   {% if widget.show_number %}
   <td>

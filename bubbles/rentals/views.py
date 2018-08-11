@@ -38,9 +38,18 @@ def index(request):
 @login_required
 def request_equipment(request):
     if request.method == 'POST':
-        form = RequestEquipmentForm(request.POST)
+        form = RequestEquipmentForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            form.cleaned_data['period'].save()
+            rental = form.rental
+            rental.state = Rental.REQUESTED
+            rental.save()
+            for rental_item in form.cleaned_data['equipment']:
+                rental_item.item.save()
+                rental_item.save()
+            return render(request, 'rentals/rental_confirmation.html')
     else:
-        form = RequestEquipmentForm()
+        form = RequestEquipmentForm(user=request.user)
 
     context = {
         'form': form,
