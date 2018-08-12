@@ -73,3 +73,8 @@ class RentalItem(models.Model):
         if type(other) == type(self):
             return self.rental == other.rental and self.item == other.item and self.cost == other.cost
         return NotImplemented
+
+class RequestItem(models.Model):
+    rental = models.ForeignKey(Rental, on_delete=models.CASCADE, null=True)
+    item_description = models.CharField(_('Type'), max_length=255)
+    item_size = models.CharField(_('Size'), max_length=2, null=True, blank=True)
