@@ -63,3 +63,20 @@ class RentalItemAdmin(admin.ModelAdmin):
         return obj.rental.user
 
     list_display = ('description', 'number', 'user')
+
+@admin.register(models.RequestItem, site=admin_site)
+class RentalItemAdmin(admin.ModelAdmin):
+    def size(self, obj):
+        return obj.item_size
+
+    def description(self, obj):
+        return obj.item_description
+    description.short_description = _('item')
+
+    def user(self, obj):
+        if obj.rental:
+            return obj.rental.user
+        else:
+            return None
+
+    list_display = ('description', 'size', 'user')
