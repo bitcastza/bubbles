@@ -65,8 +65,8 @@ def rent_equipment(request, rental_request=None):
         return redirect('rentals:request_equipment')
 
     url = reverse('rentals:rent_equipment')
-    rental = Rental.objects.get(id=rental_request)
     if request.method == 'POST':
+        rental = Rental.objects.get(id=rental_request)
         form = RentEquipmentForm(user=request.user, rental=rental, data=request.POST)
         url = reverse('rentals:rent_equipment', args=(rental_request,))
         if form.is_valid():
@@ -82,6 +82,7 @@ def rent_equipment(request, rental_request=None):
             return render(request, 'rentals/rental_confirmation.html')
     else:
         if rental_request:
+            rental = Rental.objects.get(id=rental_request)
             url = reverse('rentals:rent_equipment', args=(rental_request,))
             form = RentEquipmentForm(user=request.user,
                                      rental=rental,
