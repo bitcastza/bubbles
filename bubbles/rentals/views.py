@@ -22,9 +22,8 @@ from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 
 from bubbles.inventory.models import Item, BCD, Booties, Cylinder, Fins, Wetsuit
-from .models import Rental
+from .models import Rental, RequestItem
 from .forms import RequestEquipmentForm, RentEquipmentForm
-
 
 @login_required
 def index(request):
@@ -45,7 +44,8 @@ def request_equipment(request):
             rental.state = Rental.REQUESTED
             rental.save()
             for rental_item in form.cleaned_data['equipment']:
-                rental_item.item.save()
+                rental_item.rental = rental # TODO: Move to EquipmentForm#clean()
+                rental_item.cost = rental.default_cost_per_item
                 rental_item.save()
             return render(request, 'rentals/rental_confirmation.html')
     else:
@@ -79,6 +79,7 @@ def rent_equipment(request, rental_request=None):
                 rental_item.item.state = Item.IN_USE
                 rental_item.item.save()
                 rental_item.save()
+            RequestItem.objects.filter(rental=rental).delete()
             return render(request, 'rentals/rental_confirmation.html')
     else:
         if rental_request:
@@ -87,7 +88,7 @@ def rent_equipment(request, rental_request=None):
             form = RentEquipmentForm(user=request.user,
                                      rental=rental,
                                      data={
-                                         'equipment': rental.rentalitem_set.all(),
+                                         'equipment': rental.requestitem_set.all(),
                                          'period': rental.rental_period,
                                          'deposit': rental.deposit,
                                      })

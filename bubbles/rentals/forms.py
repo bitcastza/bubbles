@@ -23,7 +23,7 @@ from django.forms import fields, widgets
 from django.utils.translation import gettext_lazy as _
 
 from bubbles.inventory.models import BCD, Booties, Cylinder, Fins, Wetsuit, Item
-from .models import Rental, RentalItem, RentalPeriod
+from .models import Rental, RentalItem, RentalPeriod, RequestItem
 
 def get_sizes(item_type, size_tag='size'):
     sizes_set = item_type.objects.filter(state__exact=Item.AVAILABLE).values(size_tag).distinct()
@@ -58,7 +58,10 @@ class EquipmentTableWidget(widgets.MultiWidget):
         try:
             # Python created with data
             rental_items = data['equipment']
-            self.add_items(rental_items)
+            if type(rental_items[0]) == RentalItem:
+                self.add_items(rental_items)
+            else:
+                self.add_request_items(rental_items)
         except KeyError:
             # Response with POST data
             item_types = Item.objects.filter(state__exact=Item.AVAILABLE).values('description').distinct()
@@ -80,7 +83,7 @@ class EquipmentTableWidget(widgets.MultiWidget):
                         cost = value[i + 3]
                         self.add_item(description, number, size, cost)
                     else:
-                        self.add_item(description, -1, size, 0)
+                        self.add_item(description, None, size, 0)
         return super().value_from_datadict(data, files, names)
 
     def decompress(self, value):
@@ -94,6 +97,9 @@ class EquipmentTableWidget(widgets.MultiWidget):
                                     show_number=self.show_number)
         self.widgets.append(widget)
 
+    def add_request_items(self, items):
+        for request in items:
+            self.add_item(request.item_description, "", request.item_size, request.cost)
 
     def add_items(self, items):
         for rental_item in items:
@@ -151,13 +157,13 @@ class EquipmentListField(fields.Field):
         errors = []
         for i, widget in enumerate(self.widget.widgets):
             try:
-                # TODO: Figure out what to do when requesting equipment, as that
-                # does not have a number. It is a description of a selection of
-                # items, not an item in particular
                 item = Item.objects.get(number=widget.item_number,
                                         description=widget.item_description,
                                         state=Item.AVAILABLE)
-                i = getattr(item, item.description.lower())
+                try:
+                    i = getattr(item, item.description.lower())
+                except AttributeError:
+                    i = item
                 try:
                     if i.size != widget.item_size:
                         errors.append(forms.ValidationError(
@@ -180,14 +186,20 @@ class EquipmentListField(fields.Field):
                             'num': widget.item_number,
                             'size': widget.item_size,
                         }))
-            except ObjectDoesNotExist as e:
-                errors.append(forms.ValidationError(
-                    _('%(type)s number %(num)s not found'),
-                    code='invalid',
-                    params={
-                        'type': widget.item_description,
-                        'num': widget.item_number,
-                    }))
+            except ObjectDoesNotExist:
+                if widget.item_number == None:
+                    # Rental request
+                    request_item = RequestItem(item_description=widget.item_description,
+                                               item_size=widget.item_size)
+                    rental_items.append(request_item)
+                else:
+                    errors.append(forms.ValidationError(
+                        _('%(type)s number %(num)s not found'),
+                        code='invalid',
+                        params={
+                            'type': widget.item_description,
+                            'num': widget.item_number,
+                        }))
                 continue
             try:
                 rental_item = RentalItem.objects.get(item=item)
@@ -204,7 +216,8 @@ class EquipmentForm(forms.Form):
     period = forms.ModelChoiceField(queryset=period_query_set,
                                     required=False,
                                     widget=widgets.Select(
-                                        attrs={'class': 'form-control'}))
+                                        attrs={'class': 'form-control'}),
+                                   initial=period_query_set[0])
 
     def __init__(self, user, rental=None, **kwargs):
         super().__init__(**kwargs)
@@ -233,7 +246,7 @@ class EquipmentForm(forms.Form):
                                  rental_period=period)
         try:
             for rental_item in self.cleaned_data['equipment']:
-                rental_item.rental = self.rental;
+                rental_item.rental = self.rental
         except KeyError:
             pass
         return self.cleaned_data

@@ -78,3 +78,14 @@ class RequestItem(models.Model):
     rental = models.ForeignKey(Rental, on_delete=models.CASCADE, null=True)
     item_description = models.CharField(_('Type'), max_length=255)
     item_size = models.CharField(_('Size'), max_length=2, null=True, blank=True)
+    cost = models.IntegerField(_('Cost'), default=0)
+
+    def __str__(self):
+        if self.rental:
+            return "{} to {}".format(self.item_description, self.rental.user)
+        return "{} to unknown".format(self.item_description)
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return self.rental == other.rental and self.item_description == other.item_description and self.item_size == other.item_size
+        return NotImplemented
