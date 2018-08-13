@@ -19,8 +19,8 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
-from .models import Rental, RentalPeriod
-from .views import index, rent_equipment
+from bubbles.rentals.models import Rental, RentalPeriod
+from bubbles.rentals.views import index, rent_equipment
 
 class IndexViewTests(TestCase):
     @classmethod
