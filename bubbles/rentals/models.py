@@ -55,9 +55,7 @@ class Rental(models.Model):
     rental_period = models.ForeignKey(RentalPeriod, on_delete=models.CASCADE)
 
     def __str__(self):
-        if self.user:
-            return "Rental by {} for {}".format(self.user, self.rental_period)
-        return "rental for {}".format(self.rental_period)
+        return "Rental by {} for {}".format(self.user, self.rental_period)
 
 class RentalItem(models.Model):
     rental = models.ForeignKey(Rental, on_delete=models.CASCADE, null=True)
@@ -65,7 +63,7 @@ class RentalItem(models.Model):
     cost = models.IntegerField(_('Cost'), default=0)
 
     def __str__(self):
-        if self.rental.user:
+        if self.rental:
             return "{} to {}".format(self.item, self.rental.user)
         return "{} to unknown".format(self.item)
 

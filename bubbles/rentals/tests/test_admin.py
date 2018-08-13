@@ -14,7 +14,6 @@
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
 import datetime
-import locale
 
 from django.contrib import admin
 from django.contrib.auth.models import User
