@@ -39,6 +39,13 @@ def get_item_size_map():
     item_size_map['Wetsuit'] = get_sizes(Wetsuit)
     return item_size_map
 
+def get_initial_period():
+    date = datetime.date.today()
+    period_query_set = RentalPeriod.objects.filter(end_date__gt=date, hidden=False)
+    if len(period_query_set) > 0:
+        return period_query_set[0]
+    return None
+
 class EquipmentTableWidget(widgets.MultiWidget):
     template_name = 'rentals/widgets/equipment_table_widget.html'
 
@@ -217,7 +224,7 @@ class EquipmentForm(forms.Form):
                                     required=False,
                                     widget=widgets.Select(
                                         attrs={'class': 'form-control'}),
-                                   initial=period_query_set[0])
+                                   initial=get_initial_period)
 
     def __init__(self, user, rental=None, **kwargs):
         super().__init__(**kwargs)
