@@ -73,7 +73,7 @@ class IndexViewTests(TestCase):
 class RentEquipmentViewTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.path = reverse('rentals:request_equipment')
+        cls.path = reverse('rentals:rent_equipment')
         cls.factory = RequestFactory()
         cls.request = cls.factory.get(cls.path)
         cls.user = User.objects.create_user(username='jacob', is_staff=True)

@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
+import locale
+
 from django.db.models import DateField, DurationField, IntegerField
 from django.contrib import admin
 from django.forms import DateInput, NumberInput, TextInput
@@ -60,12 +62,15 @@ class RentalItemAdmin(admin.ModelAdmin):
     description.short_description = _('item')
 
     def user(self, obj):
-        return obj.rental.user
+        if obj.rental:
+            return obj.rental.user
+        else:
+            return None
 
     list_display = ('description', 'number', 'user')
 
 @admin.register(models.RequestItem, site=admin_site)
-class RentalItemAdmin(admin.ModelAdmin):
+class RequestItemAdmin(admin.ModelAdmin):
     def size(self, obj):
         return obj.item_size
 
