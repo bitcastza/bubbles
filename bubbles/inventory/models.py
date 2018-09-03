@@ -188,12 +188,14 @@ class WeightBelt(models.Model):
     state = models.CharField(_('State'), max_length=1, choices=STATE_CHOICES)
 
 class Wetsuit(Item):
+    EXTREXTRA_SMALL = 'XS'
     SMALL = 'S'
     MEDIUM = 'M'
     MEDIUM_LARGE = 'ML'
     LARGE = 'L'
     EXTRA_LARGE = 'XL'
-    SIZE_CHOICES = (
+    SIZE_CHOICES =(
+        (EXTRA_SMALL, _('Extra small'),
         (SMALL, _('Small')),
         (MEDIUM, _('Medium')),
         (MEDIUM_LARGE, _('Medium large')),
