@@ -195,7 +195,7 @@ class Wetsuit(Item):
     LARGE = 'L'
     EXTRA_LARGE = 'XL'
     SIZE_CHOICES =(
-        (EXTRA_SMALL, _('Extra small'),
+        (EXTRA_SMALL, _('Extra small')),
         (SMALL, _('Small')),
         (MEDIUM, _('Medium')),
         (MEDIUM_LARGE, _('Medium large')),
