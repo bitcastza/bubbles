@@ -135,6 +135,7 @@ class EquipmentTableWidgetTest(TestCase):
             number=self.item.number)
         data = QueryDict(string)
         self.table.show_number = True
+        self.table.show_cost = True
         self.table.value_from_datadict(data, None, 'equipment')
         self.assertEqual(len(self.table.widgets), 1)
         self.assertEqual(self.table.widgets[0].item_description,

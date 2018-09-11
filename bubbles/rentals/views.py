@@ -23,7 +23,7 @@ from django.urls import reverse
 
 from bubbles.inventory.models import Item, BCD, Booties, Cylinder, Fins, Wetsuit
 from .models import Rental, RequestItem, RentalPeriod
-from .forms import RequestEquipmentForm, RentEquipmentForm
+from .forms import RequestEquipmentForm, RentEquipmentForm, ReturnEquipmentForm
 
 @login_required
 def index(request):
@@ -46,7 +46,7 @@ def request_equipment(request):
             for rental_item in form.cleaned_data['equipment']:
                 rental_item.rental = rental
                 rental_item.save()
-            return render(request, 'rentals/rental_confirmation.html')
+            return render(request, 'rentals/request_confirmation.html')
     else:
         form = RequestEquipmentForm(user=request.user)
 
@@ -108,4 +108,44 @@ def rent_equipment(request, rental_request=None):
         'title': _('Rent Equipment'),
     }
 
+    return render(request, 'rentals/rent_equipment.html', context)
+
+@login_required
+def return_equipment(request, rental):
+    if not request.user.is_staff:
+        return redirect('rentals:request_equipment')
+
+    url = reverse('rentals:rent_equipment')
+    if request.method == 'POST':
+        rental = Rental.objects.get(id=rental)
+        form = ReturnEquipmentForm(user=request.user, rental=rental, data=request.POST)
+        url = reverse('rentals:return_equipment', args=(rental.id,))
+        if form.is_valid():
+            rental = form.rental
+            rental.state = Rental.RETURNED
+            rental.approved_by = request.user
+            rental.save()
+            if rental.rental_period.end_date == None:
+                rental.rental_period.end_date = datetime.date.today()
+                rental.rental_period.save()
+            for rental_item in form.cleaned_data['equipment']:
+                rental_item.item.state = Item.AVAILABLE
+                rental_item.item.save()
+                rental_item.save()
+            return render(request, 'rentals/return_confirmation.html')
+    else:
+        rental = Rental.objects.get(id=rental)
+        url = reverse('rentals:return_equipment', args=(rental.id,))
+        form = ReturnEquipmentForm(user=request.user,
+                                   rental=rental,
+                                   data={
+                                     'equipment': rental.rentalitem_set.all(),
+                                     'deposit': rental.deposit,
+                                   })
+
+    context = {
+        'form': form,
+        'url': url,
+        'title': _('Return Equipment'),
+    }
     return render(request, 'rentals/rent_equipment.html', context)

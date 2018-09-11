@@ -50,9 +50,10 @@ class EquipmentTableWidget(widgets.MultiWidget):
     template_name = 'rentals/widgets/equipment_table_widget.html'
     show_number = False
 
-    def __init__(self, show_number=False, widgets=[], **kwargs):
+    def __init__(self, show_number=False, show_cost=False, widgets=[], **kwargs):
         super().__init__(widgets, **kwargs)
         self.show_number = show_number
+        self.show_cost = show_cost
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -60,6 +61,7 @@ class EquipmentTableWidget(widgets.MultiWidget):
         context['widget']['item_size_map'] = get_item_size_map()
         context['widget']['item_types'] = item_types
         context['widget']['show_number'] = self.show_number
+        context['widget']['show_cost'] = self.show_cost
         return context
 
     def value_from_datadict(self, data, files, names):
@@ -82,18 +84,21 @@ class EquipmentTableWidget(widgets.MultiWidget):
                 value = data.getlist(key)
                 range_step = 2
                 if self.show_number:
-                    range_step = 4
+                    range_step += 1
+                if self.show_cost:
+                    range_step += 1
                 for i in range(0, len(value), range_step):
                     description = value[i]
                     size = value[i + 1]
                     if size == 'N/A':
                         size = None
+                    cost = 0
+                    if self.show_cost:
+                        cost = value[i + 3]
+                    number = None
                     if self.show_number:
                         number = value[i + 2]
-                        cost = value[i + 3]
-                        self.add_item(description, number, size, cost)
-                    else:
-                        self.add_item(description, None, size, 0)
+                    self.add_item(description, number, size, cost)
         return super().value_from_datadict(data, files, names)
 
     def decompress(self, value):
@@ -113,11 +118,13 @@ class EquipmentTableWidget(widgets.MultiWidget):
 
     def add_items(self, items):
         for rental_item in items:
-            # Get subclass object
-            item = getattr(rental_item.item, rental_item.item.description.lower())
             try :
+                # Get subclass object
+                item = getattr(rental_item.item, rental_item.item.description.lower())
                 self.add_item(item.description, item.number, item.size, rental_item.cost)
             except AttributeError:
+                # No subclass to be had 
+                item = rental_item.item
                 self.add_item(item.description, item.number, None, rental_item.cost)
 
     class Media:
@@ -131,21 +138,24 @@ class EquipmentRowWidget(widgets.Widget):
     show_number = False
 
     def __init__(self, item_description, item_size=None, item_number='',
-                 item_cost=0, show_number=False, **kwargs):
+                 item_cost=0, show_number=False, show_cost=False, **kwargs):
         super().__init__(**kwargs)
         self.item_description = item_description
         self.item_size = item_size
         self.item_number = item_number
         self.item_cost = item_cost
         self.show_number = show_number
+        self.show_cost = show_cost
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         try:
-            sizes = get_item_size_map()[self.item_description]
+            sizes = get_item_size_map()[self.item_description] + [ self.item_size ]
+            print(sizes)
         except KeyError:
             sizes = None
         context['widget']['show_number'] = self.show_number
+        context['widget']['show_cost'] = self.show_cost
         context['widget']['item_description'] = self.item_description
         context['widget']['item_size'] = self.item_size
         context['widget']['item_sizes'] = sizes
@@ -156,9 +166,10 @@ class EquipmentRowWidget(widgets.Widget):
 class EquipmentListField(fields.Field):
     widget = EquipmentTableWidget
 
-    def __init__(self, show_number=False, **kwargs):
+    def __init__(self, show_number=False, show_cost=False, **kwargs):
         super().__init__(**kwargs)
         self.widget.show_number = show_number
+        self.widget.show_cost = show_cost
 
     def clean(self, value):
         if value in self.empty_values:
@@ -168,8 +179,7 @@ class EquipmentListField(fields.Field):
         for i, widget in enumerate(self.widget.widgets):
             try:
                 item = Item.objects.get(number=widget.item_number,
-                                        description=widget.item_description,
-                                        state=Item.AVAILABLE)
+                                        description=widget.item_description)
                 try:
                     i = getattr(item, item.description.lower())
                 except AttributeError:
@@ -275,5 +285,41 @@ class RequestEquipmentForm(EquipmentForm):
     equipment = EquipmentListField()
 
 class RentEquipmentForm(EquipmentForm):
+    equipment = EquipmentListField(show_number=True, show_cost=True)
+    deposit = forms.IntegerField(
+        widget=widgets.NumberInput(attrs={'class': 'form-control'}))
+
+    def clean(self):
+        super().clean()
+        rented_equipment = self.cleaned_data.get('equipment')
+        for item in rented_equipment:
+            try:
+                item = item.item
+                if item.state != Item.AVAILABLE:
+                    self.add_error(forms.ValidationError(
+                        _('%(type)s number %(num)s not available'),
+                        code='invalid',
+                        params={
+                            'type': item.description,
+                            'num': item.number,
+                        }))
+            except AttributeError:
+                self.add_error('equipment', forms.ValidationError(
+                    _('%(type)s number not valid'),
+                    code='invalid',
+                    params={
+                        'type': item.item_description,
+                    }))
+
+class ReturnEquipmentForm(forms.Form):
     equipment = EquipmentListField(show_number=True)
-    deposit = forms.IntegerField(widget=widgets.NumberInput(attrs={'class': 'form-control'}))
+    deposit = forms.IntegerField(
+        widget=widgets.NumberInput(attrs={'class': 'form-control',
+                                          'readonly': True}))
+    deposit_returned = forms.BooleanField(required=False,
+        widget=widgets.CheckboxInput(attrs={'class': 'form-check-input'}))
+
+    def __init__(self, user, rental, **kwargs):
+        super().__init__(**kwargs)
+        self.user = user
+        self.rental = rental

@@ -21,6 +21,8 @@
       <input type="text" class="form-control" name="{{ widget.item_description }}" value="{{ widget.item_number }}" id="{{widget.item_description }}-number"/>
     </div>
   </td>
+  {% endif %}
+  {% if widget.show_cost %}
   <td>
     <div class="form-group">
       <input type="number" class="form-control" name="{{ widget.item_description }}" value="{{ widget.item_cost }}" id="{{widget.item_description }}-cost" min="0"/>

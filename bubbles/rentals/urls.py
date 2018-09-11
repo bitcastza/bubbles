@@ -38,4 +38,5 @@ urlpatterns = [
     path('request/', views.request_equipment, name='request_equipment'),
     path('rent/', views.rent_equipment, name='rent_equipment'),
     path('rent/<int:rental_request>/', views.rent_equipment, name='rent_equipment'),
+    path('return/<int:rental>/', views.return_equipment, name='return_equipment'),
 ]
