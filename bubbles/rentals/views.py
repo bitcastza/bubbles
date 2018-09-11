@@ -15,6 +15,7 @@
 ###########################################################################
 import datetime
 
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import FieldDoesNotExist
 from django.shortcuts import render, redirect
@@ -22,12 +23,13 @@ from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 
 from bubbles.inventory.models import Item, BCD, Booties, Cylinder, Fins, Wetsuit
-from .models import Rental, RequestItem, RentalPeriod
+from .models import Rental, RequestItem, RentalPeriod, RentalItem
 from .forms import RequestEquipmentForm, RentEquipmentForm, ReturnEquipmentForm
 
 @login_required
 def index(request):
-    rental_set = Rental.objects.filter(user=request.user)
+    rental_set = Rental.objects.filter(user=request.user,
+                                       rental_period__end_date__gt=datetime.date.today())
 
     context = {}
     if (len(rental_set) != 0):
@@ -127,7 +129,7 @@ def return_equipment(request, rental):
             rental.save()
             if rental.rental_period.end_date == None:
                 rental.rental_period.end_date = datetime.date.today()
-                rental.rental_period.save()
+                retnal.rental_period.save()
             for rental_item in form.cleaned_data['equipment']:
                 rental_item.item.state = Item.AVAILABLE
                 rental_item.item.save()

@@ -109,7 +109,8 @@ class EquipmentTableWidget(widgets.MultiWidget):
                                     item_number=item_number,
                                     item_size=item_size,
                                     item_cost=item_cost,
-                                    show_number=self.show_number)
+                                    show_number=self.show_number,
+                                    show_cost=self.show_cost)
         self.widgets.append(widget)
 
     def add_request_items(self, items):
@@ -256,8 +257,9 @@ class EquipmentForm(forms.Form):
                                     default_cost_per_item=0,
                                     hidden=True)
         current_period = self.cleaned_data['period']
-        existing_periods = Rental.objects.filter(user__exact=self.user,
-                                                 rental_period__exact=current_period)
+        existing_periods = Rental.objects.filter(user=self.user,
+                                                 rental_period=current_period,
+                                                 state=Rental.REQUESTED)
         if existing_periods.count():
             raise forms.ValidationError(_('You already have a request submitted for '
             'this period'), code='invalid')
