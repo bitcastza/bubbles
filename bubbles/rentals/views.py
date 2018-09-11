@@ -66,19 +66,10 @@ def rent_equipment(request, rental_request=None):
 
     url = reverse('rentals:rent_equipment')
     if request.method == 'POST':
-        print(request.POST)
         try:
             rental = Rental.objects.get(id=rental_request)
         except Rental.DoesNotExist:
-            temp_period = RentalPeriod(start_date=datetime.date.today(),
-                                       default_deposit=0,
-                                       default_cost_per_item=0,
-                                       hidden=True)
-            rental = Rental(user=request.user,
-                            approved_by=request.user,
-                            state=Rental.REQUESTED,
-                            deposit=0,
-                            rental_period=temp_period)
+            rental = None
         form = RentEquipmentForm(user=request.user, rental=rental, data=request.POST)
         if (rental_request):
             url = reverse('rentals:rent_equipment', args=(rental_request,))
