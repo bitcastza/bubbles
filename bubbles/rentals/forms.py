@@ -197,8 +197,10 @@ class EquipmentListField(fields.Field):
                             'size': widget.item_size,
                         }))
             except ObjectDoesNotExist:
-                if widget.item_number == None:
+                if widget.item_number == None or widget.item_number == '':
                     # Rental request
+                    # TODO: append error if submit pressed, but not if it is the initial
+                    # display
                     request_item = RequestItem(item_description=widget.item_description,
                                                item_size=widget.item_size)
                     rental_items.append(request_item)
@@ -227,7 +229,7 @@ class EquipmentForm(forms.Form):
                                     required=False,
                                     widget=widgets.Select(
                                         attrs={'class': 'form-control'}),
-                                   initial=get_initial_period)
+                                    initial=get_initial_period)
 
     def __init__(self, user, rental=None, **kwargs):
         super().__init__(**kwargs)
