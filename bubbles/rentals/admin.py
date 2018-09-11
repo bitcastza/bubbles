@@ -49,6 +49,7 @@ class RentalPeriodAdmin(admin.ModelAdmin):
                     'end_date',
                     'deposit',
                     'cost_per_item')
+    exclude = ['hidden']
     date_hierarchy = 'start_date'
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
 
