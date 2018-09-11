@@ -86,7 +86,7 @@ class EquipmentTableWidget(widgets.MultiWidget):
                 for i in range(0, len(value), range_step):
                     description = value[i]
                     size = value[i + 1]
-                    if size == "N/A":
+                    if size == 'N/A':
                         size = None
                     if self.show_number:
                         number = value[i + 2]
@@ -109,7 +109,7 @@ class EquipmentTableWidget(widgets.MultiWidget):
 
     def add_request_items(self, items):
         for request in items:
-            self.add_item(request.item_description, "", request.item_size, request.cost)
+            self.add_item(request.item_description, '', request.item_size, request.cost)
 
     def add_items(self, items):
         for rental_item in items:
