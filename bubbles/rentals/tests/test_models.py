@@ -16,7 +16,7 @@
 import datetime
 
 from django.contrib.auth.models import User
-from django.test import RequestFactory, TestCase
+from django.test import TestCase
 
 from bubbles.inventory.models import Item
 from bubbles.rentals.models import Rental, RentalPeriod, RentalItem, RequestItem
