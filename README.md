@@ -16,7 +16,7 @@ $ pyenv/bin/python manage.py runserver
 This will start a development web server on http://127.0.0.1:8000/
 
 A more production ready setup can be created by following the
-[ansible role](https://github.com/bubbles/ansible).
+[ansible role](https://gitlab.com/bubbles/ansible).
 
 ## Analysis
 
