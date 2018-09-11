@@ -56,7 +56,7 @@ class IndexViewTests(TestCase):
 
     def test_logged_in_rentals(self):
         self.request.user = self.user
-        start_date = datetime.date(year=2018, month=7, day=2)
+        start_date = datetime.date.today()
         end_date = start_date + datetime.timedelta(days=5)
         rental_period = RentalPeriod.objects.create(start_date=start_date,
                                                     end_date=end_date,
