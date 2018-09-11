@@ -44,8 +44,7 @@ def request_equipment(request):
             rental.state = Rental.REQUESTED
             rental.save()
             for rental_item in form.cleaned_data['equipment']:
-                rental_item.rental = rental # TODO: Move to EquipmentForm#clean()
-                rental_item.cost = rental.default_cost_per_item
+                rental_item.rental = rental
                 rental_item.save()
             return render(request, 'rentals/rental_confirmation.html')
     else:

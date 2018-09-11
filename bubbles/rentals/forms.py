@@ -243,22 +243,30 @@ class EquipmentForm(forms.Form):
                                     default_deposit=0,
                                     default_cost_per_item=0,
                                     hidden=True)
+        current_period = self.cleaned_data['period']
+        existing_periods = Rental.objects.filter(user__exact=self.user,
+                                                 rental_period__exact=current_period)
+        if existing_periods.count():
+            raise forms.ValidationError(_('You already have a request submitted for '
+            'this period'), code='invalid')
         return self.cleaned_data['period']
 
     def clean(self):
-        if self.rental == None:
-            state = Rental.REQUESTED
-            period = self.cleaned_data['period']
-            deposit = period.default_deposit
-            self.rental = Rental(user=self.user,
-                                 state=state,
-                                 deposit=deposit,
-                                 rental_period=period)
-        try:
-            for rental_item in self.cleaned_data['equipment']:
-                rental_item.rental = self.rental
-        except KeyError:
-            pass
+        if not self.has_error('period'):
+            if self.rental == None:
+                state = Rental.REQUESTED
+                period = self.cleaned_data['period']
+                deposit = period.default_deposit
+                self.rental = Rental(user=self.user,
+                                     state=state,
+                                     deposit=deposit,
+                                     rental_period=period)
+            try:
+                for rental_item in self.cleaned_data['equipment']:
+                    rental_item.rental = self.rental
+                    rental_item.cost = self.rental.rental_period.default_cost_per_item
+            except KeyError:
+                pass
         return self.cleaned_data
 
 class RequestEquipmentForm(EquipmentForm):
