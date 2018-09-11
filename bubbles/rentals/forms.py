@@ -48,9 +48,11 @@ def get_initial_period():
 
 class EquipmentTableWidget(widgets.MultiWidget):
     template_name = 'rentals/widgets/equipment_table_widget.html'
+    show_number = False
 
-    def __init__(self, widgets=[], **kwargs):
+    def __init__(self, show_number=False, widgets=[], **kwargs):
         super().__init__(widgets, **kwargs)
+        self.show_number = show_number
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -65,10 +67,11 @@ class EquipmentTableWidget(widgets.MultiWidget):
         try:
             # Python created with data
             rental_items = data['equipment']
-            if type(rental_items[0]) == RentalItem:
-                self.add_items(rental_items)
-            else:
-                self.add_request_items(rental_items)
+            if len(rental_items) > 0:
+                if type(rental_items[0]) == RentalItem:
+                    self.add_items(rental_items)
+                else:
+                    self.add_request_items(rental_items)
         except KeyError:
             # Response with POST data
             item_types = Item.objects.filter(state__exact=Item.AVAILABLE).values('description').distinct()
@@ -236,7 +239,7 @@ class EquipmentForm(forms.Form):
             if not self.user.is_staff:
                 raise forms.ValidationError(_('This field is required'), code='invalid')
             else:
-                return RentalPeriod(start_date=datetime.date.today,
+                return RentalPeriod(start_date=datetime.date.today(),
                                     default_deposit=0,
                                     default_cost_per_item=0,
                                     hidden=True)

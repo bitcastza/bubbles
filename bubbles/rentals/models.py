@@ -26,8 +26,10 @@ class RentalPeriod(models.Model):
     hidden = models.BooleanField(default=False)
 
     def __str__(self):
-        return "{} - {}".format(self.start_date,
-                                self.end_date)
+        if self.end_date:
+            return "{} - {}".format(self.start_date,
+                                    self.end_date)
+        return "{} -".format(self.start_date)
 
 class Rental(models.Model):
     REQUESTED = 'REQ'

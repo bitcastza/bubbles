@@ -22,7 +22,7 @@ from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 
 from bubbles.inventory.models import Item, BCD, Booties, Cylinder, Fins, Wetsuit
-from .models import Rental, RequestItem
+from .models import Rental, RequestItem, RentalPeriod
 from .forms import RequestEquipmentForm, RentEquipmentForm
 
 @login_required
@@ -66,12 +66,29 @@ def rent_equipment(request, rental_request=None):
 
     url = reverse('rentals:rent_equipment')
     if request.method == 'POST':
-        rental = Rental.objects.get(id=rental_request)
+        print(request.POST)
+        try:
+            rental = Rental.objects.get(id=rental_request)
+        except Rental.DoesNotExist:
+            temp_period = RentalPeriod(start_date=datetime.date.today(),
+                                       default_deposit=0,
+                                       default_cost_per_item=0,
+                                       hidden=True)
+            rental = Rental(user=request.user,
+                            approved_by=request.user,
+                            state=Rental.REQUESTED,
+                            deposit=0,
+                            rental_period=temp_period)
         form = RentEquipmentForm(user=request.user, rental=rental, data=request.POST)
-        url = reverse('rentals:rent_equipment', args=(rental_request,))
+        if (rental_request):
+            url = reverse('rentals:rent_equipment', args=(rental_request,))
+        else:
+            url = reverse('rentals:rent_equipment')
         if form.is_valid():
-            form.cleaned_data['period'].save()
+            period = form.cleaned_data['period']
+            period.save()
             rental = form.rental
+            rental.rental_period = period
             rental.state = Rental.RENTED
             rental.approved_by = request.user
             rental.save()
