@@ -60,6 +60,23 @@ class CylinderAdmin(admin.ModelAdmin):
     list_filter = ('state', 'manufacturer', 'capacity')
     exclude = ['description']
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
+    fieldsets = (
+        (None, {
+            'fields': ('number',
+                       'manufacturer',
+                       'date_of_purchase',
+                       'state',
+                       'serial_num',
+                       'material',
+                       'capacity',
+                       'last_viz',
+                       'last_hydro'),
+        }),
+        ('Advanced options', {
+            'classes': ('collapse',),
+            'fields': ('viz_period', 'hydro_period'),
+        })
+    )
 
 @admin.register(models.Regulator, site=admin_site)
 class RegulatorAdmin(admin.ModelAdmin):
