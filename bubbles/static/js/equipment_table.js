@@ -31,11 +31,22 @@ function addItemRemoveListener() {
     });
 }
 
+function setTotalCost() {
+    var cost = 0;
+    $('.item-cost').each(function() {
+        cost += +$(this).val();
+    });
+    cost += +$('#id_deposit').val();
+    $('#total-cost').text("Total cost: R" + cost);
+}
+
 $(document).ready(function() {
     if (!isItems()) {
         $('#submit-btn').hide();
     }
     addItemRemoveListener();
+    setTotalCost();
+    $('.item-cost').on('input', setTotalCost);
     $('#add-dropdown li').on('click', function() {
         var currentItem = this;
         var description = $(currentItem).text();
@@ -71,7 +82,7 @@ $(document).ready(function() {
             sizeOptions +
             '</div>';
         if (showNumber) {
-            cost = $('#item-cost').text();
+            cost = +$('#item-cost').text();
             row += '<td>' +
                 '<div class="form-group">' +
                 '<input type="text" class="form-control" name="' + description +
@@ -80,7 +91,8 @@ $(document).ready(function() {
                 '</td>' +
                 '<td>' +
                 '<div class="form-group">' +
-                '<input type="number" class="form-control" name="' + description +
+                '<input type="number" class="item-cost form-control" name="' +
+                description +
                 '" id="' + description + '-cost" value="' + cost + '" min="0"/>' +
                 '</div>' +
                 '</td>';
@@ -91,6 +103,8 @@ $(document).ready(function() {
             '</tr>';
         $('#equipment-table > tbody:last-child').append(row);
         $('#submit-btn').show();
+        $('.item-cost').on('input', setTotalCost);
+        setTotalCost();
         if (! showNumber) {
             $('#' + description + '-dropdown').hide();
         }

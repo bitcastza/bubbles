@@ -56,6 +56,7 @@ def request_equipment(request):
         'form': form,
         'url': reverse('rentals:request_equipment'),
         'title': _('Request Equipment'),
+        'show_cost': False,
     }
 
     return render(request, 'rentals/rent_equipment.html', context)
@@ -108,6 +109,7 @@ def rent_equipment(request, rental_request=None):
         'form': form,
         'url': url,
         'title': _('Rent Equipment'),
+        'show_cost': True,
     }
 
     return render(request, 'rentals/rent_equipment.html', context)
@@ -149,5 +151,6 @@ def return_equipment(request, rental):
         'form': form,
         'url': url,
         'title': _('Return Equipment'),
+        'show_cost': False,
     }
     return render(request, 'rentals/rent_equipment.html', context)

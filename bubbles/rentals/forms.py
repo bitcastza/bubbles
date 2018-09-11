@@ -49,9 +49,13 @@ def get_initial_period():
 class EquipmentTableWidget(widgets.MultiWidget):
     template_name = 'rentals/widgets/equipment_table_widget.html'
     show_number = False
+    show_cost = False
+    item_cost = 0
 
-    def __init__(self, show_number=False, show_cost=False, widgets=[], **kwargs):
+    def __init__(self, show_number=False, show_cost=False, item_cost=0,
+                 widgets=[], **kwargs):
         super().__init__(widgets, **kwargs)
+        self.item_cost = item_cost
         self.show_number = show_number
         self.show_cost = show_cost
 
@@ -60,6 +64,7 @@ class EquipmentTableWidget(widgets.MultiWidget):
         item_types = Item.objects.filter(state__exact=Item.AVAILABLE).values('description').distinct()
         context['widget']['item_size_map'] = get_item_size_map()
         context['widget']['item_types'] = item_types
+        context['widget']['item_cost'] = self.item_cost
         context['widget']['show_number'] = self.show_number
         context['widget']['show_cost'] = self.show_cost
         return context
@@ -124,7 +129,7 @@ class EquipmentTableWidget(widgets.MultiWidget):
                 item = getattr(rental_item.item, rental_item.item.description.lower())
                 self.add_item(item.description, item.number, item.size, rental_item.cost)
             except AttributeError:
-                # No subclass to be had 
+                # No subclass to be had
                 item = rental_item.item
                 self.add_item(item.description, item.number, None, rental_item.cost)
 
@@ -152,7 +157,6 @@ class EquipmentRowWidget(widgets.Widget):
         context = super().get_context(name, value, attrs)
         try:
             sizes = get_item_size_map()[self.item_description] + [ self.item_size ]
-            print(sizes)
         except KeyError:
             sizes = None
         context['widget']['show_number'] = self.show_number
@@ -167,10 +171,11 @@ class EquipmentRowWidget(widgets.Widget):
 class EquipmentListField(fields.Field):
     widget = EquipmentTableWidget
 
-    def __init__(self, show_number=False, show_cost=False, **kwargs):
+    def __init__(self, show_number=False, show_cost=False, item_cost=0, **kwargs):
         super().__init__(**kwargs)
         self.widget.show_number = show_number
         self.widget.show_cost = show_cost
+        self.widget.item_cost = item_cost
 
     def clean(self, value):
         if value in self.empty_values:
@@ -290,6 +295,11 @@ class RentEquipmentForm(EquipmentForm):
     equipment = EquipmentListField(show_number=True, show_cost=True)
     deposit = forms.IntegerField(
         widget=widgets.NumberInput(attrs={'class': 'form-control'}))
+
+    def __init__(self, user, rental=None, **kwargs):
+        super().__init__(user, rental, **kwargs)
+        if rental:
+            self.fields['equipment'].widget.item_cost = rental.rental_period.default_cost_per_item
 
     def clean(self):
         super().clean()

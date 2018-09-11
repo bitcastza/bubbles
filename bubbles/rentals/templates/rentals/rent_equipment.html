@@ -30,6 +30,11 @@
         <button class="btn btn-primary" id="submit-btn" type="submit">Submit</button>
       </div>
     </form>
+    {% if show_cost %}
+    <div id="total-cost">
+      Total cost:
+    </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
