@@ -35,6 +35,6 @@ from . import views
 app_name = 'pages'
 
 urlpatterns = [
-    path('', views.page, {'page_name': 'index'}, name='page'),
+    path('', views.page, {'page_name': 'index'}, name='index'),
     path('<str:page_name>/', views.page, name='page'),
 ]

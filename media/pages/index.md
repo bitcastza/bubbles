@@ -1,11 +1,4 @@
-# Help! Help!
+# Bubbles Documentation
 
-This is a help doc page
-
-```
-This is unitext with <em>html</em>
-```
-
-This is a [link](../)
-
-![](/static/img/rental.png){: .img-fluid .img-thumbnail }
+Bubbles is an SCUBA equipment management system. It supports tracking equipment
+and renting it to members.
