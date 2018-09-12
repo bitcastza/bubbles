@@ -36,6 +36,7 @@ def page(request, page_name):
         raise Http404('Page not found')
 
     text = input_file.read()
-    html = markdown.markdown(text, extensions=[EscapeHtml()])
+    html = markdown.markdown(text, extensions=[EscapeHtml(),
+                                               'markdown.extensions.attr_list'])
     context = {'body': html}
     return render(request, 'pages/page.html', context)
