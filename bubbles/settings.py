@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'bubbles.inventory',
     'bubbles.rentals',
     'bubbles.registration',
+    'bubbles.pages',
     'sakaiauthenticator',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -142,8 +143,12 @@ SAKAI_SITE_ID = 'd6d8ab20-ffa4-4047-b1fd-e6d98847a949'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
-
 STATIC_URL = '/static/'
+
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+# Example: "/var/www/example.com/media/"
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+MEDIA_ROOT = os.path.join(project_root, 'media')
 
 # Redirect to home URL after login
 LOGIN_REDIRECT_URL = '/'

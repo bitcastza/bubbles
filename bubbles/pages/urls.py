@@ -28,13 +28,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import include, path
+from django.urls import path
+from django.views.generic.base import RedirectView
+from . import views
 
-from .admin import admin_site
+app_name = 'pages'
 
 urlpatterns = [
-    path('', include('bubbles.rentals.urls')),
-    path('admin/', admin_site.urls),
-    path('accounts/', include('bubbles.registration.urls')),
-    path('docs/', include('bubbles.pages.urls')),
+    path('', views.page, {'page_name': 'index'}, name='page'),
+    path('<str:page_name>/', views.page, name='page'),
 ]
