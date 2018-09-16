@@ -29,7 +29,7 @@ from .forms import RequestEquipmentForm, RentEquipmentForm, ReturnEquipmentForm
 @login_required
 def index(request):
     rental_set = Rental.objects.filter(user=request.user,
-                                       rental_period__end_date__gt=datetime.date.today())
+                                       state=Rental.RENTED)
 
     context = {}
     if (len(rental_set) != 0):
@@ -70,9 +70,11 @@ def rent_equipment(request, rental_request=None):
     if request.method == 'POST':
         try:
             rental = Rental.objects.get(id=rental_request)
+            user = rental.user
         except Rental.DoesNotExist:
             rental = None
-        form = RentEquipmentForm(user=request.user, rental=rental, data=request.POST)
+            user = request.user
+        form = RentEquipmentForm(user=user, rental=rental, data=request.POST)
         if (rental_request):
             url = reverse('rentals:rent_equipment', args=(rental_request,))
         else:
@@ -95,7 +97,7 @@ def rent_equipment(request, rental_request=None):
         if rental_request:
             rental = Rental.objects.get(id=rental_request)
             url = reverse('rentals:rent_equipment', args=(rental_request,))
-            form = RentEquipmentForm(user=request.user,
+            form = RentEquipmentForm(user=rental.user,
                                      rental=rental,
                                      data={
                                          'equipment': rental.requestitem_set.all(),
@@ -104,10 +106,10 @@ def rent_equipment(request, rental_request=None):
                                      })
         else:
             form = RentEquipmentForm(user=request.user)
-
     context = {
         'form': form,
         'url': url,
+        'rental_user': form.user,
         'title': _('Rent Equipment'),
         'show_cost': True,
     }
@@ -140,7 +142,7 @@ def return_equipment(request, rental):
     else:
         rental = Rental.objects.get(id=rental)
         url = reverse('rentals:return_equipment', args=(rental.id,))
-        form = ReturnEquipmentForm(user=request.user,
+        form = ReturnEquipmentForm(user=rental.user,
                                    rental=rental,
                                    data={
                                      'equipment': rental.rentalitem_set.all(),
@@ -150,6 +152,7 @@ def return_equipment(request, rental):
     context = {
         'form': form,
         'url': url,
+        'rental_user': form.user,
         'title': _('Return Equipment'),
         'show_cost': False,
     }

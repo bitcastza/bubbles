@@ -290,6 +290,10 @@ class EquipmentForm(forms.Form):
 
 class RequestEquipmentForm(EquipmentForm):
     equipment = EquipmentListField()
+    #TODO: link to terms of rental
+    liability = forms.BooleanField(
+        label=_("I have read and understand the terms of rental"),
+        widget=widgets.CheckboxInput(attrs={'class': 'form-check-input'}))
 
 class RentEquipmentForm(EquipmentForm):
     equipment = EquipmentListField(show_number=True, show_cost=True)

@@ -37,7 +37,7 @@ function setTotalCost() {
         cost += +$(this).val();
     });
     cost += +$('#id_deposit').val();
-    $('#total-cost').text("Total cost: R" + cost);
+    $('#id_total_cost').text("R" + cost);
 }
 
 $(document).ready(function() {
@@ -47,6 +47,7 @@ $(document).ready(function() {
     addItemRemoveListener();
     setTotalCost();
     $('.item-cost').on('input', setTotalCost);
+    $('#id_deposit').on('input', setTotalCost);
     $('#add-dropdown li').on('click', function() {
         var currentItem = this;
         var description = $(currentItem).text();
