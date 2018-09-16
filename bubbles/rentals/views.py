@@ -28,8 +28,9 @@ from .forms import RequestEquipmentForm, RentEquipmentForm, ReturnEquipmentForm
 
 @login_required
 def index(request):
-    rental_set = Rental.objects.filter(user=request.user,
-                                       state=Rental.RENTED)
+    rental_set = Rental.objects.filter(Q(user=request.user) &
+                                       Q(state=Rental.REQUESTED) |
+                                       Q(state=Rental.RENTED))
 
     context = {}
     if (len(rental_set) != 0):
