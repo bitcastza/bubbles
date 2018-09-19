@@ -76,11 +76,13 @@ class Item(models.Model):
         return NotImplemented
 
 class BCD(Item):
+    EXTRA_SMALL = 'XS'
     SMALL = 'S'
     MEDIUM = 'M'
     MEDIUM_LARGE = 'ML'
     LARGE = 'L'
     SIZE_CHOICES = (
+        (EXTRA_SMALL, _('Extra small')),
         (SMALL, _('Small')),
         (MEDIUM, _('Medium')),
         (MEDIUM_LARGE, _('Medium large')),
@@ -101,11 +103,13 @@ class BCD(Item):
         verbose_name = 'BCD'
 
 class Booties(Item):
+    EXTRA_SMALL = 'XS'
     SMALL = 'S'
     MEDIUM = 'M'
     LARGE = 'L'
     EXTRA_LARGE = 'XL'
     SIZE_CHOICES = (
+        (EXTRA_SMALL, _('Extra small')),
         (SMALL, _('Small')),
         (MEDIUM, _('Medium')),
         (LARGE, _('Large')),
