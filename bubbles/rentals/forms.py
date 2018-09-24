@@ -308,24 +308,25 @@ class RentEquipmentForm(EquipmentForm):
     def clean(self):
         super().clean()
         rented_equipment = self.cleaned_data.get('equipment')
-        for item in rented_equipment:
-            try:
-                item = item.item
-                if item.state != Item.AVAILABLE:
-                    self.add_error(forms.ValidationError(
-                        _('%(type)s number %(num)s not available'),
+        if rented_equipment:
+            for item in rented_equipment:
+                try:
+                    item = item.item
+                    if item.state != Item.AVAILABLE:
+                        self.add_error(forms.ValidationError(
+                            _('%(type)s number %(num)s not available'),
+                            code='invalid',
+                            params={
+                                'type': item.description,
+                                'num': item.number,
+                            }))
+                except AttributeError:
+                    self.add_error('equipment', forms.ValidationError(
+                        _('%(type)s number not valid'),
                         code='invalid',
                         params={
-                            'type': item.description,
-                            'num': item.number,
+                            'type': item.item_description,
                         }))
-            except AttributeError:
-                self.add_error('equipment', forms.ValidationError(
-                    _('%(type)s number not valid'),
-                    code='invalid',
-                    params={
-                        'type': item.item_description,
-                    }))
 
 class ReturnEquipmentForm(forms.Form):
     equipment = EquipmentListField(show_number=True)
