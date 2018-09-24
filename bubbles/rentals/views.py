@@ -91,6 +91,7 @@ def rent_equipment(request, rental_request=None):
             for rental_item in form.cleaned_data['equipment']:
                 rental_item.item.state = Item.IN_USE
                 rental_item.item.save()
+                rental_item.rental = rental
                 rental_item.save()
             RequestItem.objects.filter(rental=rental).delete()
             return render(request, 'rentals/rental_confirmation.html')
