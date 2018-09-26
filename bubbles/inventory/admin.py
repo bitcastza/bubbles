@@ -20,8 +20,23 @@ from bubbles.admin import admin_site, BUBBLES_FORMFIELD_OVERRIDES
 
 from . import models
 
+def make_repair(modeladmin, request, queryset):
+    for obj in queryset:
+        obj.state = models.Item.REPAIR
+        obj.save()
+
+make_repair.short_description = 'Mark selected items as in for repairs'
+
+def make_available(modeladmin, request, queryset):
+    for obj in queryset:
+        obj.state = models.Item.AVAILABLE
+        obj.save()
+
+make_available.short_description = 'Mark selected items as available'
+
 @admin.register(models.Item, site=admin_site)
 class ItemAdmin(admin.ModelAdmin):
+    actions = [make_repair, make_available]
     list_display = ('description', 'number', 'manufacturer', 'state')
     list_filter = ('state', 'description')
     list_display_links = ('number',)
@@ -38,6 +53,7 @@ class ItemAdmin(admin.ModelAdmin):
         return qs.filter(q_filter)
 
 class SizeAdmin(admin.ModelAdmin):
+    actions = [make_repair, make_available]
     list_display = ('number', 'manufacturer', 'size', 'state')
     list_filter = ('state', 'size', 'manufacturer')
     exclude = ['description']
@@ -51,6 +67,7 @@ class BCDAdmin(SizeAdmin):
 
 @admin.register(models.Cylinder, site=admin_site)
 class CylinderAdmin(admin.ModelAdmin):
+    actions = [make_repair, make_available]
     list_display = ('number',
                     'manufacturer',
                     'serial_num',
@@ -80,6 +97,7 @@ class CylinderAdmin(admin.ModelAdmin):
 
 @admin.register(models.Regulator, site=admin_site)
 class RegulatorAdmin(admin.ModelAdmin):
+    actions = [make_repair, make_available]
     list_display = ('number',
                     'manufacturer',
                     'next_service',
