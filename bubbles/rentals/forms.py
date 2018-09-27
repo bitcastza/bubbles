@@ -246,6 +246,7 @@ class EquipmentForm(forms.Form):
                                     widget=widgets.Select(
                                         attrs={'class': 'form-control'}),
                                     initial=get_initial_period)
+    period_state_filter = Rental.REQUESTED
 
     def __init__(self, user, rental=None, **kwargs):
         super().__init__(**kwargs)
@@ -264,7 +265,7 @@ class EquipmentForm(forms.Form):
         current_period = self.cleaned_data['period']
         existing_periods = Rental.objects.filter(user=self.user,
                                                  rental_period=current_period,
-                                                 state=Rental.REQUESTED)
+                                                 state=self.period_state_filter)
         if existing_periods.count():
             raise forms.ValidationError(_('You already have a request submitted for '
             'this period'), code='invalid')
@@ -294,11 +295,13 @@ class RequestEquipmentForm(EquipmentForm):
     liability = forms.BooleanField(
         label=_("I have read and understand the terms of rental"),
         widget=widgets.CheckboxInput(attrs={'class': 'form-check-input'}))
+    period_state_filter = Rental.REQUESTED
 
 class RentEquipmentForm(EquipmentForm):
     equipment = EquipmentListField(show_number=True, show_cost=True)
     deposit = forms.IntegerField(
         widget=widgets.NumberInput(attrs={'class': 'form-control'}))
+    period_state_filter = Rental.RENTED
 
     def __init__(self, user, rental=None, **kwargs):
         super().__init__(user, rental, **kwargs)
