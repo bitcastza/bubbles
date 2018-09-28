@@ -316,7 +316,7 @@ class RentEquipmentForm(EquipmentForm):
                 try:
                     item = item.item
                     if item.state != Item.AVAILABLE:
-                        self.add_error(forms.ValidationError(
+                        self.add_error('equipment', forms.ValidationError(
                             _('%(type)s number %(num)s not available'),
                             code='invalid',
                             params={
