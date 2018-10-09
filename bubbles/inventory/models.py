@@ -89,6 +89,7 @@ class BCD(Item):
         (LARGE, _('Large')),
     )
 
+    serial_num = models.CharField(_('Serial number'), max_length=255)
     last_service = models.DateField(_('Last service'))
     size = models.CharField(_('Size'), max_length=2, choices=SIZE_CHOICES)
 
@@ -165,6 +166,7 @@ class Fins(Item):
         verbose_name_plural = 'Fins'
 
 class Regulator(Item):
+    serial_num = models.CharField(_('Serial number'), max_length=255)
     last_service = models.DateField(_('Last service'))
 
     @property
