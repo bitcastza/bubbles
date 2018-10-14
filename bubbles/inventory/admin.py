@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
+import datetime
 from django.contrib import admin
 from django.db.models import Q
 
@@ -30,9 +31,12 @@ make_repair.short_description = 'Mark selected items as in for repairs'
 def make_available(modeladmin, request, queryset):
     for obj in queryset:
         obj.state = models.Item.AVAILABLE
+        today = datetime.date.today()
+        date = datetime.date(year=today.year, month=today.month, day=1)
+        obj.last_service = date
         obj.save()
 
-make_available.short_description = 'Mark selected items as available'
+make_available.short_description = 'Return items from repair'
 
 @admin.register(models.Item, site=admin_site)
 class ItemAdmin(admin.ModelAdmin):

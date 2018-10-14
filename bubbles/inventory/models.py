@@ -142,6 +142,12 @@ class Cylinder(Item):
     def last_service(self):
         return max(self.last_viz, self.last_hydro)
 
+    @last_service.setter
+    def last_service(self, date):
+        if date - self.last_hydro > self.hydro_period:
+            self.last_hydro = date
+        self.last_viz = date
+
     def clean(self):
         self.description = "Cylinder"
 
