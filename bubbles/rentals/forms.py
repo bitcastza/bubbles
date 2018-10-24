@@ -26,7 +26,7 @@ from bubbles.inventory.models import BCD, Booties, Cylinder, Fins, Wetsuit, Item
 from .models import Rental, RentalItem, RentalPeriod, RequestItem
 
 def get_sizes(item_type, size_tag='size'):
-    sizes_set = item_type.objects.filter(state__exact=Item.AVAILABLE).values(size_tag).distinct()
+    sizes_set = item_type.objects.filter(state__exact=Item.AVAILABLE, hidden=False).values(size_tag).distinct()
     sizes = [i[size_tag] for i in sizes_set]
     return sizes
 
@@ -81,7 +81,7 @@ class EquipmentTableWidget(widgets.MultiWidget):
                     self.add_request_items(rental_items)
         except KeyError:
             # Response with POST data
-            item_types = Item.objects.filter(state__exact=Item.AVAILABLE).values('description').distinct()
+            item_types = Item.objects.filter(state__exact=Item.AVAILABLE, hidden=False).values('description').distinct()
             item_types = [i['description'] for i in item_types]
             for key in data:
                 if key not in item_types:
@@ -110,6 +110,9 @@ class EquipmentTableWidget(widgets.MultiWidget):
         return value
 
     def add_item(self, item_description, item_number, item_size, item_cost=0):
+        if item_description == 'Cylinder':
+            item_size = decimal.Decimal(item_size)
+
         widget = EquipmentRowWidget(item_description,
                                     item_number=item_number,
                                     item_size=item_size,
@@ -185,7 +188,8 @@ class EquipmentListField(fields.Field):
         for i, widget in enumerate(self.widget.widgets):
             try:
                 item = Item.objects.get(number=widget.item_number,
-                                        description=widget.item_description)
+                                        description=widget.item_description,
+                                        hidden=False)
                 try:
                     i = getattr(item, item.description.lower())
                 except AttributeError:
@@ -202,16 +206,6 @@ class EquipmentListField(fields.Field):
                             }))
                 except AttributeError:
                     pass
-
-                if i.description == 'Cylinder' and i.capacity != decimal.Decimal(widget.item_size):
-                    errors.append(forms.ValidationError(
-                        _('%(type)s number %(num)s is not size %(size)s'),
-                        code='invalid',
-                        params={
-                            'type': widget.item_description,
-                            'num': widget.item_number,
-                            'size': widget.item_size,
-                        }))
             except ObjectDoesNotExist:
                 if widget.item_number == None or widget.item_number == '':
                     # Rental request

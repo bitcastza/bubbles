@@ -60,6 +60,7 @@ class Item(models.Model):
     date_of_purchase = models.DateField(_('Date of purchase'))
     state = models.CharField(_('State'), max_length=1, choices=STATE_CHOICES, default=STATE_CHOICES[0])
     description = models.CharField(_('Type'), max_length=255)
+    hidden = models.BooleanField(_("Hidden"), blank=True, default=False)
 
     def get_change_url(self):
         content_type = ContentType.objects.get_for_model(self.__class__)
@@ -147,6 +148,10 @@ class Cylinder(Item):
         if date - self.last_hydro > self.hydro_period:
             self.last_hydro = date
         self.last_viz = date
+
+    @property
+    def size(self):
+        return self.capacity
 
     def clean(self):
         self.description = "Cylinder"

@@ -126,7 +126,7 @@ def return_equipment(request, rental):
     url = reverse('rentals:rent_equipment')
     if request.method == 'POST':
         rental = Rental.objects.get(id=rental)
-        form = ReturnEquipmentForm(user=request.user, rental=rental, data=request.POST)
+        form = ReturnEquipmentForm(user=rental.user, rental=rental, data=request.POST)
         url = reverse('rentals:return_equipment', args=(rental.id,))
         if form.is_valid():
             rental = form.rental
@@ -135,7 +135,7 @@ def return_equipment(request, rental):
             rental.save()
             if rental.rental_period.end_date == None:
                 rental.rental_period.end_date = datetime.date.today()
-                retnal.rental_period.save()
+                rental.rental_period.save()
             for rental_item in form.cleaned_data['equipment']:
                 rental_item.item.state = Item.AVAILABLE
                 rental_item.item.save()
