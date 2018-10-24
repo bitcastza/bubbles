@@ -45,6 +45,19 @@ class ItemAdmin(admin.ModelAdmin):
     list_filter = ('state', 'description')
     list_display_links = ('number',)
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
+    fieldsets = (
+        (None, {
+            'fields': ('number',
+                       'manufacturer',
+                       'date_of_purchase',
+                       'state',
+                       'description'),
+        }),
+        ('Advanced options', {
+            'classes': ('collapse',),
+            'fields': ('hidden',),
+        })
+    )
 
     def get_queryset(self, request):
         q_filter = ~Q(description__exact='BCD') & \
@@ -62,12 +75,40 @@ class SizeAdmin(admin.ModelAdmin):
     list_filter = ('state', 'size', 'manufacturer')
     exclude = ['description']
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
+    fieldsets = (
+        (None, {
+            'fields': ('number',
+                       'manufacturer',
+                       'date_of_purchase',
+                       'state',
+                       'size'),
+        }),
+        ('Advanced options', {
+            'classes': ('collapse',),
+            'fields': ('hidden',),
+        })
+    )
 
 @admin.register(models.BCD, site=admin_site)
 class BCDAdmin(SizeAdmin):
     list_display = ('number', 'manufacturer', 'size', 'next_service', 'state')
     exclude = ['description']
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
+    fieldsets = (
+        (None, {
+            'fields': ('number',
+                       'manufacturer',
+                       'date_of_purchase',
+                       'state',
+                       'size',
+                       'serial_num',
+                       'last_service'),
+        }),
+        ('Advanced options', {
+            'classes': ('collapse',),
+            'fields': ('hidden',),
+        })
+    )
 
 @admin.register(models.Cylinder, site=admin_site)
 class CylinderAdmin(admin.ModelAdmin):
@@ -95,7 +136,7 @@ class CylinderAdmin(admin.ModelAdmin):
         }),
         ('Advanced options', {
             'classes': ('collapse',),
-            'fields': ('viz_period', 'hydro_period'),
+            'fields': ('viz_period', 'hydro_period', 'hidden'),
         })
     )
 
@@ -109,6 +150,20 @@ class RegulatorAdmin(admin.ModelAdmin):
     list_filter = ('state', 'manufacturer')
     exclude = ['description']
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
+    fieldsets = (
+        (None, {
+            'fields': ('number',
+                       'manufacturer',
+                       'date_of_purchase',
+                       'state',
+                       'serial_num',
+                       'last_service'),
+        }),
+        ('Advanced options', {
+            'classes': ('collapse',),
+            'fields': ('hidden',),
+        })
+    )
 
 admin_site.register(models.Booties, SizeAdmin)
 admin_site.register(models.Fins, SizeAdmin)
