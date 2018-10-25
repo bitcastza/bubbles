@@ -91,7 +91,7 @@ class SizeAdmin(admin.ModelAdmin):
 
 @admin.register(models.BCD, site=admin_site)
 class BCDAdmin(SizeAdmin):
-    list_display = ('number', 'manufacturer', 'size', 'next_service', 'state')
+    list_display = ('number', 'manufacturer', 'size', 'serial_num', 'next_service', 'state')
     exclude = ['description']
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
     fieldsets = (
@@ -145,6 +145,7 @@ class RegulatorAdmin(admin.ModelAdmin):
     actions = [make_repair, make_available]
     list_display = ('number',
                     'manufacturer',
+                    'serial_num',
                     'next_service',
                     'state')
     list_filter = ('state', 'manufacturer')
