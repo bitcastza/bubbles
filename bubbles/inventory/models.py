@@ -29,12 +29,14 @@ class Item(models.Model):
     BROKEN = 'B'
     REPAIR = 'R'
     CONDEMNED = 'C'
+    MISSING = 'M'
     STATE_CHOICES = (
         (AVAILABLE, _('Available')),
         (IN_USE, _('In use')),
         (BROKEN, _('Broken')),
         (REPAIR, _('Repair')),
         (CONDEMNED, _('Condemned')),
+        (MISSING, _('Missing')),
     )
 
     def get_next_number():
