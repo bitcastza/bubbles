@@ -159,11 +159,13 @@ class Cylinder(Item):
         self.description = "Cylinder"
 
 class Fins(Item):
+    EXTRA_SMALL = 'XS'
     SMALL = 'S'
     MEDIUM = 'M'
     LARGE = 'L'
     EXTRA_LARGE = 'XL'
     SIZE_CHOICES = (
+        (EXTRA_SMALL, _('Extra small')),
         (SMALL, _('Small')),
         (MEDIUM, _('Medium')),
         (LARGE, _('Large')),
