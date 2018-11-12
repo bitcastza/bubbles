@@ -70,11 +70,11 @@ def insurance_report(request):
             unit_value = 0
         total_unit_cost = unit_value * item['num']
         table_data += [[description, item['num'],
-                        'R{:_d}'.format(unit_value).replace('_', ' '),
-                        'R{:_d}'.format(total_unit_cost).replace('_', ' ')]]
+                        'R{:,d}'.format(unit_value).replace(',', ' '),
+                        'R{:,d}'.format(total_unit_cost).replace(',', ' ')]]
         total_cost += total_unit_cost
     table_data += [['', '', 'Total cost',
-                    'R{:_d}'.format(total_cost).replace('_', ' ')]]
+                    'R{:,d}'.format(total_cost).replace(',', ' ')]]
     table = Table(table_data, style=
                   [('FONT', (0,0), (len(table_data[0]) - 1, 0), 'Helvetica-Bold'),
                   ('FONT', (0, 1), (len(table_data[1]) - 1, len(table_data) - 1),
