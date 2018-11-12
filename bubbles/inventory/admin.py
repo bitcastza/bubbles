@@ -166,6 +166,11 @@ class RegulatorAdmin(admin.ModelAdmin):
         })
     )
 
+@admin.register(models.ItemValue, site=admin_site)
+class ItemValueAdmin(admin.ModelAdmin):
+    list_display = ('description', 'cost')
+    formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
+
 admin_site.register(models.Booties, SizeAdmin)
 admin_site.register(models.Fins, SizeAdmin)
 admin_site.register(models.Weight)

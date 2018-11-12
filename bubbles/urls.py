@@ -34,6 +34,7 @@ from .admin import admin_site
 
 urlpatterns = [
     path('', include('bubbles.rentals.urls')),
+    path('inventory/', include('bubbles.inventory.urls')),
     path('admin/', admin_site.urls),
     path('accounts/', include('bubbles.registration.urls')),
     path('docs/', include('bubbles.pages.urls')),

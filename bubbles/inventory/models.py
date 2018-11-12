@@ -228,3 +228,15 @@ class Wetsuit(Item):
 
     def clean(self):
         self.description = "Wetsuit"
+
+class ItemValue(models.Model):
+    description = models.CharField(_('Type'), max_length=255, unique=True)
+    cost = models.IntegerField(_('Value'), default=0)
+
+    def __str__(self):
+        return '{} (R{:d})'.format(self.description, self.cost)
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return self.description == other.description and self.cost == other.cost
+        return NotImplemented
