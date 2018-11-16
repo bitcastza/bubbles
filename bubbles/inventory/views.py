@@ -58,7 +58,7 @@ def insurance_report(request):
     story = [Spacer(1, 2 * cm)]
     style = styles['Normal']
 
-    item_set = Item.objects.exclude(state=Item.MISSING, state=Item.CONDEMNED).values('description').annotate(num=Count('description'))
+    item_set = Item.objects.exclude(state=Item.MISSING).exclude(state=Item.CONDEMNED).values('description').annotate(num=Count('description'))
     value_set = ItemValue.objects.all()
     table_data = [[_('Item type'), _('Quantity'), _('Unit Cost'), _('Total Cost')]]
     total_cost = 0
