@@ -69,6 +69,7 @@ class RentalItemAdmin(admin.ModelAdmin):
             return None
 
     list_display = ('description', 'number', 'user')
+    formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
 
 @admin.register(models.RequestItem, site=admin_site)
 class RequestItemAdmin(admin.ModelAdmin):
@@ -86,3 +87,4 @@ class RequestItemAdmin(admin.ModelAdmin):
             return None
 
     list_display = ('description', 'size', 'user')
+    formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
