@@ -63,6 +63,7 @@ class RentalItem(models.Model):
     rental = models.ForeignKey(Rental, on_delete=models.CASCADE, null=True)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     cost = models.IntegerField(_('Cost'), default=0)
+    returned = models.BooleanField(_('Returned'), default=False)
 
     def __str__(self):
         if self.rental:

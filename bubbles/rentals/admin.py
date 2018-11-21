@@ -57,34 +57,42 @@ class RentalPeriodAdmin(admin.ModelAdmin):
 class RentalItemAdmin(admin.ModelAdmin):
     def number(self, obj):
         return obj.item.number
+    number.admin_order_field = 'item__number'
 
     def description(self, obj):
         return obj.item.description
     description.short_description = _('item')
+    description.admin_order_field = 'item__description'
 
     def user(self, obj):
         if obj.rental:
             return obj.rental.user
         else:
             return None
+    user.admin_order_field = 'rental__user'
 
-    list_display = ('description', 'number', 'user')
+    list_display = ('description', 'number', 'user', 'returned')
+    list_filter = ('returned',)
+    ordering = ['rental__user']
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
 
 @admin.register(models.RequestItem, site=admin_site)
 class RequestItemAdmin(admin.ModelAdmin):
     def size(self, obj):
         return obj.item_size
+    size.admin_order_field = 'item__size'
 
     def description(self, obj):
         return obj.item_description
     description.short_description = _('item')
+    description.admin_order_field = 'item_description'
 
     def user(self, obj):
         if obj.rental:
             return obj.rental.user
         else:
             return None
+    user.admin_order_field = 'rental__user'
 
     list_display = ('description', 'size', 'user')
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES

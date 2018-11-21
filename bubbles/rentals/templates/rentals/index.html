@@ -13,17 +13,28 @@
         </tr>
       </thead>
       <tbody>
-        {% for rental in rentals %}
-        {% for rentalitem in rental.rentalitem_set.all %}
+        {% for rentalitem in rentals %}
         <tr>
           <td>{{ rentalitem.item.description }}</td>
           <td>{{ rentalitem.item.number }}</td>
         </tr>
         {% endfor %}
-        {% endfor %}
       </tbody>
     </table>
   </div>
+  {% endif %}
+  {% if requests %}
+  <div class="col-sm-6">
+    <h1>My Requests</h1>
+    <ul class="list-group">
+        {% for request in requests %}
+        <li class="list-group-item"><a href={% url 'rentals:request_equipment' request.id %}>{{ request.rental_period }}</a>
+        {% endfor %}
+  </div>
+  {% endif %}
+  {% if rentals and requests %}
+</div>
+<div class="row">
   {% endif %}
   <div class="col-sm-6">
     <iframe width="650" height="450" src="https://embed.windy.com/embed2.html?lat=-34.247&lon=18.532&zoom=11&level=surface&overlay=waves&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=true&detailLat=-34.186&detailLon=18.443&metricWind=default&metricTemp=default&radarRange=-1" frameborder="0"></iframe> 

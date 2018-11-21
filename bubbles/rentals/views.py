@@ -15,10 +15,9 @@
 ###########################################################################
 import datetime
 
-from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import FieldDoesNotExist
-from django.shortcuts import render, redirect
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 
@@ -28,34 +27,60 @@ from .forms import RequestEquipmentForm, RentEquipmentForm, ReturnEquipmentForm
 
 @login_required
 def index(request):
-    rental_set = Rental.objects.filter(Q(user=request.user) & (
-                                       Q(state=Rental.REQUESTED) |
-                                       Q(state=Rental.RENTED)))
+
+    rental_set = RentalItem.objects.filter(rental__user=request.user, returned=False)
+    requests = Rental.objects.filter(user=request.user, state=Rental.REQUESTED)
 
     context = {}
-    if (len(rental_set) != 0):
+    if (rental_set.count() != 0):
         context['rentals'] = rental_set
+    if (requests.count() != 0):
+        context['requests'] = requests
     return render(request, 'rentals/index.html', context)
 
 @login_required
-def request_equipment(request):
+def request_equipment(request, request_id=None):
+    url = reverse('rentals:request_equipment')
     if request.method == 'POST':
-        form = RequestEquipmentForm(user=request.user, data=request.POST)
+        if request_id:
+            url = reverse('rentals:request_equipment', args=(request_id,))
+            rental_request = get_object_or_404(Rental, id=request_id)
+            form = RequestEquipmentForm(user=request.user,
+                                        request_id=request_id,
+                                        rental=rental_request,
+                                        data=request.POST)
+        else:
+            form = RequestEquipmentForm(user=request.user,
+                                        data=request.POST)
         if form.is_valid():
             form.cleaned_data['period'].save()
             rental = form.rental
             rental.state = Rental.REQUESTED
             rental.save()
+            RequestItem.objects.filter(rental=rental).delete()
             for rental_item in form.cleaned_data['equipment']:
                 rental_item.rental = rental
                 rental_item.save()
             return render(request, 'rentals/request_confirmation.html')
+    elif request_id != None:
+        rental_request = get_object_or_404(Rental, id=request_id)
+        url = reverse('rentals:request_equipment', args=(request_id,))
+        if rental_request.user != request.user:
+            raise PermissionDenied
+        form = RequestEquipmentForm(user=request.user,
+                                    request_id=request_id,
+                                    rental=rental_request,
+                                    data={
+                                        'period': rental_request.rental_period,
+                                        'equipment': rental_request.requestitem_set.all(),
+                                        'liability': True,
+                                    })
     else:
         form = RequestEquipmentForm(user=request.user)
 
     context = {
         'form': form,
-        'url': reverse('rentals:request_equipment'),
+        'url': url,
         'title': _('Request Equipment'),
         'show_cost': False,
     }
@@ -85,10 +110,8 @@ def rent_equipment(request, rental_request=None):
             rental = get_existing_rentals(request.user)
             user = request.user
         form = RentEquipmentForm(user=user, rental=rental, data=request.POST)
-        if (rental_request):
+        if rental_request:
             url = reverse('rentals:rent_equipment', args=(rental_request,))
-        else:
-            url = reverse('rentals:rent_equipment')
         if form.is_valid():
             period = form.cleaned_data['period']
             period.save()
@@ -145,16 +168,23 @@ def return_equipment(request, rental):
         url = reverse('rentals:return_equipment', args=(rental.id,))
         if form.is_valid():
             rental = form.rental
-            rental.state = Rental.RETURNED
-            rental.approved_by = request.user
-            rental.save()
-            if rental.rental_period.end_date == None:
-                rental.rental_period.end_date = datetime.date.today()
-                rental.rental_period.save()
             for rental_item in form.cleaned_data['equipment']:
                 rental_item.item.state = Item.AVAILABLE
                 rental_item.item.save()
+                rental_item.returned = True
                 rental_item.save()
+            all_returned = True
+            for rental_item in rental.rentalitem_set.filter(returned=False):
+                if rental_item not in form.cleaned_data['equipment']:
+                    all_returned = False
+                    break
+            if all_returned:
+                rental.state = Rental.RETURNED
+                rental.approved_by = request.user
+                rental.save()
+                if rental.rental_period.end_date == None:
+                    rental.rental_period.end_date = datetime.date.today()
+                    rental.rental_period.save()
             return render(request, 'rentals/return_confirmation.html')
     else:
         rental = Rental.objects.get(id=rental)
@@ -162,7 +192,7 @@ def return_equipment(request, rental):
         form = ReturnEquipmentForm(user=rental.user,
                                    rental=rental,
                                    data={
-                                     'equipment': rental.rentalitem_set.all(),
+                                     'equipment': rental.rentalitem_set.filter(returned=False),
                                      'deposit': rental.deposit,
                                    })
 

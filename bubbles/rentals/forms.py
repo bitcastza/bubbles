@@ -48,9 +48,6 @@ def get_initial_period():
 
 class EquipmentTableWidget(widgets.MultiWidget):
     template_name = 'rentals/widgets/equipment_table_widget.html'
-    show_number = False
-    show_cost = False
-    item_cost = 0
 
     def __init__(self, show_number=False, show_cost=False, item_cost=0,
                  widgets=[], **kwargs):
@@ -209,11 +206,10 @@ class EquipmentListField(fields.Field):
             except ObjectDoesNotExist:
                 if widget.item_number == None or widget.item_number == '':
                     # Rental request
-                    # TODO: append error if submit pressed, but not if it is the initial
-                    # display
                     request_item = RequestItem(item_description=widget.item_description,
                                                item_size=widget.item_size)
-                    rental_items.append(request_item)
+                    if request_item not in rental_items:
+                        rental_items.append(request_item)
                 else:
                     errors.append(forms.ValidationError(
                         _('%(type)s number %(num)s not found'),
@@ -242,10 +238,11 @@ class EquipmentForm(forms.Form):
                                     initial=get_initial_period)
     period_state_filter = Rental.REQUESTED
 
-    def __init__(self, user, rental=None, **kwargs):
+    def __init__(self, user, rental=None, request_id=None, **kwargs):
         super().__init__(**kwargs)
         self.user = user
         self.rental = rental
+        self.request_id = request_id
 
     def clean_period(self):
         if self.cleaned_data['period'] == None:
@@ -265,7 +262,7 @@ class EquipmentForm(forms.Form):
         existing_periods = Rental.objects.filter(user=self.user,
                                                  rental_period=current_period,
                                                  state=self.period_state_filter)
-        if existing_periods.count():
+        if existing_periods.count() and self.request_id == None:
             raise forms.ValidationError(_('You already have a request submitted for '
             'this period'), code='invalid')
         return self.cleaned_data['period']

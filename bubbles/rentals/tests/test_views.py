@@ -16,11 +16,14 @@
 import datetime
 
 from django.contrib.auth.models import AnonymousUser, User
+from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
-from bubbles.rentals.models import Rental, RentalPeriod
-from bubbles.rentals.views import index, rent_equipment
+from bubbles.rentals.models import Rental, RentalPeriod, RentalItem, RequestItem
+from bubbles.rentals.views import index, rent_equipment, request_equipment
+from bubbles.inventory.models import Item
 
 class IndexViewTests(TestCase):
     @classmethod
@@ -58,6 +61,11 @@ class IndexViewTests(TestCase):
         self.request.user = self.user
         start_date = datetime.date.today()
         end_date = start_date + datetime.timedelta(days=5)
+        item = Item.objects.create(number='1',
+                                   manufacturer='test',
+                                   date_of_purchase=datetime.date.today(),
+                                   state = Item.IN_USE,
+                                   description='BCD')
         rental_period = RentalPeriod.objects.create(start_date=start_date,
                                                     end_date=end_date,
                                                     default_deposit=0,
@@ -67,8 +75,51 @@ class IndexViewTests(TestCase):
                                        state=Rental.REQUESTED,
                                        rental_period=rental_period,
                                        deposit=0)
+        rental_item = RentalItem.objects.create(rental=rental,
+                                                item=item,
+                                                cost=25)
         response = index(self.request)
         self.assertContains(response, "rental-table")
+
+class RequestEquipmentViewTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.path = reverse('rentals:request_equipment')
+        cls.factory = RequestFactory()
+        cls.request = cls.factory.get(cls.path)
+        cls.user = User.objects.create_user(username='jacob', is_staff=False)
+
+    def test_not_logged_in(self):
+        self.request.user = AnonymousUser()
+        response = request_equipment(self.request)
+        self.assertEqual(response.status_code, 302)
+
+    def test_logged_in_not_exist(self):
+        self.request.user = self.user
+
+        self.assertRaisesMessage(Http404,
+                                '',
+                                request_equipment,
+                                request=self.request,
+                                request_id=1)
+
+    def test_logged_in_not_own(self):
+        self.request.user = self.user
+        other_user = User.objects.create_user(username='other')
+        rental_period = RentalPeriod.objects.create(start_date=datetime.date.today(),
+                                                    end_date=datetime.date.today(),
+                                                    default_deposit=0,
+                                                    default_cost_per_item=0)
+        rental = Rental.objects.create(user=other_user,
+                                       state=Rental.REQUESTED,
+                                       rental_period=rental_period,
+                                       deposit=0)
+
+        self.assertRaisesMessage(PermissionDenied,
+                                '',
+                                request_equipment,
+                                request=self.request,
+                                request_id=rental.id)
 
 class RentEquipmentViewTests(TestCase):
     @classmethod
