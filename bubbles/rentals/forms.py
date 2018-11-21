@@ -252,10 +252,15 @@ class EquipmentForm(forms.Form):
             if not self.user.is_staff:
                 raise forms.ValidationError(_('This field is required'), code='invalid')
             else:
-                return RentalPeriod(start_date=datetime.date.today(),
-                                    default_deposit=0,
-                                    default_cost_per_item=0,
-                                    hidden=True)
+                current_rentals = Rental.objects.filter(user=self.user,
+                                                        state=Rental.RENTED)
+                if current_rentals.count() > 0:
+                    return current_rentals.first().rental_period
+                else:
+                    return RentalPeriod(start_date=datetime.date.today(),
+                                        default_deposit=0,
+                                        default_cost_per_item=0,
+                                        hidden=True)
         current_period = self.cleaned_data['period']
         existing_periods = Rental.objects.filter(user=self.user,
                                                  rental_period=current_period,
@@ -279,7 +284,7 @@ class EquipmentForm(forms.Form):
                 for rental_item in self.cleaned_data['equipment']:
                     rental_item.rental = self.rental
                     rental_item.cost = self.rental.rental_period.default_cost_per_item
-            except KeyError:
+            except (KeyError, TypeError):
                 pass
         return self.cleaned_data
 

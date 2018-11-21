@@ -62,6 +62,14 @@ def request_equipment(request):
 
     return render(request, 'rentals/rent_equipment.html', context)
 
+def get_existing_rentals(user):
+    existing_rental = Rental.objects.filter(user=user,
+                                            state=Rental.RENTED)
+    if existing_rental.count() > 0:
+        return existing_rental.first()
+    return None
+
+
 @login_required
 def rent_equipment(request, rental_request=None):
     if not request.user.is_staff:
@@ -73,7 +81,8 @@ def rent_equipment(request, rental_request=None):
             rental = Rental.objects.get(id=rental_request)
             user = rental.user
         except Rental.DoesNotExist:
-            rental = None
+            # Staff member renting for themselves
+            rental = get_existing_rentals(request.user)
             user = request.user
         form = RentEquipmentForm(user=user, rental=rental, data=request.POST)
         if (rental_request):
@@ -107,7 +116,13 @@ def rent_equipment(request, rental_request=None):
                                          'deposit': rental.deposit,
                                      })
         else:
-            form = RentEquipmentForm(user=request.user)
+            # Staff member renting for themselves
+            rental = get_existing_rentals(request.user)
+            form = RentEquipmentForm(user=request.user, rental=rental,
+                                     data={
+                                         'period': None,
+                                         'deposit': 0,
+                                     })
     context = {
         'form': form,
         'url': url,
