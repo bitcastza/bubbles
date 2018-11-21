@@ -33,7 +33,7 @@ function addItemRemoveListener() {
 
 function setTotalCost() {
     var cost = 0;
-    $('.item-cost').each(function() {
+    $('.item-cost-value').each(function() {
         cost += +$(this).val();
     });
     cost += +$('#id_deposit').val();
@@ -46,7 +46,7 @@ $(document).ready(function() {
     }
     addItemRemoveListener();
     setTotalCost();
-    $('.item-cost').on('input', setTotalCost);
+    $('.item-cost-value').on('input', setTotalCost);
     $('#id_deposit').on('input', setTotalCost);
     $('#add-dropdown li').on('click', function() {
         var currentItem = this;
@@ -74,25 +74,26 @@ $(document).ready(function() {
         var description = $(this).text();
         var showNumber = $('#show-number').text() == "True";
         var row = '<tr>' +
-            '<td>' +
-            '<input type="text" class="form-control" name="' + description +
+            '<td class="item-description">' +
+            '<input type="text" class="form-control"' +
+            'name="' + description +
             '" value="' + description + '" id="' + description +
             '" readonly/>' +
             '</td>' +
-            '<td class="size"><div class="form-group">' +
+            '<td class="item-size"><div class="form-group">' +
             sizeOptions +
             '</div>';
         if (showNumber) {
-            cost = +$('#item-cost').text();
-            row += '<td>' +
+            cost = +$('#item-cost-value').text();
+            row += '<td class="item-number">' +
                 '<div class="form-group">' +
                 '<input type="text" class="form-control" name="' + description +
                 '" id="' + description + '-number"/>' +
                 '</div>' +
                 '</td>' +
-                '<td>' +
+                '<td class="item-cost">' +
                 '<div class="form-group">' +
-                '<input type="number" class="item-cost form-control" name="' +
+                '<input type="number" class="item-cost-value form-control" name="' +
                 description +
                 '" id="' + description + '-cost" value="' + cost + '" min="0"/>' +
                 '</div>' +
@@ -104,7 +105,7 @@ $(document).ready(function() {
             '</tr>';
         $('#equipment-table > tbody:last-child').append(row);
         $('#submit-btn').show();
-        $('.item-cost').on('input', setTotalCost);
+        $('.item-cost-value').on('input', setTotalCost);
         setTotalCost();
         if (! showNumber) {
             $('#' + description + '-dropdown').hide();

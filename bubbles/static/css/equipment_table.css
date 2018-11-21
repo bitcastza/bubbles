@@ -1,3 +1,15 @@
-td.size {
-  width: 100px;
+td.item-description {
+  min-width: 120px;
+}
+
+td.item-size {
+  min-width: 95px;
+}
+
+td.item-number {
+  min-width: 120px;
+}
+
+td.item-cost {
+  min-width: 80px;
 }
