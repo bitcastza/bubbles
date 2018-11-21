@@ -13,11 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
-from django.apps import AppConfig
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+from .models import RentalItem
+from bubbles.inventory.models import Item
 
-
-class RentalsConfig(AppConfig):
-    name = 'bubbles.rentals'
-
-    def ready(self):
-        from . import signals
+@receiver(pre_delete, sender=RentalItem)
+def handle_delete_rental_item(sender, instance, using, **kwargs):
+    print('delete item')
+    instance.item.state = Item.AVAILABLE
+    instance.item.save()

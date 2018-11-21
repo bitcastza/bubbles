@@ -46,8 +46,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'bubbles',
-    'bubbles.inventory',
-    'bubbles.rentals',
+    'bubbles.inventory.apps.InventoryConfig',
+    'bubbles.rentals.apps.RentalsConfig',
     'bubbles.registration',
     'bubbles.pages',
     'sakaiauthenticator',
