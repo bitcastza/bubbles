@@ -55,6 +55,7 @@ class Rental(models.Model):
     notes = models.TextField(_('Notes'), null=True, blank=True)
     deposit_returned = models.BooleanField(_('Deposit returned'), default=True)
     rental_period = models.ForeignKey(RentalPeriod, on_delete=models.CASCADE)
+    weight = models.IntegerField(_('Weight'), null=True, blank=True)
 
     def __str__(self):
         return "Rental by {} for {}".format(self.user, self.rental_period)

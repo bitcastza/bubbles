@@ -195,6 +195,10 @@ class Weight(models.Model):
     total_weight = models.IntegerField(_('Total weight'))
     available_weight = models.IntegerField(_('Available weight'))
 
+    def __str__(self):
+        return '{:d}kg ({:d}kg available)'.format(self.total_weight,
+                                                self.available_weight)
+
 class WeightBelt(models.Model):
     IN_USE = 'U'
     BROKEN = 'B'

@@ -237,6 +237,10 @@ class EquipmentForm(forms.Form):
                                         attrs={'class': 'form-control'}),
                                     initial=get_initial_period)
     period_state_filter = Rental.REQUESTED
+    belt_weight = forms.IntegerField(min_value=0,
+                                max_value=15,
+                                initial=0,
+                                widget=widgets.NumberInput(attrs={'class': 'form-control'}))
 
     def __init__(self, user, rental=None, request_id=None, **kwargs):
         super().__init__(**kwargs)
@@ -328,6 +332,10 @@ class RentEquipmentForm(EquipmentForm):
                         }))
 
 class ReturnEquipmentForm(forms.Form):
+    belt_weight = forms.IntegerField(min_value=0,
+                                max_value=15,
+                                initial=0,
+                                widget=widgets.NumberInput(attrs={'class': 'form-control'}))
     equipment = EquipmentListField(show_number=True)
     deposit = forms.IntegerField(
         widget=widgets.NumberInput(attrs={'class': 'form-control',

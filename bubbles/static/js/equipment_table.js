@@ -36,6 +36,10 @@ function setTotalCost() {
     $('.item-cost-value').each(function() {
         cost += +$(this).val();
     });
+    console.log($('id_belt_weight').val());
+    if ($('#id_belt_weight').val() > 0) {
+        cost += +$('#item-cost').text();
+    }
     cost += +$('#id_deposit').val();
     $('#id_total_cost').text("R" + cost);
 }
@@ -48,6 +52,7 @@ $(document).ready(function() {
     setTotalCost();
     $('.item-cost-value').on('input', setTotalCost);
     $('#id_deposit').on('input', setTotalCost);
+    $('#id_belt_weight').on('input', setTotalCost);
     $('#add-dropdown li').on('click', function() {
         var currentItem = this;
         var description = $(currentItem).text();
@@ -84,7 +89,7 @@ $(document).ready(function() {
             sizeOptions +
             '</div>';
         if (showNumber) {
-            cost = +$('#item-cost-value').text();
+            cost = +$('#item-cost').text();
             row += '<td class="item-number">' +
                 '<div class="form-group">' +
                 '<input type="text" class="form-control" name="' + description +

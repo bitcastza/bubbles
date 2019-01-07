@@ -21,7 +21,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 
-from bubbles.inventory.models import Item, BCD, Booties, Cylinder, Fins, Wetsuit
+from bubbles.inventory.models import Item, BCD, Booties, Cylinder, Fins, Wetsuit, Weight
 from .models import Rental, RequestItem, RentalPeriod, RentalItem
 from .forms import RequestEquipmentForm, RentEquipmentForm, ReturnEquipmentForm
 
@@ -56,6 +56,7 @@ def request_equipment(request, request_id=None):
             form.cleaned_data['period'].save()
             rental = form.rental
             rental.state = Rental.REQUESTED
+            rental.weight = form.cleaned_data['belt_weight']
             rental.save()
             RequestItem.objects.filter(rental=rental).delete()
             for rental_item in form.cleaned_data['equipment']:
@@ -119,6 +120,11 @@ def rent_equipment(request, rental_request=None):
             rental.rental_period = period
             rental.state = Rental.RENTED
             rental.approved_by = request.user
+            num_weights = form.cleaned_data['belt_weight']
+            total_weight = Weight.objects.first()
+            total_weight.available_weight = total_weight.available_weight - num_weights
+            total_weight.save()
+            rental.weight = num_weights
             rental.save()
             for rental_item in form.cleaned_data['equipment']:
                 rental_item.item.state = Item.IN_USE
@@ -137,6 +143,7 @@ def rent_equipment(request, rental_request=None):
                                          'equipment': rental.requestitem_set.all(),
                                          'period': rental.rental_period,
                                          'deposit': rental.deposit,
+                                         'belt_weight': rental.weight,
                                      })
         else:
             # Staff member renting for themselves
@@ -178,9 +185,17 @@ def return_equipment(request, rental):
                 if rental_item not in form.cleaned_data['equipment']:
                     all_returned = False
                     break
+            returned_weight = form.cleaned_data['belt_weight']
+            total_weight = Weight.objects.first()
+            total_weight.available_weight = total_weight.available_weight + returned_weight
+            if total_weight.available_weight > total_weight.total_weight:
+                total_weight.total_weight = total_weight.available_weight
+            total_weight.save()
+            if returned_weight != rental.weight:
+                all_returned = False
+            rental.approved_by = request.user
             if all_returned:
                 rental.state = Rental.RETURNED
-                rental.approved_by = request.user
                 rental.save()
                 if rental.rental_period.end_date == None:
                     rental.rental_period.end_date = datetime.date.today()
@@ -192,8 +207,9 @@ def return_equipment(request, rental):
         form = ReturnEquipmentForm(user=rental.user,
                                    rental=rental,
                                    data={
-                                     'equipment': rental.rentalitem_set.filter(returned=False),
-                                     'deposit': rental.deposit,
+                                       'equipment': rental.rentalitem_set.filter(returned=False),
+                                       'deposit': rental.deposit,
+                                       'belt_weight': rental.weight,
                                    })
 
     context = {

@@ -15,11 +15,13 @@
 ###########################################################################
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-from .models import RentalItem
+from .models import RentalItem, Weight
 from bubbles.inventory.models import Item
 
 @receiver(pre_delete, sender=RentalItem)
 def handle_delete_rental_item(sender, instance, using, **kwargs):
-    print('delete item')
     instance.item.state = Item.AVAILABLE
     instance.item.save()
+    total_weight = Weight.objects.first()
+    total_weight.available_weight = total_weight.available_weight + instance.weight
+    total_weight.save()
