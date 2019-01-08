@@ -15,18 +15,32 @@
 ###########################################################################
 import codecs
 import os
-import markdown
 
+from markdown import markdown, Extension
+from markdown.inlinepatterns import InlineProcessor
+from markdown.util import etree
 from django.http import Http404
 from django.shortcuts import render
 from bubbles.settings import MEDIA_ROOT
 
 PAGE_ROOT = 'pages'
 
-class EscapeHtml(markdown.Extension):
-    def extendMarkdown(self, md, md_globals):
-        del md.preprocessors['html_block']
-        del md.inlinePatterns['html']
+class ImageClass(InlineProcessor):
+    def handleMatch(self, m, data):
+        print(m)
+        img = etree.Element('img')
+        img.attrib['class'] = 'img-fluid rounded'
+        img.attrib['alt'] = m.group(1)
+        img.attrib['src'] = m.group(2)
+        img.attrib['title'] = m.group(3)
+        return img, m.start(0), m.end(0)
+
+class EscapeHtml(Extension):
+    def extendMarkdown(self, md):
+        md.preprocessors.deregister('html_block')
+        md.inlinePatterns.deregister('html')
+        img_pattern = ImageClass(r'!\[(.+)]\((.+) "(.+)"\)')
+        md.inlinePatterns.register(img_pattern, 'img_pattern', 175)
 
 def page(request, page_name):
     filename = os.path.join(MEDIA_ROOT, PAGE_ROOT, page_name) + '.md'
@@ -36,7 +50,7 @@ def page(request, page_name):
         raise Http404('Page not found')
 
     text = input_file.read()
-    html = markdown.markdown(text, extensions=[EscapeHtml(),
-                                               'markdown.extensions.attr_list'])
+    html = markdown(text, extensions=[EscapeHtml(),
+                                      'markdown.extensions.attr_list'])
     context = {'body': html}
     return render(request, 'pages/page.html', context)

@@ -148,7 +148,7 @@ STATIC_URL = '/static/'
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-MEDIA_ROOT = os.path.join(project_root, 'media')
+MEDIA_ROOT = os.path.join(project_root, 'bubbles/media')
 
 # Redirect to home URL after login
 LOGIN_REDIRECT_URL = '/'

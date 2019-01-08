@@ -1,4 +1,9 @@
 {% extends "bubbles/base.html" %}
+{% load static %}
+
+{% block extra_head %}
+  <script src="{% static 'vendor/popper/popper.min.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 <div class="row">
