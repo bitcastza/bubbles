@@ -10,7 +10,7 @@
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation{% endblock %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs">
+<div class="breadcrumbs well well-sm">
   <a href="{% url 'admin:index' %}">Home</a>
   <span class="glyphicon glyphicon-menu-right"></span>
   <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
