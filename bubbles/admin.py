@@ -18,8 +18,8 @@ import datetime
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
-from django.db.models import DateField, DecimalField, DurationField, CharField,  IntegerField, TextField, BooleanField
-from django.forms import NumberInput, TextInput, ModelChoiceField, CheckboxInput
+from django.db.models import DateField, DecimalField, DurationField, CharField,  IntegerField, TextField, BooleanField, ForeignKey
+from django.forms import NumberInput, TextInput, ChoiceField, CheckboxInput
 from django.forms.widgets import Select
 
 from .forms import CalendarWidget
@@ -35,7 +35,8 @@ BUBBLES_FORMFIELD_OVERRIDES = {
     TextField: {'widget': TextInput(attrs={'class': 'vTextField form-control'})},
     CharField: {'widget': TextInput(attrs={'class': 'vTextField form-control'})},
     DecimalField: {'widget': NumberInput(attrs={'class': 'form-control'})},
-    ModelChoiceField: {'widget': Select(attrs={'class': 'form-control'})},
+    ForeignKey: {'widget': Select(attrs={'class': 'form-control'})},
+    ChoiceField: {'widget': Select(attrs={'class': 'form-control'})},
     BooleanField: {'widget': CheckboxInput(attrs={'class': 'form-check-input'})},
 }
 
