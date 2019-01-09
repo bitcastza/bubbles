@@ -5,30 +5,32 @@
   {% if rentals %}
   <div class="col-sm-6">
     <h1>My Rentals</h1>
-    <table class="table table-striped table-responsive" id="rental-table">
-      <thead>
-        <tr>
-          <th scope="col">Item</th>
-          <th scope="col">Number</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for rentalitem in rentals %}
-        <tr>
-          <td>{{ rentalitem.item.description }}</td>
-          <td>{{ rentalitem.item.number }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-striped" id="rental-table">
+        <thead>
+          <tr>
+            <th scope="col">Item</th>
+            <th scope="col">Number</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rentalitem in rentals %}
+          <tr>
+            <td>{{ rentalitem.item.description }}</td>
+            <td>{{ rentalitem.item.number }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
   {% endif %}
   {% if requests %}
   <div class="col-sm-6">
     <h1>My Requests</h1>
     <ul class="list-group">
-        {% for request in requests %}
-        <li class="list-group-item"><a href={% url 'rentals:request_equipment' request.id %}>{{ request.rental_period }}</a>
+      {% for request in requests %}
+      <li class="list-group-item"><a href={% url 'rentals:request_equipment' request.id %}>{{ request.rental_period }}</a>
         {% endfor %}
   </div>
   {% endif %}
