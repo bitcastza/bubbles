@@ -18,8 +18,7 @@ import datetime
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
-from django.db.models import DateField, DecimalField, DurationField, CharField,  IntegerField, TextField, BooleanField, ForeignKey
-from django.forms import NumberInput, TextInput, ChoiceField, CheckboxInput
+from django.db.models import DateField
 from django.forms.widgets import Select
 
 from .forms import CalendarWidget
@@ -28,16 +27,6 @@ from bubbles.rentals.models import Rental
 
 BUBBLES_FORMFIELD_OVERRIDES = {
     DateField: {'widget': CalendarWidget},
-    IntegerField: {
-        'widget': NumberInput(attrs={'class': 'vIntegerField form-control'})
-    },
-    DurationField: {'widget': TextInput(attrs={'class': 'form-control'})},
-    TextField: {'widget': TextInput(attrs={'class': 'vTextField form-control'})},
-    CharField: {'widget': TextInput(attrs={'class': 'vTextField form-control'})},
-    DecimalField: {'widget': NumberInput(attrs={'class': 'form-control'})},
-    ForeignKey: {'widget': Select(attrs={'class': 'form-control'})},
-    ChoiceField: {'widget': Select(attrs={'class': 'form-control'})},
-    BooleanField: {'widget': CheckboxInput(attrs={'class': 'form-check-input'})},
 }
 
 def get_next_service_set(item_type):

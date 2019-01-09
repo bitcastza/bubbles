@@ -1,3 +1,5 @@
+{% load widget_tweaks %}
+
 <fieldset>
   {% if fieldset.name %}<h2><a class="text-secondary" href="#{{ fieldset.name|slugify }}-fields" data-toggle="collapse"><span class="fas fa-plus"</span> {{ fieldset.name }}</a></h2>
   {% endif %}
@@ -20,7 +22,7 @@
             {% if field.is_readonly %}
             <div class="readonly">{{ field.contents }}</div>
             {% else %}
-            {{ field.field }}
+            {{ field.field|add_class:'form-control' }}
             {% endif %}
             {% endif %}
           </div>
