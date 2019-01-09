@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-md navbar-dark navbar-light bg-dark justify-content-between">
   {% block navtitle %}
   <a class="navbar-brand" href="/">Bubbles</a>
   {% endblock %}
@@ -7,37 +7,37 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     {% block navuser %}
-    <ul class="navbar-nav mr-auto navbar-right">
+    <ul class="navbar-nav ml-auto">
       {% if user.is_authenticated %}
       <li class="nav-item">
         {% if user.is_staff %}
-        <a href="{% url 'rentals:rent_equipment' %}">
+        <a class="nav-link" href="{% url 'rentals:rent_equipment' %}">
           <span class="fas fa-plus"></span> Rent Equipment</a>
         {% else %}
-        <a href="{% url 'rentals:request_equipment' %}">
+        <a class="nav-link" href="{% url 'rentals:request_equipment' %}">
           <span class="fas fa-plus"></span> Request Equipment</a>
         {% endif %}
       </li>
       {% endif %}
       {% if user.is_staff %}
       <li class="nav-item">
-        <a href="{% url 'admin:index' %}">
+        <a class="nav-link" href="{% url 'admin:index' %}">
           <span class="fas fa-cog"></span> Site Admin</a>
       </li>
       {% endif %}
       {% if user.is_authenticated %}
       <li class="nav-item">
-        <a href="{% url 'registration:logout' %}">
+        <a class="nav-link" href="{% url 'registration:logout' %}">
           <span class="fas fa-sign-out-alt"></span> Log Out</a>
       </li>
       {% else %}
       <li class="nav-item">
-        <a href=" {% url 'registration:login' %}">
+        <a class="nav-link" href=" {% url 'registration:login' %}">
           <span class="fas fa-sign-in-alt"></span> Login</a>
       </li>
       {% endif %}
       <li class="nav-item">
-        <a href="{% url 'pages:index' %}">
+        <a class="nav-link" href="{% url 'pages:index' %}">
           <span class="fas fa-question"></span> Help</a>
       </li>
     </ul>

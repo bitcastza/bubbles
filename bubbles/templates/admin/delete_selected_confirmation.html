@@ -10,15 +10,22 @@
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs well well-sm">
-  <a href="{% url 'admin:index' %}">Home</a>
-  <span class="glyphicon glyphicon-menu-right"></span>
-  <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
-  <span class="glyphicon glyphicon-menu-right"></span>
-  <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
-  <span class="glyphicon glyphicon-menu-right"></span>
-  Delete multiple objects
-</div>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{% url 'admin:index' %}">Home</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    </li>
+    <li class="breadcrumb-item active">
+      Delete multiple objects
+    </li>
+  </ol>
+</nav>
 {% endblock %}
 
 {% block content %}<div id="content-main">
@@ -52,7 +59,7 @@
       <input type="hidden" name="post" value="yes">
       <div class="btn-group">
         <button class="btn btn-danger" type="submit">Yes, I'm sure</button>
-        <a href="#" class="button cancel-link btn btn-default">No, take me back</a>
+        <a href="#" class="button cancel-link btn btn-secondary">No, take me back</a>
       </div>
     </div>
   </form>

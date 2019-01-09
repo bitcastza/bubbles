@@ -1,5 +1,5 @@
-<fieldset class="form-group">
-  {% if fieldset.name %}<h2><a href="#{{ fieldset.name|slugify }}-fields" data-toggle="collapse"><span class="glyphicon glyphicon-plus-sign h2-glyphicon"</span></a> {{ fieldset.name }}</h2>
+<fieldset>
+  {% if fieldset.name %}<h2><a class="text-secondary" href="#{{ fieldset.name|slugify }}-fields" data-toggle="collapse"><span class="fas fa-plus"</span> {{ fieldset.name }}</a></h2>
   {% endif %}
   {% if fieldset.description %}
   <div class="description">{{ fieldset.description|safe }}</div>

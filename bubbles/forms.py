@@ -17,15 +17,17 @@ from django import forms
 
 class CalendarWidget(forms.DateInput):
     def __init__(self, attrs=None, format=None):
-        default_attrs = {'class': 'date-input form-control'}
+        default_attrs = {
+            'class': 'date-input',
+            'width': 276
+        }
         if attrs:
             default_attrs.update(attrs)
         super().__init__(default_attrs)
 
     class Media:
         css = {
-            'screen': ('vendor/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css')
+            'screen': ('vendor/gijgo/css/gijgo.min.css',)
         }
-        js = ('vendor/moment/min/moment.min.js',
-              'vendor/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
+        js = ( 'vendor/gijgo/js/gijgo.min.js',
               'js/use_datetimepicker.js',)

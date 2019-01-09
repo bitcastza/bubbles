@@ -7,13 +7,19 @@
 
 {% if not is_popup %}
 {% block breadcrumbs %}
-<div class="breadcrumbs well well-sm">
-  <a href="{% url 'admin:index' %}">Home</a>
-  <span class="glyphicon glyphicon-menu-right"></span>
-  <a href="{% url 'admin:app_list' app_label=cl.opts.app_label %}">{{ cl.opts.app_config.verbose_name }}</a>
-  <span class="glyphicon glyphicon-menu-right"></span>
-  {{ cl.opts.verbose_name_plural|capfirst }}
-</div>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{% url 'admin:index' %}">Home</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{% url 'admin:app_list' app_label=cl.opts.app_label %}">{{ cl.opts.app_config.verbose_name }}</a>
+    </li>
+    <li class="breadcrumb-item active">
+      {{ cl.opts.verbose_name_plural|capfirst }}
+    </li>
+  </ol>
+</nav>
 {% endblock %}
 {% endif %}
 
@@ -26,7 +32,7 @@
   <div class="col-sm-2">
     {% url cl.opts|admin_urlname:'add' as add_url %}
     <a href="{% add_preserved_filters add_url is_popup to_field %}" class="btn btn-primary btn-heading" role="buttom">
-      <span class="glyphicon glyphicon-plus"></span> Add {{ cl.opts.verbose_name }}
+      <span class="fas fa-plus"></span> Add {{ cl.opts.verbose_name }}
     </a>
   </div>
   {% endif %}
@@ -64,12 +70,12 @@
   {% if cl.has_filters %}
   <div id="changelist-filter" class="col-sm-4">
     <h2>Filter</h2>
-    <div class="panel-group">
+    <div class="d-flex flex-column bd-highlight mb-3">
       {% for spec in cl.filter_specs %}
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h3 class="panel-title">
-            <a data-toggle="collapse" href="#collapse{{ forloop.counter }}">By {{ spec.title }}</a>
+      <div class="card">
+        <div class="card-heading">
+          <h3 class="card-title">
+            <a data-toggle="collapse" href="#collapse{{ forloop.counter }}" class="filter-link text-secondary">By {{ spec.title }}</a>
           </h3>
         </div>
         <div id="collapse{{ forloop.counter }}" class="pannel-collapse collapse">
@@ -101,7 +107,7 @@
     <ul class="list-group">
       {% for entry in admin_log %}
       <li class="list-group-item">
-        <span class="glyphicon glyphicon-{% if entry.is_addition %}plus{% endif %}{% if entry.is_change %}pencil{% endif %}{% if entry.is_deletion %}minus{% endif %}"></span>
+        <span class="fas fa-{% if entry.is_addition %}plus{% endif %}{% if entry.is_change %}pencil-alt{% endif %}{% if entry.is_deletion %}minus{% endif %}"></span>
         {% if entry.is_deletion or not entry.get_admin_url %}
         {{ entry.object_repr }}
         {% if entry.content_type %}

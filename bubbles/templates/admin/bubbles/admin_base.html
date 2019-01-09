@@ -4,26 +4,19 @@
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock blockbots%}
 {% endblock extra_head %}
 
-{% block navuser %}
-<ul class="nav navbar-nav navbar-right">
-  <li>
-    <a href="/">
-      <span class="glyphicon glyphicon-globe"></span> View Site</a>
-  </li>
-  <li>
-    <a href="{% url 'registration:logout' %}">
-      <span class="glyphicon glyphicon-log-out"></span> Log Out</a>
-  </li>
-</ul>
-{% endblock %}
-
 {% block pre_content %}
 {% block breadcrumbs %}
 {% if title %}
-<div class="breadcrumbs well well-sm">
-  <a href="{% url 'admin:index' %}">Home</a>
-  <span class="glyphicon glyphicon-menu-right"></span> {{ title }}
-</div>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{% url 'admin:index' %}">Home</a>
+    </li>
+    <li class="breadcrumb-item active">
+      {{ title }}
+    </li>
+  </ol>
+</nav>
 {% endif %}
 {% endblock %}
 {% block messages %}
@@ -59,7 +52,7 @@
     <ul class="list-group">
       {% for entry in admin_log %}
       <li class="list-group-item">
-        <span class="glyphicon glyphicon-{% if entry.is_addition %}plus{% endif %}{% if entry.is_change %}pencil{% endif %}{% if entry.is_deletion %}minus{% endif %}"></span>
+        <span class="fas fa-{% if entry.is_addition %}plus{% endif %}{% if entry.is_change %}pencil-alt{% endif %}{% if entry.is_deletion %}minus{% endif %}"></span>
         {% if entry.is_deletion or not entry.get_admin_url %}
         {{ entry.object_repr }}
         {% if entry.content_type %}

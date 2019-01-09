@@ -105,7 +105,7 @@ $(document).ready(function() {
                 '</td>';
         }
         row += '<td class="item-entry">' +
-            '<a href="#"><i class="glyphicon glyphicon-remove item-remove"></i></a>'+
+            '<a href="#"><i class="fas fa-minus item-remove"></i></a>'+
             '</td>' +
             '</tr>';
         $('#equipment-table > tbody:last-child').append(row);

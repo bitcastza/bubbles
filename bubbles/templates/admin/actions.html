@@ -1,6 +1,6 @@
 <div class="actions">
     {% for field in action_form %}{% if field.label %}<label>{{ field.label }} {% endif %}{{ field }}{% if field.label %}</label>{% endif %}{% endfor %}
-    <button type="submit" class="btn btn-default" title="Run the selected action" name="index" value="{{ action_index|default:0 }}">Go</button>
+    <button type="submit" class="btn btn-secondary" title="Run the selected action" name="index" value="{{ action_index|default:0 }}">Go</button>
     {% if actions_selection_counter %}
         <span class="action-counter" data-actions-icnt="{{ cl.result_list|length }}">{{ selection_note }}</span>
         {% if cl.result_count != cl.result_list|length %}

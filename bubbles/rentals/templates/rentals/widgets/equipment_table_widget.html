@@ -21,8 +21,8 @@
 </table>
 </div>
 <div class="dropdown">
-  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-    <span class="glyphicon glyphicon-plus"></span>
+  <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
+    <span class="fas fa-minus"></span>
     Add Item
     <span class="caret"></span>
   </button>
@@ -32,9 +32,9 @@
     {% endfor %}
   </ul>
 </div>
-<div class="hidden" id="show-number">{{ widget.show_number }}</div>
-<div class="hidden" id="item-cost">{{ widget.item_cost|default:"0" }}</div>
-<div class="hidden" id="size-options">
+<div hidden id="show-number">{{ widget.show_number }}</div>
+<div hidden id="item-cost">{{ widget.item_cost|default:"0" }}</div>
+<div hidden id="size-options">
   {% for item, sizes in widget.item_size_map.items %}
   <div id="{{ item }}">
     {% if sizes|length != 0 %}
