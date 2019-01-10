@@ -65,10 +65,16 @@ class Item(models.Model):
     hidden = models.BooleanField(_("Hidden"), blank=True, default=False)
 
     def get_change_url(self):
+        # Promote to subtype
+        item = getattr(self, self.description.lower())
         content_type = ContentType.objects.get_for_model(self.__class__)
+        if item.description == "Cylinder":
+            id_number = item.serial_num
+        else:
+            id_number = item.id
         return reverse("admin:{}_{}_change".format(content_type.app_label,
                                                    content_type.model),
-                                    args=(self.id,))
+                                    args=(id_number,))
 
     def __str__(self):
         return '{} {} ({})'.format(self.manufacturer, self.description, self.number)
