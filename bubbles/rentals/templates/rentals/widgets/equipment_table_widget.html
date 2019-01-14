@@ -26,11 +26,11 @@
     Add Item
     <span class="caret"></span>
   </button>
-  <ul class="dropdown-menu" id="add-dropdown">
+  <div class="dropdown-menu" id="add-dropdown">
     {% for type in widget.item_types %}
-    <li id="{{ type.description }}-dropdown"><a href="#">{{ type.description }}</a></li>
+    <a href="#" id="{{ type.description }}-dropdown" class="dropdown-item">{{ type.description }}</a>
     {% endfor %}
-  </ul>
+  </div>
 </div>
 <div hidden id="show-number">{{ widget.show_number }}</div>
 <div hidden id="item-cost">{{ widget.item_cost|default:"0" }}</div>

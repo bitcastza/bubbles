@@ -53,7 +53,7 @@ $(document).ready(function() {
     $('.item-cost-value').on('input', setTotalCost);
     $('#id_deposit').on('input', setTotalCost);
     $('#id_belt_weight').on('input', setTotalCost);
-    $('#add-dropdown li').on('click', function() {
+    $('#add-dropdown a').on('click', function() {
         var currentItem = this;
         var description = $(currentItem).text();
         var sizeOptions = '<input type="text" '+
