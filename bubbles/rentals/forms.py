@@ -22,7 +22,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms import fields, widgets
 from django.utils.translation import gettext_lazy as _
 
-from bubbles.inventory.models import BCD, Booties, Cylinder, Fins, Wetsuit, Item
+from bubbles.inventory.models import BCD, Booties, Cylinder, Fins, Wetsuit, Item, Weight
 from .models import Rental, RentalItem, RentalPeriod, RequestItem
 
 def get_sizes(item_type, size_tag='size'):
@@ -270,6 +270,16 @@ class EquipmentForm(forms.Form):
             raise forms.ValidationError(_('You already have a request submitted for '
             'this period'), code='invalid')
         return self.cleaned_data['period']
+
+    def clean_belt_weight(self):
+        if self.cleaned_data['belt_weight'] == None:
+            raise forms.ValidationError(_('This field is required'), code='invalid')
+        total_weight = Weight.objects.first()
+        if total_weight == None:
+            raise forms.ValidationError(_('No total weight specified by staff, unable to continue.' +
+            'Please send this error to your system administrator.'), code='invalid')
+        return self.cleaned_data['belt_weight']
+
 
     def clean(self):
         if not self.has_error('period'):
