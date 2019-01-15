@@ -63,7 +63,7 @@ def request_equipment(request, request_id=None):
                 rental_item.rental = rental
                 rental_item.save()
             return render(request, 'rentals/request_confirmation.html')
-    elif request_id != None:
+    elif request_id != None: # Edit
         rental_request = get_object_or_404(Rental, id=request_id)
         url = reverse('rentals:request_equipment', args=(request_id,))
         if rental_request.user != request.user:
@@ -74,6 +74,7 @@ def request_equipment(request, request_id=None):
                                     data={
                                         'period': rental_request.rental_period,
                                         'equipment': rental_request.requestitem_set.all(),
+                                        'belt_weight': rental_request.weight,
                                         'liability': True,
                                     })
     else:
@@ -152,6 +153,7 @@ def rent_equipment(request, rental_request=None):
                                      data={
                                          'period': None,
                                          'deposit': 0,
+                                         'belt_weight': 0,
                                      })
     context = {
         'form': form,
