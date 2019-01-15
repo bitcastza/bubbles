@@ -28,8 +28,13 @@
           {{ error }}
         </div>
         {% endfor %}
-        <label class="control-label{% if field.field.widget.input_type == "checkbox" %} form-check-label{% endif %}" for="{{ field.id_for_label }}">{{ field.label }}:</label>
+        {% if field.field.widget.input_type == "checkbox" %}
         {{ field }}
+        <label class="control-label form-check-label" for="{{ field.id_for_label }}">{{ field.label }}:</label>
+        {% else %}
+        <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}:</label>
+        {{ field }}
+        {% endif %}
       </div>
       {% endfor %}
       <div class="form-group">
