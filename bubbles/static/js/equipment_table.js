@@ -19,10 +19,9 @@ function isItems() {
     return numItems > 0;
 }
 
-// TODO: Does not re-add the item to the dropdown after it is removed
 function addItemRemoveListener() {
     $('.item-remove').on('click', function() {
-        var enableType = $('td:first-child', $(this).parents('tr')).val();
+        var enableType = $('td:first-child', $(this).parents('tr'))[0].firstChild.value;
         $('#' + enableType + '-dropdown').show();
         $(this).parents('tr').remove();
         if (!isItems()) {
@@ -36,7 +35,6 @@ function setTotalCost() {
     $('.item-cost-value').each(function() {
         cost += +$(this).val();
     });
-    console.log($('id_belt_weight').val());
     if ($('#id_belt_weight').val() > 0) {
         cost += +$('#item-cost').text();
     }
