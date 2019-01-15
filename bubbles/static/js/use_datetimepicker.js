@@ -15,6 +15,7 @@
  */
 $(document).ready(function () {
     $('.date-input').datepicker({
-        uiLibrary: 'bootstrap4'
+        uiLibrary: 'bootstrap4',
+        format: 'yyyy-mm-dd'
     });
 });
