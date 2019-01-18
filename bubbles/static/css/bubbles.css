@@ -24,3 +24,7 @@
 caption {
   caption-side: top;
 }
+
+iframe.weather {
+    margin-top: 10px;
+}
