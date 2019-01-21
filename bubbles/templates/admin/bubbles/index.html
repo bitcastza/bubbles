@@ -8,7 +8,11 @@
     <h1>Rental Queue</h1>
     <ul class="list-group">
       {% for rental in rental_requests %}
-      <li class="list-group-item"><a href="{% url 'rentals:rent_equipment' rental.id %}">{{ rental.user }}</a></li>
+      <li class="list-group-item">
+        <a href="{% url 'rentals:rent_equipment' rental.id %}">
+          {{ rental.user.first_name }} {{ rental.user.last_name }} ({{ rental.user }})
+        </a>
+      </li>
       {% endfor %}
     </ul>
   </div>
@@ -18,7 +22,11 @@
     <h1>Rental Returns</h1>
     <ul class="list-group">
       {% for rental in rental_returns %}
-      <li class="list-group-item"><a href="{% url 'rentals:return_equipment' rental.id %}">{{ rental.user }}</a></li>
+      <li class="list-group-item">
+        <a href="{% url 'rentals:return_equipment' rental.id %}">
+          {{ rental.user.first_name }} {{ rental.user.last_name }} ({{ rental.user }})
+        </a>
+      </li>
       {% endfor %}
     </ul>
   </div>
