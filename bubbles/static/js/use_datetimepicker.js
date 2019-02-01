@@ -16,6 +16,7 @@
 $(document).ready(function () {
     $('.date-input').datepicker({
         uiLibrary: 'bootstrap4',
-        format: 'yyyy-mm-dd'
+        format: 'yyyy-mm-dd',
+        iconsLibrary: 'fontawesome'
     });
 });
