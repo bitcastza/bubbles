@@ -162,7 +162,6 @@ class Cylinder(Item):
             self.last_hydro = date
         self.last_viz = date
 
-    #TODO: Fix failing test caused by this
     @property
     def id(self):
         return self.serial_num
