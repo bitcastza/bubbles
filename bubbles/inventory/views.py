@@ -14,19 +14,23 @@
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
 import datetime
+
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
-from django.http import FileResponse
+from django.http import FileResponse, Http404
 from django.shortcuts import render
 from django.utils.translation import gettext as _
+from django.forms import formset_factory
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.rl_config import defaultPageSize
 from reportlab.lib.units import cm
 
+from . import models
 from .models import Item, ItemValue
+from .forms import InventoryCheckForm, BaseInventoryCheckFormSet
 
 PAGE_HEIGHT = defaultPageSize[1];
 PAGE_WIDTH = defaultPageSize[0]
@@ -85,3 +89,70 @@ def insurance_report(request):
     response = FileResponse(open(path, 'rb'), content_type='application/pdf', )
     response['Content-Disposition'] = 'filename="' + _('Insurance Inventory') + '"\''
     return response
+
+def expected_found(value, state):
+    if state == Item.AVAILABLE or state == Item.BROKEN:
+        return not value
+    elif state == Item.IN_USE or state == Item.REPAIR or state == Item.MISSING:
+        return value
+
+@staff_member_required
+def do_inventory_check(request, item_type):
+    try:
+        item_type_class = getattr(models, item_type.title())
+    except AttributeError:
+        raise Http404('Item type does not exist')
+    InventoryCheckFormSet = formset_factory(InventoryCheckForm,
+                                            extra=len(Item.STATE_CHOICES),
+                                            formset=BaseInventoryCheckFormSet)
+    if request.method == 'POST':
+        formset = InventoryCheckFormSet(data=request.POST,
+                                        form_kwargs={
+                                            'item_type': item_type_class,
+                                        })
+        formset.item_type = item_type
+        if formset.is_valid():
+            #TODO: Use and indicate changes made in result message...
+            state_transition = {
+                Item.AVAILABLE: Item.MISSING,
+                Item.IN_USE: Item.AVAILABLE,
+                Item.BROKEN: Item.REPAIR,
+                Item.REPAIR: Item.AVAILABLE,
+                Item.MISSING: Item.AVAILABLE,
+            }
+            changed = {}
+            counter = 0
+            for form in formset:
+                current_state = Item.STATE_CHOICES[counter][0]
+                items = list(item_type_class.objects.filter(state=current_state).order_by('number'))
+                for i in range(0, len(items)):
+                    if expected_found(form[items[i].id].data, current_state):
+                        state_name = Item.STATE_MAP[current_state]
+                        try:
+                            changed[state_name].append(items[i])
+                        except KeyError:
+                            changed[state_name] = [items[i],]
+                counter += 1
+            for state_description, items in changed.items():
+                state = Item.MISSING
+                for s, description in Item.STATE_MAP.items():
+                    if description == state_description:
+                        state = s
+                for item in items:
+                    item.state = state_transition[state]
+                    item.save()
+            context = {
+                'changed': changed,
+            }
+            return render(request,
+                          'inventory/inventory_check_results.html',
+                          {'changed': changed,})
+    else:
+        formset = InventoryCheckFormSet(form_kwargs={
+            'item_type': item_type_class,
+        })
+        formset.item_type = item_type
+    context = {
+        'formset': formset
+    }
+    return render(request, 'inventory/inventory_check.html', context)

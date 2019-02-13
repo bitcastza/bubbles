@@ -1,0 +1,12 @@
+{% extends "bubbles/base.html" %}
+
+{% block content %}
+{% for state, items in changed.items %}
+<h1>Expected {{ state }}</h1>
+<ul>
+  {% for item in items %}
+  <li>{{ item }}</li>
+  {% endfor %}
+</ul>
+{% endfor %}
+{% endblock %}

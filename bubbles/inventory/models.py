@@ -30,13 +30,21 @@ class Item(models.Model):
     REPAIR = 'R'
     CONDEMNED = 'C'
     MISSING = 'M'
+    STATE_MAP = {
+        AVAILABLE: _('Available'),
+        IN_USE: _('In use'),
+        BROKEN: _('Broken'),
+        REPAIR: _('Repair'),
+        MISSING: _('Missing'),
+        CONDEMNED: _('Condemned'),
+    }
     STATE_CHOICES = (
-        (AVAILABLE, _('Available')),
-        (IN_USE, _('In use')),
-        (BROKEN, _('Broken')),
-        (REPAIR, _('Repair')),
-        (CONDEMNED, _('Condemned')),
-        (MISSING, _('Missing')),
+        (AVAILABLE, STATE_MAP[AVAILABLE]),
+        (IN_USE, STATE_MAP[IN_USE]),
+        (BROKEN, STATE_MAP[BROKEN]),
+        (REPAIR, STATE_MAP[REPAIR]),
+        (MISSING, STATE_MAP[MISSING]),
+        (CONDEMNED, STATE_MAP[CONDEMNED]),
     )
 
     def get_next_number():
@@ -68,10 +76,7 @@ class Item(models.Model):
         # Promote to subtype
         item = getattr(self, self.description.lower())
         content_type = ContentType.objects.get_for_model(self.__class__)
-        if item.description == "Cylinder":
-            id_number = item.serial_num
-        else:
-            id_number = item.id
+        id_number = item.id
         return reverse("admin:{}_{}_change".format(content_type.app_label,
                                                    content_type.model),
                                     args=(id_number,))
@@ -156,6 +161,10 @@ class Cylinder(Item):
         if date - self.last_hydro > self.hydro_period:
             self.last_hydro = date
         self.last_viz = date
+
+    @property
+    def id(self):
+        return self.serial_num
 
     @property
     def size(self):

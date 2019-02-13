@@ -1,0 +1,25 @@
+{% extends "bubbles/base.html" %}
+
+{% block content %}
+<form action="{% url 'inventory:do_inventory_check' formset.item_type %}" method="post">
+  {% csrf_token %}
+  {{ formset.management_form }}
+  <h1>{{ formset.item_type | title }}</h1>
+  {% for form in formset %}
+  {% if form.fields|length > 0 %}
+  <div>
+    <h2>{{ form.item_state }}</h2>
+    {% for field in form %}
+    <div class="col-sm-2">
+      <div class="form-check">
+        {{ field }}
+        <label class="control-label form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endfor %}
+  <button class="btn btn-primary" id="submit-btn" type="submit">Submit</button>
+</form>
+{% endblock %}

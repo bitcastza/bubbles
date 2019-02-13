@@ -34,5 +34,10 @@ from . import views
 app_name = 'inventory'
 
 urlpatterns = [
-    path('insurance_report.pdf', views.insurance_report, name='insurance_report'),
+    path('insurance_report.pdf',
+         views.insurance_report,
+         name='insurance_report'),
+    path('check_inventory/<str:item_type>/',
+         views.do_inventory_check,
+         name='do_inventory_check'),
 ]
