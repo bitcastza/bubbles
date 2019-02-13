@@ -41,7 +41,7 @@ class CylinderTests(TestCase):
                                  manufacturer='test',
                                  date_of_purchase=last_viz,
                                  state=Item.AVAILABLE,
-                                 description='BCD',
+                                 description='Cylinder',
                                  serial_num='123',
                                  material='steel',
                                  capacity=12,
