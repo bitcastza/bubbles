@@ -126,6 +126,7 @@ def do_inventory_check(request, item_type):
                 current_state = Item.STATE_CHOICES[counter][0]
                 items = list(item_type_class.objects.filter(state=current_state).order_by('number'))
                 for i in range(0, len(items)):
+
                     if expected_found(form[items[i].id].data, current_state):
                         state_name = Item.STATE_MAP[current_state]
                         try:

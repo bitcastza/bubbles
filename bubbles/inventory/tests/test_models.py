@@ -15,9 +15,33 @@
 ###########################################################################
 import datetime
 
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
+from django.urls import reverse
 
-from .models import Item, BCD, Cylinder, Regulator
+from bubbles.inventory.models import Item, BCD, Cylinder, Regulator
+
+class RegulatorTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        last_service = datetime.date(year=2018, month=7, day=2)
+        cls.regulator = Regulator.objects.create(number='1',
+                                 manufacturer='test',
+                                 date_of_purchase=last_service,
+                                 state=Item.AVAILABLE,
+                                 description='Regulator',
+                                 last_service=last_service)
+
+    def test_next_service(self):
+        next_service = datetime.date(year=2019, month=7, day=1)
+        self.assertEqual(self.regulator.next_service, next_service)
+
+    def test_get_change_url(self):
+        content_type = ContentType.objects.get_for_model(Regulator)
+        url = reverse("admin:{}_{}_change".format(content_type.app_label,
+                                                  content_type.model),
+                      args=(self.regulator.id,))
+        self.assertEqual(self.regulator.get_change_url(), url)
 
 class BCDTests(TestCase):
     def test_next_service(self):
@@ -72,14 +96,9 @@ class CylinderTests(TestCase):
         self.cylinder.last_viz = last_service
         self.assertEqual(self.cylinder.last_service, last_service)
 
-class BCDTests(TestCase):
-    def test_next_service(self):
-        last_service = datetime.date(year=2018, month=7, day=2)
-        next_service = datetime.date(year=2019, month=7, day=1)
-        regulator = Regulator.objects.create(number='1',
-                                 manufacturer='test',
-                                 date_of_purchase=last_service,
-                                 state=Item.AVAILABLE,
-                                 description='Regulator',
-                                 last_service=last_service)
-        self.assertEqual(regulator.next_service, next_service)
+    def test_get_change_url(self):
+        content_type = ContentType.objects.get_for_model(Cylinder)
+        url = reverse("admin:{}_{}_change".format(content_type.app_label,
+                                                  content_type.model),
+                      args=(self.cylinder.serial_num,))
+        self.assertEqual(self.cylinder.get_change_url(), url)

@@ -76,10 +76,13 @@ class Item(models.Model):
         # Promote to subtype
         item = getattr(self, self.description.lower())
         content_type = ContentType.objects.get_for_model(self.__class__)
-        id_number = item.id
+        if self.description == 'Cylinder':
+            id_number = item.serial_num
+        else:
+            id_number = item.id
         return reverse("admin:{}_{}_change".format(content_type.app_label,
                                                    content_type.model),
-                                    args=(id_number,))
+                       args=(id_number,))
 
     def __str__(self):
         return '{} {} ({})'.format(self.manufacturer, self.description, self.number)
@@ -161,14 +164,6 @@ class Cylinder(Item):
         if date - self.last_hydro > self.hydro_period:
             self.last_hydro = date
         self.last_viz = date
-
-    @property
-    def id(self):
-        return self.serial_num
-
-    @id.setter
-    def id(self, serial_num):
-        self.serial_num = serial_num
 
     @property
     def size(self):
