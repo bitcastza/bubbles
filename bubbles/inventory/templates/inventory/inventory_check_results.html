@@ -1,12 +1,14 @@
 {% extends "bubbles/base.html" %}
+{% load resolve %}
 
 {% block content %}
 {% for state, items in changed.items %}
-<h1>Expected {{ state }}</h1>
+<h1>Expected {{ state|resolve:state_names }}</h1>
 <ul>
   {% for item in items %}
   <li>{{ item }}</li>
   {% endfor %}
 </ul>
+<button class="btn btn-primary">Mark {{ state|resolve:state_transition|resolve:state_names }}</button>
 {% endfor %}
 {% endblock %}

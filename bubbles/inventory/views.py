@@ -112,7 +112,6 @@ def do_inventory_check(request, item_type):
                                         })
         formset.item_type = item_type
         if formset.is_valid():
-            #TODO: Use and indicate changes made in result message...
             state_transition = {
                 Item.AVAILABLE: Item.MISSING,
                 Item.IN_USE: Item.AVAILABLE,
@@ -128,26 +127,19 @@ def do_inventory_check(request, item_type):
                 for i in range(0, len(items)):
 
                     if expected_found(form[items[i].id].data, current_state):
-                        state_name = Item.STATE_MAP[current_state]
                         try:
-                            changed[state_name].append(items[i])
+                            changed[current_state].append(items[i])
                         except KeyError:
-                            changed[state_name] = [items[i],]
+                            changed[current_state] = [items[i],]
                 counter += 1
-            for state_description, items in changed.items():
-                state = Item.MISSING
-                for s, description in Item.STATE_MAP.items():
-                    if description == state_description:
-                        state = s
-                for item in items:
-                    item.state = state_transition[state]
-                    item.save()
             context = {
                 'changed': changed,
+                'state_names': Item.STATE_MAP,
+                'state_transition': state_transition,
             }
             return render(request,
                           'inventory/inventory_check_results.html',
-                          {'changed': changed,})
+                          context)
     else:
         formset = InventoryCheckFormSet(form_kwargs={
             'item_type': item_type_class,
