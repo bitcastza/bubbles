@@ -44,6 +44,7 @@ class ItemAdmin(admin.ModelAdmin):
     list_display = ('description', 'number', 'manufacturer', 'state')
     list_filter = ('state', 'description')
     list_display_links = ('number',)
+    ordering = ['number']
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
     fieldsets = (
         (None, {
@@ -74,6 +75,7 @@ class SizeAdmin(admin.ModelAdmin):
     list_display = ('number', 'manufacturer', 'size', 'state')
     list_filter = ('state', 'size', 'manufacturer')
     exclude = ['description']
+    ordering = ['number']
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
     fieldsets = (
         (None, {
@@ -121,6 +123,7 @@ class CylinderAdmin(admin.ModelAdmin):
                     'state',)
     list_filter = ('state', 'manufacturer', 'capacity')
     exclude = ['description']
+    ordering = ['number']
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
     fieldsets = (
         (None, {
@@ -150,6 +153,7 @@ class RegulatorAdmin(admin.ModelAdmin):
                     'state')
     list_filter = ('state', 'manufacturer')
     exclude = ['description']
+    ordering = ['number']
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
     fieldsets = (
         (None, {

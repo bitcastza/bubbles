@@ -28,13 +28,24 @@ from . import models
 class RentalAdmin(admin.ModelAdmin):
     def start_date(self, obj):
         return obj.rental_period.start_date
+    start_date.admin_order_field = 'rental_period__start_date'
 
     def end_date(self, obj):
         return obj.rental_period.end_date
+    end_date.admin_order_field = 'rental_period__end_date'
 
-    list_display = ('user', 'start_date', 'end_date', 'state')
+    def formatted_username(self, obj):
+        if obj.user.first_name and obj.user.last_name:
+            return obj.user.first_name + ' ' + obj.user.last_name + ' (' + str(obj.user) + ')'
+        else:
+            return obj.user
+    formatted_username.short_description = _('user')
+    formatted_username.admin_order_field = 'user'
+
+    list_display = ('formatted_username', 'start_date', 'end_date', 'state')
     date_hierarchy = 'rental_period__start_date'
     list_filter = ('state',)
+    ordering = ['-rental_period__start_date']
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
 
 @admin.register(models.RentalPeriod, site=admin_site)
@@ -51,6 +62,7 @@ class RentalPeriodAdmin(admin.ModelAdmin):
                     'cost_per_item')
     exclude = ['hidden']
     date_hierarchy = 'start_date'
+    ordering = ['-start_date']
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
 
 @admin.register(models.RentalItem, site=admin_site)
