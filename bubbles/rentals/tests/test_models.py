@@ -34,21 +34,59 @@ class RentalPeriodTest(TestCase):
                          "{} - {}".format(start_date, end_date))
 
 class RentalTest(TestCase):
-    def test_str(self):
+    @classmethod
+    def setUpTestData(cls):
         start_date = datetime.date(year=2018, month=7, day=2)
         end_date = start_date + datetime.timedelta(days=5)
-        rental_period = RentalPeriod(start_date=start_date,
+        cls.rental_period = RentalPeriod(start_date=start_date,
                                      end_date=end_date,
                                      default_deposit=100,
                                      default_cost_per_item=25,
                                      hidden=False)
-        user = User.objects.create_user(username='jacob')
-        rental = Rental(user=user,
+        cls.user = User.objects.create_user(username='jacob')
+        cls.rental = Rental(user=cls.user,
                         state=Rental.REQUESTED,
                         deposit=100,
-                        rental_period=rental_period)
-        self.assertEqual(rental.__str__(),
-                         "Rental by {} for {}".format(user, rental_period))
+                        rental_period=cls.rental_period)
+
+    def test_overdue_staff(self):
+        self.rental_period.end_date = None
+        self.assertFalse(self.rental.is_overdue())
+
+    def test_overdue_true(self):
+        today = datetime.date.today()
+        self.rental_period.end_date = today - datetime.timedelta(days=1)
+        self.assertTrue(self.rental.is_overdue())
+
+    def test_overdue_false(self):
+        today = datetime.date.today()
+        self.rental_period.end_date = today + datetime.timedelta(days=1)
+        self.assertFalse(self.rental.is_overdue())
+
+    def test_due_staff(self):
+        self.rental_period.end_date = None
+        self.assertFalse(self.rental.is_due())
+
+    def test_due_true(self):
+        today = datetime.date.today()
+        self.rental_period.end_date = today
+        self.assertTrue(self.rental.is_due())
+
+    def test_due_false_coming(self):
+        today = datetime.date.today()
+        self.rental_period.end_date = today + datetime.timedelta(days=1)
+        self.assertFalse(self.rental.is_due())
+
+    def test_due_false_past(self):
+        today = datetime.date.today()
+        self.rental_period.end_date = today - datetime.timedelta(days=1)
+        self.assertFalse(self.rental.is_due())
+
+    def test_str(self):
+        self.assertEqual(self.rental.__str__(),
+                         "Rental by {} for {}".format(self.user,
+                                                      self.rental_period))
+
 
 class RentalItemTest(TestCase):
     @classmethod

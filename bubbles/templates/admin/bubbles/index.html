@@ -22,7 +22,7 @@
     <h1>Rental Returns</h1>
     <ul class="list-group">
       {% for rental in rental_returns %}
-      <li class="list-group-item">
+      <li class="list-group-item {% if rental.is_due %}list-group-item-warning{% endif %}{% if rental.is_overdue %}list-group-item-danger{% endif %}">
         <a href="{% url 'rentals:return_equipment' rental.id %}">
           {{ rental.user.first_name }} {{ rental.user.last_name }} ({{ rental.user }})
         </a>

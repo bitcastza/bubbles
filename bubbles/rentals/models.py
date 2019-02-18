@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
+import datetime
+
 from django.conf import settings
 from django.db import models
 from bubbles.inventory.models import *
@@ -56,6 +58,20 @@ class Rental(models.Model):
     deposit_returned = models.BooleanField(_('Deposit returned'), default=True)
     rental_period = models.ForeignKey(RentalPeriod, on_delete=models.CASCADE)
     weight = models.IntegerField(_('Weight'), null=True, blank=True)
+
+    def is_overdue(self):
+        today = datetime.date.today()
+        if self.rental_period.end_date:
+            return self.rental_period.end_date < today
+        else:
+            return False
+
+    def is_due(self):
+        today = datetime.date.today()
+        if self.rental_period.end_date:
+            return self.rental_period.end_date == today
+        else:
+            return False
 
     def __str__(self):
         return "Rental by {} for {}".format(self.user, self.rental_period)
