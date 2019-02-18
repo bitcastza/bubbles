@@ -14,7 +14,7 @@
       {% if rental_user %}
       <div class="form-group">
         <label class="control-label" for="id_user">User:</label>
-        <p class="form-control-static" id="id_user">{{ rental_user.first_name }} {{ rental_user.last_name }}</p>
+        <p class="form-control-static" id="id_user">{{ rental_user.first_name }} {{ rental_user.last_name }} ({{ rental_user.username }})</p>
       </div>
       {% endif %}
       {% for field in form %}
