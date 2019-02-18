@@ -229,13 +229,6 @@ class EquipmentListField(fields.Field):
         return rental_items
 
 class EquipmentForm(forms.Form):
-    date = datetime.date.today()
-    period_query_set = RentalPeriod.objects.filter(end_date__gt=date, hidden=False)
-    period = forms.ModelChoiceField(queryset=period_query_set,
-                                    required=False,
-                                    widget=widgets.Select(
-                                        attrs={'class': 'form-control'}),
-                                    initial=get_initial_period)
     period_state_filter = Rental.REQUESTED
     belt_weight = forms.IntegerField(min_value=0,
                                 max_value=15,
@@ -247,6 +240,19 @@ class EquipmentForm(forms.Form):
         self.user = user
         self.rental = rental
         self.request_id = request_id
+        if user.is_staff:
+            # Staff should not select a period
+            period_query_set = RentalPeriod.objects.filter(start_date=None)
+        else:
+            date = datetime.date.today()
+            period_query_set = RentalPeriod.objects.filter(end_date__gt=date, hidden=False)
+        self.fields['period'] = forms.ModelChoiceField(queryset=period_query_set,
+                                    required=False,
+                                    widget=widgets.Select(
+                                        attrs={'class': 'form-control'}),
+                                    initial=get_initial_period)
+        # Move period to beginning of the form
+        self.fields.move_to_end('period', last=False)
 
     def clean_period(self):
         if self.cleaned_data['period'] == None:
