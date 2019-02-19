@@ -9,7 +9,7 @@ def fix_item_state(apps, schema_editor):
         current_rentals = RentalItem.objects.filter(item=rental_item.item, returned=False)
         if rental_item.item.state == 'U' and current_rentals.count() == 0:
             rental_item.item.state = 'A'
-            rental_item.item.save
+            rental_item.item.save()
 
 class Migration(migrations.Migration):
 
