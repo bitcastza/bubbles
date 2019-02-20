@@ -98,8 +98,12 @@ def expected_found(value, state):
 
 @staff_member_required
 def do_inventory_check(request, item_type):
+    if item_type.lower() == 'bcd':
+        item_type = item_type.upper()
+    else:
+        item_type = item_type.title()
     try:
-        item_type_class = getattr(models, item_type.title())
+        item_type_class = getattr(models, item_type)
     except AttributeError:
         raise Http404('Item type does not exist')
     InventoryCheckFormSet = formset_factory(InventoryCheckForm,
