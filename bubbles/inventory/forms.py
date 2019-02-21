@@ -14,6 +14,7 @@
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
 from django import forms
+from django.db.models import Q
 from django.forms import widgets
 from django.utils.translation import gettext_lazy as _
 
@@ -22,11 +23,28 @@ from .models import Item
 class InventoryCheckForm(forms.Form):
     def __init__(self, item_type, state, **kwargs):
         super().__init__(**kwargs)
-        items = item_type.objects.filter(state=state).order_by('number')
+        if item_type == Item:
+            q_filter = ~Q(description__exact='BCD') & \
+                    ~Q(description__exact='Booties') & \
+                    ~Q(description__exact='Cylinder') & \
+                    ~Q(description__exact='Fins') & \
+                    ~Q(description__exact='Regulator') & \
+                    ~Q(description__exact='Wetsuit')
+            q_filter = q_filter & Q(state=state)
+            show_description = True
+        else:
+            q_filter = Q(state=state)
+            show_description = False
+
+        items = item_type.objects.filter(q_filter).order_by('description', 'number')
         self.item_state = Item.STATE_MAP[state]
         for item in items:
+            label = ""
+            if show_description:
+                label += item.description + ': '
+            label += item.number + ' (' + item.manufacturer + ')'
             self.fields[item.id] = forms.BooleanField(
-                label=_(item.number + ' (' + item.manufacturer + ')'),
+                label=_(label),
                 required=False,
                 widget=widgets.CheckboxInput(attrs={
                     'class': 'form-check-input'
