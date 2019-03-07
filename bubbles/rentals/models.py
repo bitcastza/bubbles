@@ -25,13 +25,15 @@ class RentalPeriod(models.Model):
     end_date = models.DateField(_('End date'), null=True)
     default_deposit = models.IntegerField(_('Deposit'))
     default_cost_per_item = models.IntegerField(_('Cost per item'))
+    name = models.CharField(_('Name'), max_length=255)
     hidden = models.BooleanField(default=False)
 
     def __str__(self):
         if self.end_date:
-            return "{} - {}".format(self.start_date,
-                                    self.end_date)
-        return "{} -".format(self.start_date)
+            return " {} ({} - {})".format(self.name,
+                                          self.start_date,
+                                          self.end_date)
+        return "{} ({} -)".format(self.name, self.start_date)
 
 class Rental(models.Model):
     REQUESTED = 'REQ'
