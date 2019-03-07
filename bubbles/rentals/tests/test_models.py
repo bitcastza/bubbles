@@ -29,9 +29,10 @@ class RentalPeriodTest(TestCase):
                                      end_date=end_date,
                                      default_deposit=100,
                                      default_cost_per_item=25,
+                                     name='Test',
                                      hidden=False)
         self.assertEqual(rental_period.__str__(),
-                         "{} - {}".format(start_date, end_date))
+                         "{} ({} - {})".format('Test', start_date, end_date))
 
 class RentalTest(TestCase):
     @classmethod
@@ -42,6 +43,7 @@ class RentalTest(TestCase):
                                      end_date=end_date,
                                      default_deposit=100,
                                      default_cost_per_item=25,
+                                     name='Test',
                                      hidden=False)
         cls.user = User.objects.create_user(username='jacob')
         cls.rental = Rental(user=cls.user,
@@ -97,6 +99,7 @@ class RentalItemTest(TestCase):
                                      end_date=end_date,
                                      default_deposit=100,
                                      default_cost_per_item=25,
+                                     name='Test',
                                      hidden=False)
         cls.user = User.objects.create_user(username='jacob')
         rental = Rental(user=cls.user,
@@ -134,6 +137,7 @@ class RentalItemTest(TestCase):
                                      end_date=end_date,
                                      default_deposit=100,
                                      default_cost_per_item=25,
+                                     name='Test',
                                      hidden=False)
         cls.user = User.objects.create_user(username='jacob')
         rental = Rental(user=cls.user,

@@ -64,6 +64,7 @@ class StaticFunctionTest(TestCase):
                                      end_date=end_date,
                                      default_deposit=100,
                                      default_cost_per_item=25,
+                                     name='Test',
                                      hidden=False)
         rental_period.save()
         self.assertEqual(forms.get_initial_period(), rental_period)
@@ -89,6 +90,7 @@ class EquipmentTableWidgetTest(TestCase):
                                      end_date=end_date,
                                      default_deposit=100,
                                      default_cost_per_item=25,
+                                     name='Test',
                                      hidden=False)
         user = User.objects.create_user(username='jacob')
         cls.rental = Rental(rental_period=rental_period,

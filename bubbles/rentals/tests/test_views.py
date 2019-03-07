@@ -69,7 +69,8 @@ class IndexViewTests(TestCase):
         rental_period = RentalPeriod.objects.create(start_date=start_date,
                                                     end_date=end_date,
                                                     default_deposit=0,
-                                                    default_cost_per_item=0)
+                                                    default_cost_per_item=0,
+                                                    name='Test')
         rental = Rental.objects.create(user=self.user,
                                        approved_by=self.user,
                                        state=Rental.REQUESTED,
@@ -109,7 +110,8 @@ class RequestEquipmentViewTests(TestCase):
         rental_period = RentalPeriod.objects.create(start_date=datetime.date.today(),
                                                     end_date=datetime.date.today(),
                                                     default_deposit=0,
-                                                    default_cost_per_item=0)
+                                                    default_cost_per_item=0,
+                                                    name='Test')
         rental = Rental.objects.create(user=other_user,
                                        state=Rental.REQUESTED,
                                        rental_period=rental_period,
