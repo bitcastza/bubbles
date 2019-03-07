@@ -78,7 +78,7 @@ class EquipmentTableWidget(widgets.MultiWidget):
                     self.add_request_items(rental_items)
         except KeyError:
             # Response with POST data
-            item_types = Item.objects.filter(state__exact=Item.AVAILABLE, hidden=False).values('description').distinct()
+            item_types = Item.objects.filter(hidden=False).values('description').distinct()
             item_types = [i['description'] for i in item_types]
             for key in data:
                 if key not in item_types:
@@ -245,7 +245,8 @@ class EquipmentForm(forms.Form):
             period_query_set = RentalPeriod.objects.filter(start_date=None)
         else:
             date = datetime.date.today()
-            period_query_set = RentalPeriod.objects.filter(end_date__gt=date, hidden=False)
+            period_query_set = RentalPeriod.objects.filter(end_date__gt=date,
+                                                           hidden=False)
         self.fields['period'] = forms.ModelChoiceField(queryset=period_query_set,
                                     required=False,
                                     widget=widgets.Select(
