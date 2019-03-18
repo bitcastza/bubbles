@@ -153,3 +153,61 @@ class EquipmentTableWidgetTest(TestCase):
         self.assertEqual(len(self.table.widgets), 1)
         self.assertEqual(self.table.widgets[0].item_description,
                          self.item.description)
+
+class EquipmentListFieldTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.item = BCD(number='1',
+                   manufacturer='test',
+                   date_of_purchase=datetime.date(year=2016, month=3, day=1),
+                   state = BCD.AVAILABLE,
+                   size = BCD.LARGE,
+                   last_service=datetime.date(year=2016, month=3, day=1),
+                   description='BCD')
+        cls.item.save()
+        start_date = datetime.date.today()
+        rental_period = RentalPeriod(start_date=start_date,
+                                     end_date=start_date + datetime.timedelta(days=5),
+                                     default_deposit=100,
+                                     default_cost_per_item=25,
+                                     name='Test',
+                                     hidden=False)
+        rental_period.save()
+        user = User.objects.create_user(username='jacob')
+        cls.rental = Rental(rental_period=rental_period,
+                        user=user,
+                        state=Rental.RENTED,
+                        deposit=0)
+        cls.rental.save()
+        cls.rental_item = RentalItem(item=cls.item,
+                                          rental=cls.rental,
+                                          cost=0)
+        cls.rental_item.save()
+
+    def test_return_rented_item_after_second_rental(self):
+        start_date = datetime.date(year=2018, month=3, day=1)
+        returned_rental_period = RentalPeriod(start_date=start_date,
+                                     end_date=start_date + datetime.timedelta(days=4),
+                                     default_deposit=100,
+                                     default_cost_per_item=25,
+                                     name='Test',
+                                     hidden=False)
+        returned_rental_period.save()
+        user = User.objects.create_user(username='bob')
+        returned_rental = Rental(rental_period=returned_rental_period,
+                        user=user,
+                        state=Rental.RETURNED,
+                        deposit=0)
+        returned_rental.save()
+        returned_rental_item = RentalItem(item=self.item,
+                                          rental=returned_rental,
+                                          cost=0,
+                                          returned=True)
+        returned_rental_item.save()
+
+        form = EquipmentListField(show_number=True)
+        data = { 
+            'equipment': [self.rental_item],
+        }
+        form.widget.value_from_datadict(data, None, 'equipment')
+        self.assertIsNotNone(form.clean("Test"))

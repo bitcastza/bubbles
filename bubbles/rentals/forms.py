@@ -221,7 +221,7 @@ class EquipmentListField(fields.Field):
                         }))
                 continue
             try:
-                rental_item = RentalItem.objects.get(item=item)
+                rental_item = RentalItem.objects.get(item=item, returned=False)
             except ObjectDoesNotExist:
                 rental_item = RentalItem(item=item,cost=int(widget.item_cost))
             rental_items.append(rental_item)
