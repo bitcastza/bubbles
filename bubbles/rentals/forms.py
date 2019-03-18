@@ -19,6 +19,7 @@ import sys
 
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.safestring import mark_safe
 from django.forms import fields, widgets
 from django.utils.translation import gettext_lazy as _
 
@@ -310,7 +311,7 @@ class RequestEquipmentForm(EquipmentForm):
     equipment = EquipmentListField()
     #TODO: link to terms of rental
     liability = forms.BooleanField(
-        label=_("I have read and understand the terms of rental"),
+        label=mark_safe(_("I have read and understand the <a href=/docs/terms>terms of rental</a>")),
         widget=widgets.CheckboxInput(attrs={'class': 'form-check-input'}))
     period_state_filter = Rental.REQUESTED
 
