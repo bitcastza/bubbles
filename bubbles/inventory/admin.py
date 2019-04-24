@@ -31,16 +31,30 @@ make_repair.short_description = 'Mark selected items as in for repairs'
 def make_available(modeladmin, request, queryset):
     for obj in queryset:
         obj.state = models.Item.AVAILABLE
+        obj.save()
+
+make_available.short_description = 'Mark available'
+
+def make_missing(modeladmin, request, queryset):
+    for obj in queryset:
+        obj.state = models.Item.MISSING
+        obj.save()
+
+make_missing.short_description = 'Mark missing'
+
+def return_from_repair(modeladmin, request, queryset):
+    make_available(modeladmin, request, queryset)
+    for obj in queryset:
         today = datetime.date.today()
         date = datetime.date(year=today.year, month=today.month, day=1)
         obj.last_service = date
         obj.save()
 
-make_available.short_description = 'Return items from repair'
+return_from_repair.short_description = 'Return items from repair'
 
 @admin.register(models.Item, site=admin_site)
 class ItemAdmin(admin.ModelAdmin):
-    actions = [make_repair, make_available]
+    actions = [make_available, make_repair, return_from_repair, make_missing]
     list_display = ('description', 'number', 'manufacturer', 'state')
     list_filter = ('state', 'description')
     list_display_links = ('number',)
@@ -71,7 +85,7 @@ class ItemAdmin(admin.ModelAdmin):
         return qs.filter(q_filter)
 
 class SizeAdmin(admin.ModelAdmin):
-    actions = [make_repair, make_available]
+    actions = [make_available, make_repair, return_from_repair, make_missing]
     list_display = ('number', 'manufacturer', 'size', 'state')
     list_filter = ('state', 'size', 'manufacturer')
     exclude = ['description']
@@ -114,7 +128,7 @@ class BCDAdmin(SizeAdmin):
 
 @admin.register(models.Cylinder, site=admin_site)
 class CylinderAdmin(admin.ModelAdmin):
-    actions = [make_repair, make_available]
+    actions = [make_available, make_repair, return_from_repair, make_missing]
     list_display = ('number',
                     'manufacturer',
                     'serial_num',
@@ -145,7 +159,7 @@ class CylinderAdmin(admin.ModelAdmin):
 
 @admin.register(models.Regulator, site=admin_site)
 class RegulatorAdmin(admin.ModelAdmin):
-    actions = [make_repair, make_available]
+    actions = [make_available, make_repair, return_from_repair, make_missing]
     list_display = ('number',
                     'manufacturer',
                     'serial_num',
