@@ -56,7 +56,8 @@ class RentalPeriodAdmin(admin.ModelAdmin):
     def cost_per_item(self, obj):
         return "R{}".format(obj.default_cost_per_item)
 
-    list_display = ('start_date',
+    list_display = ('name',
+                    'start_date',
                     'end_date',
                     'deposit',
                     'cost_per_item')
