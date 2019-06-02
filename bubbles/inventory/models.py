@@ -93,12 +93,14 @@ class Item(models.Model):
         return NotImplemented
 
 class BCD(Item):
+    EXTRA_EXTRA_SMALL = '2XS'
     EXTRA_SMALL = 'XS'
     SMALL = 'S'
     MEDIUM = 'M'
     MEDIUM_LARGE = 'ML'
     LARGE = 'L'
     SIZE_CHOICES = (
+        (EXTRA_EXTRA_SMALL, _('Extra extra small')),
         (EXTRA_SMALL, _('Extra small')),
         (SMALL, _('Small')),
         (MEDIUM, _('Medium')),
@@ -108,7 +110,7 @@ class BCD(Item):
 
     serial_num = models.CharField(_('Serial number'), max_length=255)
     last_service = models.DateField(_('Last service'))
-    size = models.CharField(_('Size'), max_length=2, choices=SIZE_CHOICES)
+    size = models.CharField(_('Size'), max_length=3, choices=SIZE_CHOICES)
 
     @property
     def next_service(self):
