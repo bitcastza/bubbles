@@ -19,7 +19,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.http.request import QueryDict
 
-from bubbles.inventory.models import BCD
+from bubbles.inventory.models import BCD, Item
 from bubbles.rentals import forms
 from bubbles.rentals.forms import EquipmentTableWidget, EquipmentListField
 from bubbles.rentals.models import RentalPeriod, RentalItem, RequestItem, Rental
@@ -102,13 +102,45 @@ class EquipmentTableWidgetTest(TestCase):
 
     def test_get_context(self):
         context = self.table.get_context('Equipment table', None, None)
-        item_size_map = {'BCD': [BCD.LARGE], 
+        item_size_map = {self.item.description: [self.item.size],
                          'Booties': [],
                          'Cylinder': [],
                          'Fins': [],
                          'Wetsuit': [],}
-        self.assertEqual(context['widget']['item_size_map'], item_size_map)
-        self.assertEqual(context['widget']['item_types'][0]['description'], 'BCD')
+        context = context['widget']
+        self.assertEqual(context['item_size_map'], item_size_map)
+        item_types = [x['description'] for x in context['item_types']]
+        self.assertIn(self.item.description, item_types)
+
+    def test_get_context_hidden(self):
+        hidden_item = Item(number='3',
+                           manufacturer='Reef',
+                           date_of_purchase=datetime.date(year=2015,
+                                                          month=1,
+                                                          day=1),
+                           state = Item.AVAILABLE,
+                           description='Hood',
+                           hidden=True)
+        hidden_item.save()
+        context = self.table.get_context('Equipment table', None, None)
+        context = context['widget']
+        item_types = [x['description'] for x in context['item_types']]
+        self.assertNotIn(hidden_item.description, item_types)
+
+    def test_get_context_free(self):
+        free_item = Item(number='3',
+                           manufacturer='Reef',
+                           date_of_purchase=datetime.date(year=2015,
+                                                          month=1,
+                                                          day=1),
+                           state = Item.AVAILABLE,
+                           description='Hood',
+                           free=True)
+        free_item.save()
+        context = self.table.get_context('Equipment table', None, None)
+        context = context['widget']
+        free_items = [x['description'] for x in context['free_items']]
+        self.assertIn(free_item.description, free_items)
 
     def test_value_from_datadict_rental_items(self):
         item = RentalItem(item=self.item,
@@ -206,8 +238,42 @@ class EquipmentListFieldTest(TestCase):
         returned_rental_item.save()
 
         form = EquipmentListField(show_number=True)
-        data = { 
+        data = {
             'equipment': [self.rental_item],
         }
         form.widget.value_from_datadict(data, None, 'equipment')
         self.assertIsNotNone(form.clean("Test"))
+
+class EquipmentFormTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.item = Item(number='3',
+                   manufacturer='Reef',
+                   date_of_purchase=datetime.date(year=2015, month=1, day=1),
+                   state = Item.AVAILABLE,
+                   description='Hood')
+        cls.item.save()
+        cls.request_item = RequestItem(item_description=cls.item.description,
+                                       cost=25)
+        start_date = datetime.date.today()
+        cls.rental_period = RentalPeriod(start_date=start_date,
+                                     end_date=start_date + datetime.timedelta(days=5),
+                                     default_deposit=100,
+                                     default_cost_per_item=25,
+                                     name='Test',
+                                     hidden=False)
+        cls.rental_period.save()
+        cls.user = User.objects.create_user(username='jacob')
+        cls.rental = Rental(rental_period=cls.rental_period,
+                        user=cls.user,
+                        state=Rental.REQUESTED,
+                        deposit=0)
+        cls.rental.save()
+
+    def test_request_hood(self):
+        string = 'period={period}&belt_weight=0&{key}={key}&{key}=N/A&liability=on'.format(period=self.rental_period, key=self.request_item.item_description)
+        data = QueryDict(string)
+        form = forms.RequestEquipmentForm(user=self.user,
+                                          data=data)
+        form.clean()
+        self.assertIsNotNone(form.cleaned_data['equipment'])

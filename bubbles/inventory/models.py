@@ -71,6 +71,7 @@ class Item(models.Model):
     state = models.CharField(_('State'), max_length=1, choices=STATE_CHOICES, default=STATE_CHOICES[0])
     description = models.CharField(_('Type'), max_length=255)
     hidden = models.BooleanField(_("Hidden"), blank=True, default=False)
+    free = models.BooleanField(_("Free"), blank=True, default=False)
 
     def get_change_url(self):
         # Promote to subtype
@@ -151,7 +152,7 @@ class Cylinder(Item):
     last_viz = models.DateField(_('Last visual inspection'))
     last_hydro = models.DateField(_('Last hydro-static inspection'))
     viz_period = models.DurationField(_('Visual inspection validity period'), default=timedelta(weeks=52))
-    hydro_period = models.DurationField(_('Hydro-static test validity period'), default=timedelta(weeks=104))
+    hydro_period = models.DurationField(_('Hydro-static test validity period'), default=timedelta(weeks=208))
 
     @property
     def next_service(self):

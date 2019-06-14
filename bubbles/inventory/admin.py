@@ -70,7 +70,7 @@ class ItemAdmin(admin.ModelAdmin):
         }),
         ('Advanced options', {
             'classes': ('collapse',),
-            'fields': ('hidden',),
+            'fields': ('hidden', 'free',),
         })
     )
 

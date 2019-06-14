@@ -27,8 +27,8 @@ from .forms import RequestEquipmentForm, RentEquipmentForm, ReturnEquipmentForm
 
 @login_required
 def index(request):
-
-    rental_set = RentalItem.objects.filter(rental__user=request.user, returned=False)
+    rental_set = RentalItem.objects.filter(rental__user=request.user,
+                                           returned=False)
     requests = Rental.objects.filter(user=request.user, state=Rental.REQUESTED)
 
     context = {}

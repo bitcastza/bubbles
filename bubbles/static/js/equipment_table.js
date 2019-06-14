@@ -88,6 +88,9 @@ $(document).ready(function() {
             '</div>';
         if (showNumber) {
             cost = +$('#item-cost').text();
+            if (document.getElementById('free-' + description.replace(/ /gi, '')) != null) {
+                cost = 0;
+            }
             row += '<td class="item-number">' +
                 '<div class="form-group">' +
                 '<input type="text" class="form-control" name="' + description +

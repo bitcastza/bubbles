@@ -28,12 +28,19 @@
   </button>
   <div class="dropdown-menu" id="add-dropdown">
     {% for type in widget.item_types %}
-    <a href="#" id="{{ type.description }}-dropdown" class="dropdown-item">{{ type.description }}</a>
+    <a href="#" id="{{ type.description | cut:' ' }}-dropdown" class="dropdown-item">{{ type.description }}</a>
     {% endfor %}
   </div>
 </div>
 <div hidden id="show-number">{{ widget.show_number }}</div>
 <div hidden id="item-cost">{{ widget.item_cost|default:"0" }}</div>
+<div hidden id="free-items">
+  <ul class="items">
+  {% for item_type in widget.free_items %}
+    <li id="free-{{ item_type.description | cut:' ' }}">{{ item_type.description }}</li>
+  {% endfor %}
+  </ul>
+</div>
 <div hidden id="size-options">
   {% for item, sizes in widget.item_size_map.items %}
   <div id="{{ item }}">

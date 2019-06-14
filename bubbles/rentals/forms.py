@@ -59,9 +59,13 @@ class EquipmentTableWidget(widgets.MultiWidget):
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        item_types = Item.objects.filter(state__exact=Item.AVAILABLE).values('description').distinct()
+        item_types = Item.objects.filter(state=Item.AVAILABLE,
+                                         hidden=False).values('description').distinct()
+        free_items = Item.objects.filter(state=Item.AVAILABLE,
+                                         free=True).values('description').distinct()
         context['widget']['item_size_map'] = get_item_size_map()
         context['widget']['item_types'] = item_types
+        context['widget']['free_items'] = free_items
         context['widget']['item_cost'] = self.item_cost
         context['widget']['show_number'] = self.show_number
         context['widget']['show_cost'] = self.show_cost
@@ -121,18 +125,28 @@ class EquipmentTableWidget(widgets.MultiWidget):
 
     def add_request_items(self, items):
         for request in items:
-            self.add_item(request.item_description, '', request.item_size, request.cost)
+            self.add_item(request.item_description,
+                          '',
+                          request.item_size,
+                          request.cost)
 
     def add_items(self, items):
         for rental_item in items:
             try :
                 # Get subclass object
-                item = getattr(rental_item.item, rental_item.item.description.lower())
-                self.add_item(item.description, item.number, item.size, rental_item.cost)
+                item = getattr(rental_item.item,
+                               rental_item.item.description.lower())
+                self.add_item(item.description,
+                              item.number,
+                              item.size,
+                              rental_item.cost)
             except AttributeError:
                 # No subclass to be had
                 item = rental_item.item
-                self.add_item(item.description, item.number, None, rental_item.cost)
+                self.add_item(item.description,
+                              item.number,
+                              None,
+                              rental_item.cost)
 
     class Media:
         css = {
@@ -172,7 +186,8 @@ class EquipmentRowWidget(widgets.Widget):
 class EquipmentListField(fields.Field):
     widget = EquipmentTableWidget
 
-    def __init__(self, show_number=False, show_cost=False, item_cost=0, **kwargs):
+    def __init__(self, show_number=False, show_cost=False,
+                 item_cost=0, **kwargs):
         super().__init__(**kwargs)
         self.widget.show_number = show_number
         self.widget.show_cost = show_cost
@@ -234,7 +249,8 @@ class EquipmentForm(forms.Form):
     belt_weight = forms.IntegerField(min_value=0,
                                 max_value=15,
                                 initial=0,
-                                widget=widgets.NumberInput(attrs={'class': 'form-control'}))
+                                widget=widgets.NumberInput(attrs={
+                                    'class': 'form-control'}))
 
     def __init__(self, user, rental=None, request_id=None, **kwargs):
         super().__init__(**kwargs)
@@ -300,16 +316,19 @@ class EquipmentForm(forms.Form):
                                      deposit=deposit,
                                      rental_period=period)
             try:
+                free_items = Item.objects.filter(state__exact=Item.AVAILABLE,
+                                                 free=True).values('description').distinct()
+                free_items = [x['description'] for x in free_items]
                 for rental_item in self.cleaned_data['equipment']:
                     rental_item.rental = self.rental
-                    rental_item.cost = self.rental.rental_period.default_cost_per_item
+                    if rental_item.item_description not in free_items:
+                        rental_item.cost = self.rental.rental_period.default_cost_per_item
             except (KeyError, TypeError):
                 pass
         return self.cleaned_data
 
 class RequestEquipmentForm(EquipmentForm):
     equipment = EquipmentListField()
-    #TODO: link to terms of rental
     liability = forms.BooleanField(
         label=mark_safe(_("I have read and understand the <a href=/docs/terms>terms of rental</a>")),
         widget=widgets.CheckboxInput(attrs={'class': 'form-check-input'}))
