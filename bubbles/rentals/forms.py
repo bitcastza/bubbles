@@ -321,8 +321,11 @@ class EquipmentForm(forms.Form):
                 free_items = [x['description'] for x in free_items]
                 for rental_item in self.cleaned_data['equipment']:
                     rental_item.rental = self.rental
-                    if rental_item.item_description not in free_items:
-                        rental_item.cost = self.rental.rental_period.default_cost_per_item
+                    try:
+                        if rental_item.item_description not in free_items:
+                            rental_item.cost = self.rental.rental_period.default_cost_per_item
+                    except AttributeError:
+                        pass # Only Request Items have item_description
             except (KeyError, TypeError):
                 pass
         return self.cleaned_data
