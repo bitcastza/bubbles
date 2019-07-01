@@ -41,42 +41,52 @@
 {% if apps_length|divisibleby:2 %}
 <div class="row">
   {% endif %}
-  <div class="col-sm-4">
-    <h2>Recent actions</h2>
-    <h3>My actions</h3>
-    {% load log %}
-    {% get_admin_log 10 as admin_log for_user user %}
-    {% if not admin_log %}
-    <p>None available</p>
-    {% else %}
-    <ul class="list-group">
-      {% for entry in admin_log %}
-      <li class="list-group-item">
-        <span class="fas fa-{% if entry.is_addition %}plus{% endif %}{% if entry.is_change %}pencil-alt{% endif %}{% if entry.is_deletion %}minus{% endif %}"></span>
-        {% if entry.is_deletion or not entry.get_admin_url %}
-        {{ entry.object_repr }}
-        {% if entry.content_type %}
-        - {% filter capfirst %}{{ entry.content_type }}{% endfilter %}
-        {% else %}
-        - Unknown content
-        {% endif %}
-        {% else %}
-        <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}
-        {% if entry.content_type %}
-        - {% filter capfirst %}{{ entry.content_type }}{% endfilter %}
-        {% else %}
-        - Unknown content
-        {% endif %}</a>
-        {% endif %}
-      </li>
-      {% endfor %}
-    </ul>
-    {% endif %}
+  <div class="col-sm-6">
+    <div class="row">
+      <div class="col-sm-9">
+        <h2>Recent actions</h2>
+        <h3>My actions</h3>
+      </div>
+      <div class="col-sm-3">
+        <a href="{% url 'rentals:view_admin_log' %}" class="btn btn-primary btn-heading" role="button">
+          <span class="fas fa-clipboard-list"></span> View All
+        </a>
+      </div>
+    </div>
+    <div class="col-sm-12">
+      {% load log %}
+      {% get_admin_log 10 as admin_log for_user user %}
+      {% if not admin_log %}
+      <p>None available</p>
+      {% else %}
+      <ul class="list-group">
+        {% for entry in admin_log %}
+        <li class="list-group-item">
+          <span class="fas fa-{% if entry.is_addition %}plus{% endif %}{% if entry.is_change %}pencil-alt{% endif %}{% if entry.is_deletion %}minus{% endif %}"></span>
+          {% if entry.is_deletion or not entry.get_admin_url %}
+          {{ entry.object_repr }}
+          {% if entry.content_type %}
+          - {% filter capfirst %}{{ entry.content_type }}{% endfilter %}
+          {% else %}
+          - Unknown content
+          {% endif %}
+          {% else %}
+          <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}
+            {% if entry.content_type %}
+            - {% filter capfirst %}{{ entry.content_type }}{% endfilter %}
+            {% else %}
+            - Unknown content
+            {% endif %}</a>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% if apps_length|divisibleby:2 %}
   </div>
-{% if apps_length|divisibleby:2 %}
-</div>
-{% endif %}
-{% endblock sidebar %}
-<br class="clear" />
-{% endblock post_content %}
+  {% endif %}
+  {% endblock sidebar %}
+  <br class="clear" />
+  {% endblock post_content %}
 

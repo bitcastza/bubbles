@@ -16,6 +16,7 @@
 import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.models import LogEntry
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -223,3 +224,7 @@ def return_equipment(request, rental):
         'show_cost': False,
     }
     return render(request, 'rentals/rent_equipment.html', context)
+
+def view_admin_log(request):
+    admin_log = LogEntry.objects.order_by('-action_time')[:50]
+    return render(request, 'rentals/admin_log.html', {'admin_log': admin_log})

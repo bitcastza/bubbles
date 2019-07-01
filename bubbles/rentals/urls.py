@@ -41,4 +41,5 @@ urlpatterns = [
     path('rent/', views.rent_equipment, name='rent_equipment'),
     path('rent/<int:rental_request>/', views.rent_equipment, name='rent_equipment'),
     path('return/<int:rental>/', views.return_equipment, name='return_equipment'),
+    path('admin/admin_log/', views.view_admin_log, name='view_admin_log'),
 ]
