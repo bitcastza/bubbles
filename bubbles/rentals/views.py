@@ -15,7 +15,7 @@
 ###########################################################################
 import datetime
 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.admin.models import LogEntry
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
@@ -225,6 +225,10 @@ def return_equipment(request, rental):
     }
     return render(request, 'rentals/rent_equipment.html', context)
 
+def user_is_staff_check(user):
+    return user.is_staff
+
+@user_passes_test(user_is_staff_check)
 def view_admin_log(request):
     admin_log = LogEntry.objects.order_by('-action_time')[:50]
     return render(request, 'rentals/admin_log.html', {'admin_log': admin_log})
