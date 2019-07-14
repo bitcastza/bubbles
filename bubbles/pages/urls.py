@@ -37,4 +37,5 @@ app_name = 'pages'
 urlpatterns = [
     path('', views.page, {'page_name': 'index'}, name='index'),
     path('<str:page_name>', views.page, name='page'),
+    path('<str:page_name>/', views.page, name='page-slash'),
 ]

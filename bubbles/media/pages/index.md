@@ -11,8 +11,8 @@ the next few days.
 ![user's homescreen](/static/img/user_index.png "User's Homescreen")
 
 The links in the top right of the screen provide access to the other frequently
-used part of the site. **Request Equipment** allows the user to request
-equipment for future rental periods. **Log Out** logs the user out of their
+used part of the site. [Request Equipment](request_equipment) allows the user to
+request equipment for future rental periods. **Log Out** logs the user out of their
 current session and **Help** displays this help document.
 
 Any equipment currently rented out by the user is listed in the **My Rentals**
