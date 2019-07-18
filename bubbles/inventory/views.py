@@ -128,13 +128,20 @@ def do_inventory_check(request, item_type):
             for form in formset:
                 current_state = Item.STATE_CHOICES[counter][0]
                 items = list(item_type_class.objects.filter(state=current_state).order_by('number'))
-                for i in range(0, len(items)):
-
-                    if expected_found(form[items[i].id].data, current_state):
+                for item in items:
+                    try:
+                        data = form[item.id].data
+                    except KeyError:
+                        # Handle the case when the item is unselected, and not
+                        # in the form
+                        data = False
+                    if expected_found(data, current_state):
                         try:
-                            changed[current_state].append(items[i])
+                            changed[current_state].append(item)
                         except KeyError:
-                            changed[current_state] = [items[i],]
+                            changed[current_state] = [item,]
+                        item.state = state_transition[current_state]
+                        item.save()
                 counter += 1
             context = {
                 'changed': changed,
