@@ -25,6 +25,7 @@ from django.utils.translation import gettext_lazy as _
 
 from bubbles.inventory.models import BCD, Booties, Cylinder, Fins, Wetsuit, Item, Weight
 from .models import Rental, RentalItem, RentalPeriod, RequestItem
+from .exceptions import RentalError
 
 def get_sizes(item_type, size_tag='size'):
     sizes_set = item_type.objects.filter(state__exact=Item.AVAILABLE, hidden=False).values(size_tag).distinct()
@@ -235,6 +236,8 @@ class EquipmentListField(fields.Field):
                             'num': widget.item_number,
                         }))
                 continue
+            except Item.MultipleObjectsReturned as e:
+                raise RentalError(widget.item_description, widget.item_number, e)
             try:
                 rental_item = RentalItem.objects.get(item=item, returned=False)
             except ObjectDoesNotExist:

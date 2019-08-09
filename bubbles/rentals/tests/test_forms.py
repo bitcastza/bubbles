@@ -23,6 +23,7 @@ from bubbles.inventory.models import BCD, Item
 from bubbles.rentals import forms
 from bubbles.rentals.forms import EquipmentTableWidget, EquipmentListField
 from bubbles.rentals.models import RentalPeriod, RentalItem, RequestItem, Rental
+from bubbles.rentals.exceptions import RentalError
 
 class StaticFunctionTest(TestCase):
     def test_get_sizes_available(self):
@@ -243,6 +244,22 @@ class EquipmentListFieldTest(TestCase):
         }
         form.widget.value_from_datadict(data, None, 'equipment')
         self.assertIsNotNone(form.clean("Test"))
+
+    def test_multiple_item_number_error(self):
+        dup_item = BCD(number='1',
+                       manufacturer='another',
+                       date_of_purchase=datetime.date(year=2016, month=3, day=1),
+                       state = BCD.AVAILABLE,
+                       size = BCD.SMALL,
+                       last_service=datetime.date(year=2016, month=3, day=1),
+                       description='BCD')
+        dup_item.save()
+        form = EquipmentListField(show_number=True)
+        data = {
+            'equipment': [self.rental_item],
+        }
+        form.widget.value_from_datadict(data, None, 'equipment')
+        self.assertRaises(RentalError, form.clean, 'Test')
 
 class EquipmentFormTest(TestCase):
     @classmethod

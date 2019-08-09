@@ -97,7 +97,6 @@ def get_existing_rentals(user):
         return existing_rental.first()
     return None
 
-
 @login_required
 def rent_equipment(request, rental_request=None):
     if not request.user.is_staff:
@@ -223,6 +222,8 @@ def return_equipment(request, rental):
         'title': _('Return Equipment'),
         'show_cost': False,
     }
+    # TODO: Catch RentalError and show error message about multiple objects with
+    # the same number
     return render(request, 'rentals/rent_equipment.html', context)
 
 def user_is_staff_check(user):
