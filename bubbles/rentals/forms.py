@@ -153,7 +153,7 @@ class EquipmentTableWidget(widgets.MultiWidget):
         css = {
             'screen': ('css/equipment_table.css',),
         }
-        js = ('js/equipment_table.js',)
+        js = ('vendor/gijgo/js/gijgo.min.js', 'js/equipment_table.js',)
 
 class EquipmentRowWidget(widgets.Widget):
     template_name = 'rentals/widgets/equipment_item_widget.html'
