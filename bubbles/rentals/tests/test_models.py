@@ -123,7 +123,7 @@ class RentalItemTest(TestCase):
                          "{} to {}".format(self.item, self.user))
 
     def test_eq_different_type(self):
-        self.assertEqual(self.rental_item.__eq__("Test"), NotImplemented)
+        self.assertFalse(self.rental_item.__eq__("Test"))
 
     def test_eq(self):
         self.assertTrue(self.rental_item.__eq__(self.rental_item))
@@ -160,7 +160,7 @@ class RentalItemTest(TestCase):
                          "{} to {}".format(self.item_description, self.user))
 
     def test_eq_different_type(self):
-        self.assertEqual(self.request_item.__eq__("Test"), NotImplemented)
+        self.assertFalse(self.request_item.__eq__("Test"))
 
     def test_eq(self):
         self.assertTrue(self.request_item.__eq__(self.request_item))

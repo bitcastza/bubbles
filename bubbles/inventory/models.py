@@ -88,11 +88,6 @@ class Item(models.Model):
     def __str__(self):
         return '{} {} ({})'.format(self.manufacturer, self.description, self.number)
 
-    def __eq__(self, other):
-        if type(other) == type(self):
-            return self.number == other.number and self.description == other.description
-        return NotImplemented
-
 class BCD(Item):
     EXTRA_EXTRA_SMALL = '2XS'
     EXTRA_SMALL = 'XS'
@@ -256,8 +251,3 @@ class ItemValue(models.Model):
 
     def __str__(self):
         return '{} (R{:d})'.format(self.description, self.cost)
-
-    def __eq__(self, other):
-        if type(other) == type(self):
-            return self.description == other.description and self.cost == other.cost
-        return NotImplemented

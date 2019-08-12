@@ -89,11 +89,6 @@ class RentalItem(models.Model):
             return "{} to {}".format(self.item, self.rental.user)
         return "{} to unknown".format(self.item)
 
-    def __eq__(self, other):
-        if type(other) == type(self):
-            return self.rental == other.rental and self.item == other.item and self.cost == other.cost
-        return NotImplemented
-
 class RequestItem(models.Model):
     rental = models.ForeignKey(Rental, on_delete=models.CASCADE, null=True)
     item_description = models.CharField(_('Type'), max_length=255)
@@ -104,8 +99,3 @@ class RequestItem(models.Model):
         if self.rental:
             return "{} to {}".format(self.item_description, self.rental.user)
         return "{} to unknown".format(self.item_description)
-
-    def __eq__(self, other):
-        if type(other) == type(self):
-            return self.rental == other.rental and self.item_description == other.item_description and self.item_size == other.item_size
-        return NotImplemented
