@@ -1,4 +1,4 @@
-django
+django==2.1.5
 sakaiauthenticator>1.0.1
 markdown>3.0
 reportlab
