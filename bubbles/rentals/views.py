@@ -33,11 +33,17 @@ def index(request):
     requests = Rental.objects.filter(user=request.user, state=Rental.REQUESTED)
 
     context = {}
+    message = request.COOKIES.get('message')
     if (rental_set.count() != 0):
         context['rentals'] = rental_set
     if (requests.count() != 0):
         context['requests'] = requests
-    return render(request, 'rentals/index.html', context)
+    if message:
+        context['messages'] = [message,]
+    response = render(request, 'rentals/index.html', context)
+    if message:
+        response.delete_cookie('message')
+    return response
 
 @login_required
 def request_equipment(request, request_id=None):
@@ -63,7 +69,10 @@ def request_equipment(request, request_id=None):
             for rental_item in form.cleaned_data['equipment']:
                 rental_item.rental = rental
                 rental_item.save()
-            return render(request, 'rentals/request_confirmation.html')
+            response = redirect('rentals:index')
+            rental_period = rental.rental_period
+            response.set_cookie('message', _('Equipment requested! Please collect your gear on {date}').format(date=rental_period.start_date))
+            return response
     elif request_id != None: # Edit
         rental_request = get_object_or_404(Rental, id=request_id)
         url = reverse('rentals:request_equipment', args=(request_id,))
@@ -134,7 +143,9 @@ def rent_equipment(request, rental_request=None):
                 rental_item.returned = False
                 rental_item.save()
             RequestItem.objects.filter(rental=rental).delete()
-            return render(request, 'rentals/rental_confirmation.html')
+            response = redirect('admin:index')
+            response.set_cookie('message', _('Equipment rented!'))
+            return response
     else:
         if rental_request:
             rental = Rental.objects.get(id=rental_request)
@@ -204,7 +215,9 @@ def return_equipment(request, rental):
                 if rental.rental_period.end_date == None:
                     rental.rental_period.end_date = datetime.date.today()
                     rental.rental_period.save()
-            return render(request, 'rentals/return_confirmation.html')
+            response = redirect('admin:index')
+            response.set_cookie('message', _('Equipment returned!'))
+            return response
     else:
         rental = Rental.objects.get(id=rental)
         url = reverse('rentals:return_equipment', args=(rental.id,))
@@ -223,8 +236,6 @@ def return_equipment(request, rental):
         'title': _('Return Equipment'),
         'show_cost': False,
     }
-    # TODO: Catch RentalError and show error message about multiple objects with
-    # the same number
     return render(request, 'rentals/rent_equipment.html', context)
 
 def user_is_staff_check(user):

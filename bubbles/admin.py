@@ -53,7 +53,13 @@ class BubblesAdminSite(admin.AdminSite):
         extra_context['rental_requests'] = rental_requests
         extra_context['rental_returns'] = rental_returns
         extra_context['need_servicing'] = bcd_service_set + cylinder_service_set + regulator_service_set
-        return super(BubblesAdminSite, self).index(request, extra_context=extra_context)
+        message = request.COOKIES.get('message')
+        if message:
+            extra_context['messages'] = [message,]
+        response = super(BubblesAdminSite, self).index(request, extra_context=extra_context)
+        if message:
+            response.delete_cookie('message')
+        return response
 
     def each_context(self, request):
         context = super(BubblesAdminSite, self).each_context(request)
