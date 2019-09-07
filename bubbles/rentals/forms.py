@@ -204,22 +204,6 @@ class EquipmentListField(fields.Field):
                 item = Item.objects.get(number=widget.item_number,
                                         description=widget.item_description,
                                         hidden=False)
-                try:
-                    i = getattr(item, item.description.lower())
-                except AttributeError:
-                    i = item
-                try:
-                    if i.size != widget.item_size:
-                        errors.append(forms.ValidationError(
-                            _('%(type)s number %(num)s is not size %(size)s'),
-                            code='invalid',
-                            params={
-                                'type': widget.item_description,
-                                'num': widget.item_number,
-                                'size': widget.item_size,
-                            }))
-                except AttributeError:
-                    pass
             except ObjectDoesNotExist:
                 if widget.item_number == None or widget.item_number == '':
                     # Rental request
