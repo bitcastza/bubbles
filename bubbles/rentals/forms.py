@@ -348,13 +348,31 @@ class RentEquipmentForm(EquipmentForm):
             for item in rented_equipment:
                 try:
                     item = item.item
-                    if item.state != Item.AVAILABLE:
+                    if item.state == Item.IN_USE:
+                        rental_item = item.rentalitem_set.filter(returned=False).first()
+                        rental = rental_item.rental.user
+                        print(user)
+                        user_str = '{first:s} {last:s} ({account:s})'.format(
+                            first=user.first_name,
+                            last=user.last_name,
+                            account=user.username)
                         self.add_error('equipment', forms.ValidationError(
-                            _('%(type)s number %(num)s not available'),
+                            _('%(type)s number %(num)s not available. It is currently rented to %(user)s'),
                             code='invalid',
                             params={
                                 'type': item.description,
                                 'num': item.number,
+                                'user': user_str,
+                            }))
+
+                    elif item.state != Item.AVAILABLE:
+                        self.add_error('equipment', forms.ValidationError(
+                            _('%(type)s number %(num)s not available. It is currently %(state)s'),
+                            code='invalid',
+                            params={
+                                'type': item.description,
+                                'num': item.number,
+                                'state': Item.STATE_MAP[item.state].lower(),
                             }))
                 except AttributeError:
                     self.add_error('equipment', forms.ValidationError(
