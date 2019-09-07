@@ -16,6 +16,7 @@
 import datetime
 
 from django.contrib.auth.models import User
+from django.forms import ValidationError
 from django.test import TestCase
 from django.http.request import QueryDict
 
@@ -23,7 +24,6 @@ from bubbles.inventory.models import BCD, Item
 from bubbles.rentals import forms
 from bubbles.rentals.forms import EquipmentTableWidget, EquipmentListField
 from bubbles.rentals.models import RentalPeriod, RentalItem, RequestItem, Rental
-from bubbles.rentals.exceptions import RentalError
 
 class StaticFunctionTest(TestCase):
     def test_get_sizes_available(self):
@@ -259,7 +259,7 @@ class EquipmentListFieldTest(TestCase):
             'equipment': [self.rental_item],
         }
         form.widget.value_from_datadict(data, None, 'equipment')
-        self.assertRaises(RentalError, form.clean, 'Test')
+        self.assertRaises(ValidationError, form.clean, 'Test')
 
 class EquipmentFormTest(TestCase):
     @classmethod
