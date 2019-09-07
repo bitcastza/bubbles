@@ -176,6 +176,7 @@ def return_equipment(request, rental):
         rental = Rental.objects.get(id=rental)
         form = ReturnEquipmentForm(user=rental.user, rental=rental, data=request.POST)
         url = reverse('rentals:return_equipment', args=(rental.id,))
+        is_valid = False
         if form.is_valid():
             rental = form.rental
             for rental_item in form.cleaned_data['equipment']:
