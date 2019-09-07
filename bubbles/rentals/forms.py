@@ -350,8 +350,13 @@ class RentEquipmentForm(EquipmentForm):
                     item = item.item
                     if item.state == Item.IN_USE:
                         rental_item = item.rentalitem_set.filter(returned=False).first()
+                        if rental_item is None:
+                            # Rental item has been returned or state is
+                            # incorrect.
+                            item.state = Item.AVAILABLE
+                            item.save()
+                            continue
                         rental = rental_item.rental.user
-                        print(user)
                         user_str = '{first:s} {last:s} ({account:s})'.format(
                             first=user.first_name,
                             last=user.last_name,
