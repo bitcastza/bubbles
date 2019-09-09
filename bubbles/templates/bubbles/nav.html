@@ -24,6 +24,10 @@
         <a class="nav-link" href="{% url 'admin:index' %}">
           <span class="fas fa-cog"></span> Site Admin</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'reporting:index' %}">
+          <span class="fas fa-clipboard-list"></span> Reporting</a>
+      </li>
       {% endif %}
       {% if user.is_authenticated %}
       <li class="nav-item">
