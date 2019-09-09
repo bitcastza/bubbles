@@ -143,7 +143,7 @@ class Booties(Item):
 class Cylinder(Item):
     serial_num = models.CharField(_('Serial number'), max_length=255, primary_key=True)
     material = models.CharField(_('Material'), max_length=255)
-    capacity = models.DecimalField(_('Capacity'), max_digits=4, decimal_places=2)
+    size = models.DecimalField(_('Capacity'), max_digits=4, decimal_places=2)
     last_viz = models.DateField(_('Last visual inspection'))
     last_hydro = models.DateField(_('Last hydro-static inspection'))
     viz_period = models.DurationField(_('Visual inspection validity period'), default=timedelta(weeks=52))
@@ -162,10 +162,6 @@ class Cylinder(Item):
         if date - self.last_hydro > self.hydro_period:
             self.last_hydro = date
         self.last_viz = date
-
-    @property
-    def size(self):
-        return self.capacity
 
     def clean(self):
         self.description = "Cylinder"

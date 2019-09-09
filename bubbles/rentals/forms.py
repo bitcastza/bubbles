@@ -26,7 +26,8 @@ from django.utils.translation import gettext_lazy as _
 from bubbles.inventory.models import BCD, Booties, Cylinder, Fins, Wetsuit, Item, Weight
 from .models import Rental, RentalItem, RentalPeriod, RequestItem
 
-def get_sizes(item_type, size_tag='size'):
+def get_sizes(item_type):
+    size_tag = 'size'
     sizes_set = item_type.objects.filter(state__exact=Item.AVAILABLE, hidden=False).values(size_tag).distinct()
     sizes = [i[size_tag] for i in sizes_set]
     return sizes
@@ -35,7 +36,7 @@ def get_item_size_map():
     item_size_map = {}
     item_size_map['BCD'] = get_sizes(BCD)
     item_size_map['Booties'] = get_sizes(Booties)
-    item_size_map['Cylinder'] = get_sizes(Cylinder, 'capacity')
+    item_size_map['Cylinder'] = get_sizes(Cylinder)
     item_size_map['Fins'] = get_sizes(Fins)
     item_size_map['Wetsuit'] = get_sizes(Wetsuit)
     return item_size_map

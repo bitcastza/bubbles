@@ -68,7 +68,7 @@ class CylinderTests(TestCase):
                                  description='Cylinder',
                                  serial_num='123',
                                  material='steel',
-                                 capacity=12,
+                                 size=12,
                                  last_viz=last_viz,
                                  last_hydro=last_viz)
 

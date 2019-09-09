@@ -132,10 +132,10 @@ class CylinderAdmin(admin.ModelAdmin):
     list_display = ('number',
                     'manufacturer',
                     'serial_num',
-                    'capacity',
+                    'size',
                     'last_viz',
                     'state',)
-    list_filter = ('state', 'manufacturer', 'capacity')
+    list_filter = ('state', 'manufacturer', 'size')
     exclude = ['description']
     ordering = ['number']
     formfield_overrides = BUBBLES_FORMFIELD_OVERRIDES
@@ -147,7 +147,7 @@ class CylinderAdmin(admin.ModelAdmin):
                        'state',
                        'serial_num',
                        'material',
-                       'capacity',
+                       'size',
                        'last_viz',
                        'last_hydro'),
         }),
