@@ -36,6 +36,8 @@ urlpatterns = [
     path('', include('bubbles.rentals.urls')),
     path('inventory/', include('bubbles.inventory.urls')),
     path('admin/', admin_site.urls),
+    path('admin/reporting/', include('bubbles.reporting.urls')),
     path('accounts/', include('bubbles.registration.urls')),
     path('docs/', include('bubbles.pages.urls')),
+    path('temp/', include('django.contrib.admindocs.urls')),
 ]

@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'bubbles.inventory.apps.InventoryConfig',
     'bubbles.rentals.apps.RentalsConfig',
     'bubbles.registration',
+    'bubbles.reporting',
     'bubbles.pages',
     'sakaiauthenticator',
     'django.contrib.admin',

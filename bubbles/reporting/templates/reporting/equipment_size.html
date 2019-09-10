@@ -1,0 +1,30 @@
+{% extends "bubbles/base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<script src="{% static 'vendor/d3/d3.min.js' %}"></script>
+<script src="{% static 'js/display_graph.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-sm-10">
+    <h2 id="item-heading">{{ item }}</h2>
+  </div>
+  <div class="col-sm-2">
+    <select id="item-type" onchange="updateGraph()">
+      {% for type in item_types %}
+      <option value="{{ type }}">{{ type }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+<div id="chart-view" class="col-sm-12">
+<svg class="chart"></svg>
+</div>
+<div class="results">
+  {% for k,v in result.items %}
+  <div class="result" id="{{ k }}" value="{{ v }}"></div>
+  {% endfor %}
+</div>
+{% endblock %}

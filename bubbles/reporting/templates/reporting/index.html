@@ -1,0 +1,19 @@
+{% extends "bubbles/base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-sm-6">
+    <h2>Equipment</h2>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <a href="{% url 'reporting:size' %}">Breakdown by size</a>
+      </li>
+    </ul>
+  </div>
+  <div class="col-sm-6">
+    <h2>Rentals</h2>
+    <ul class="list-group">
+    </ul>
+  </div>
+</div>
+{% endblock %}

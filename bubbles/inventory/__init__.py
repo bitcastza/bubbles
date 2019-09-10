@@ -30,3 +30,12 @@ def get_item_size_map():
     item_size_map['Fins'] = get_sizes(Fins)
     item_size_map['Wetsuit'] = get_sizes(Wetsuit)
     return item_size_map
+
+def get_size_breakdown(item_type):
+    sizes = get_item_size_map()[item_type]
+    size_count = {}
+    from bubbles.inventory import models
+    for s in sizes:
+        size_count[s] = getattr(models, item_type).objects.filter(size=s).count()
+    return size_count
+
