@@ -26,38 +26,6 @@ from bubbles.rentals.forms import EquipmentTableWidget, EquipmentListField
 from bubbles.rentals.models import RentalPeriod, RentalItem, RequestItem, Rental
 
 class StaticFunctionTest(TestCase):
-    def test_get_sizes_available(self):
-        date_of_purchase = datetime.date(year=2018, month=7, day=2)
-        item = BCD(number='1',
-                   manufacturer='test',
-                   date_of_purchase=date_of_purchase,
-                   state = BCD.AVAILABLE,
-                   size = BCD.LARGE,
-                   last_service=date_of_purchase,
-                   description='BCD')
-        item.save()
-        results = forms.get_sizes(BCD)
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0], BCD.LARGE)
-
-    def test_get_sizes_none(self):
-        results = forms.get_sizes(BCD)
-        self.assertEqual(len(results), 0)
-
-    def test_get_item_size_map(self):
-        date_of_purchase = datetime.date(year=2018, month=7, day=2)
-        item = BCD(number='1',
-                   manufacturer='test',
-                   date_of_purchase=date_of_purchase,
-                   state = BCD.AVAILABLE,
-                   size = BCD.LARGE,
-                   last_service=date_of_purchase,
-                   description='BCD')
-        item.save()
-        item_size_map = forms.get_item_size_map()
-        self.assertEqual(len(item_size_map['BCD']), 1)
-        self.assertEqual(len(item_size_map['Booties']), 0)
-
     def test_get_initial_period_exists(self):
         start_date = datetime.date.today()
         end_date = start_date + datetime.timedelta(days=5)
