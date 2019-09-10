@@ -17,16 +17,12 @@
   {% endif %}
   {% if widget.show_number %}
   <td class="item-number">
-    <div class="form-group">
-      <input type="text" class="form-control" name="{{ widget.item_description }}" value="{{ widget.item_number }}" id="{{widget.item_description }}-number"/>
-    </div>
+    <input type="text" class="form-control" name="{{ widget.item_description }}" value="{{ widget.item_number }}" id="{{widget.item_description }}-number"/>
   </td>
   {% endif %}
   {% if widget.show_cost %}
   <td class="item-cost">
-    <div class="form-group">
-      <input type="number" class="form-control item-cost-value" name="{{ widget.item_description }}" value="{{ widget.item_cost }}" id="{{widget.item_description }}-cost" min="0"/>
-    </div>
+    <input type="number" class="form-control item-cost-value" name="{{ widget.item_description }}" value="{{ widget.item_cost }}" id="{{widget.item_description }}-cost" min="0"/>
   </td>
   {% endif %}
   <td class="item-entry">

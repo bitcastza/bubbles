@@ -54,61 +54,96 @@ $(document).ready(function() {
     $('#add-dropdown a').on('click', function() {
         var currentItem = this;
         var description = $(currentItem).text();
-        var sizeOptions = '<input type="text" '+
-            'class="form-control" id="' + description +
-            '-size" name="' + description + '" value="N/A" readonly>';
+        var sizeOptions = $(document.createElement('input'))
+            .attr({
+                'type': 'text',
+                'id': description + '-size',
+                'name': description,
+                'value': 'N/A',
+                'readonly': true
+            })
+            .addClass('form-control');
         $('#size-options').children('div').each(function() {
             if (this.id != description) {
                 return;
             }
             if ($(this).is(':empty')) {
-                sizeOptions = '<select class="form-control disabled" id="' +
-                    description + '-size" name="' + description + '"/>';
+                sizeOptions = $(document.createElement('select'))
+                    .addClass('form-control')
+                    .addClass('disabled')
+                    .attr({'id': description + '-size',
+                           'name': description});
             } else {
-                sizeOptions = '<select class="form-control" id="' +
-                    description + '-size" name="' +
-                    description + '">';
+                sizeOptions = $(document.createElement('select'))
+                    .addClass('form-control')
+                    .attr({'id': description + '-size',
+                           'name': description});
                 $('#' + this.id + ' .sizes li').each(function() {
-                    sizeOptions += '<option>' + $(this).text() + '</option>';
+                    var option = $(document.createElement('option'))
+                        .append($(this).text());
+                    sizeOptions.append(option);
                 });
-                sizeOptions += '</select>';
             }
         });
         var description = $(this).text();
         var showNumber = $('#show-number').text() == "True";
-        var row = '<tr>' +
-            '<td class="item-description">' +
-            '<input type="text" class="form-control"' +
-            'name="' + description +
-            '" value="' + description + '" id="' + description +
-            '" readonly/>' +
-            '</td>' +
-            '<td class="item-size"><div class="form-group">' +
-            sizeOptions +
-            '</div>';
+        var itemDescription = $(document.createElement('td'))
+            .addClass('item-description');
+        itemDescription.append($(document.createElement('input'))
+            .addClass('form-control')
+            .attr({
+                'type': 'text',
+                'name': description,
+                'value': description,
+                'id': description + '-description',
+                'readonly': '',
+            }));
+        var itemSize = $(document.createElement('td'))
+            .addClass('item-size')
+            .append(sizeOptions);
+        var row = $(document.createElement('tr'))
+            .append(itemDescription)
+            .append(itemSize);
+
         if (showNumber) {
             cost = +$('#item-cost').text();
             if (document.getElementById('free-' + description.replace(/ /gi, '')) != null) {
                 cost = 0;
             }
-            row += '<td class="item-number">' +
-                '<div class="form-group">' +
-                '<input type="text" class="form-control" name="' + description +
-                '" id="' + description + '-number"/>' +
-                '</div>' +
-                '</td>' +
-                '<td class="item-cost">' +
-                '<div class="form-group">' +
-                '<input type="number" class="item-cost-value form-control" name="' +
-                description +
-                '" id="' + description + '-cost" value="' + cost + '" min="0"/>' +
-                '</div>' +
-                '</td>';
+            var itemNumber = $(document.createElement('td'))
+                .addClass('item-number');
+            itemNumber.append($(document.createElement('input'))
+                .addClass('form-control')
+                .attr({
+                    'type': 'text',
+                    'name': description,
+                    'id': description + '-number',
+                    'value': ''
+                }));
+            row.append(itemNumber);
+            var itemCost = $(document.createElement('td'))
+                .addClass('item-cost');
+            itemCost.append(
+                $(document.createElement('input'))
+                    .addClass('item-cost-value')
+                    .addClass('form-control')
+                    .attr({
+                        'type': 'number',
+                        'name': description + '-cost',
+                        'id': description + '-cost',
+                        'value': cost,
+                        'min': 0
+                    }));
+            row.append(itemCost);
         }
-        row += '<td class="item-entry">' +
-            '<a href="#"><i class="fas fa-trash item-remove"></i></a>'+
-            '</td>' +
-            '</tr>';
+        var itemEntry = $(document.createElement('td'))
+            .addClass('item-entry');
+        itemEntry.append($(document.createElement('a'))
+            .attr({'href': '#'}).append($(document.createElement('i'))
+                .addClass('fas')
+                .addClass('fa-trash')
+                .addClass('item-remove')));
+        row.append(itemEntry);
         $('#equipment-table > tbody:last-child').append(row);
         $('#submit-btn').show();
         $('.item-cost-value').on('input', setTotalCost);
