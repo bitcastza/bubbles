@@ -83,8 +83,14 @@ function makeGraph(data) {
     g.append('g')
         .attr('transform', 'translate(0,' + height + ')')
         .call(d3.axisBottom(xScale).ticks(data.length));
+    var dataMax = d3.max(data, function(d) { return d.value; });
+    var yTicks = 10;
+    console.log(dataMax);
+    if (dataMax < yTicks) {
+        yTicks = dataMax;
+    }
     g.append('g')
-        .call(d3.axisLeft(yScale).ticks(10))
+        .call(d3.axisLeft(yScale).ticks(yTicks))
         .append('text')
         .attr('y', 6)
         .attr('dy', '0.71em')

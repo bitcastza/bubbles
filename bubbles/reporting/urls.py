@@ -20,6 +20,7 @@ app_name = 'reporting'
 urlpatterns = [
     path('', views.index, name='index'),
     path('equipment/size', views.equipment_size, name='size'),
+    path('equipment/repair', views.equipment_under_repair, name='repair'),
     path('api/equipment/size/<str:item_type>',
          api.equipment_size, name='api-size'),
 ]
