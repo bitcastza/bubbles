@@ -129,7 +129,7 @@ $(document).ready(function() {
                     .addClass('form-control')
                     .attr({
                         'type': 'number',
-                        'name': description + '-cost',
+                        'name': description,
                         'id': description + '-cost',
                         'value': cost,
                         'min': 0
