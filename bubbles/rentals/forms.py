@@ -343,7 +343,7 @@ class RentEquipmentForm(EquipmentForm):
                             item.state = Item.AVAILABLE
                             item.save()
                             continue
-                        rental = rental_item.rental.user
+                        user = rental_item.rental.user
                         user_str = '{first:s} {last:s} ({account:s})'.format(
                             first=user.first_name,
                             last=user.last_name,
