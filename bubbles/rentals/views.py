@@ -16,7 +16,8 @@
 import datetime
 
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.admin.models import LogEntry
+from django.contrib.admin.models import LogEntry, CHANGE
+from django.contrib.auth.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -142,6 +143,13 @@ def rent_equipment(request, rental_request=None):
                 rental_item.rental = rental
                 rental_item.returned = False
                 rental_item.save()
+            content_type = ContentType.objects.get(app_label='rentals',
+                                                   model='rental')
+            LogEntry.objects.log_action(request.user.pk,
+                                        content_type.pk,
+                                        rental.pk,
+                                        str(rental),
+                                        CHANGE)
             RequestItem.objects.filter(rental=rental).delete()
             response = redirect('admin:index')
             response.set_cookie('message', _('Equipment rented!'))
@@ -215,6 +223,13 @@ def return_equipment(request, rental):
                 if rental.rental_period.end_date == None:
                     rental.rental_period.end_date = datetime.date.today()
                     rental.rental_period.save()
+            content_type = ContentType.objects.get(app_label='rentals',
+                                                   model='rental')
+            LogEntry.objects.log_action(request.user.pk,
+                                        content_type.pk,
+                                        rental.pk,
+                                        str(rental),
+                                        CHANGE)
             response = redirect('admin:index')
             response.set_cookie('message', _('Equipment returned!'))
             return response

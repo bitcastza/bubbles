@@ -40,7 +40,10 @@ def get_size_breakdown(item_type, state_filter=None):
     size_count = {}
     from bubbles.inventory import models
     for s in sizes:
-        size_count[s] = getattr(models, item_type).objects.filter(size=s).count()
+        flt = Q(size=s)
+        if state_filter:
+            flt = flt & state_filter
+        result = size_count[s] = getattr(models, item_type).objects.filter(flt).count()
     return size_count
 
 def get_items_in_state(state):
