@@ -1,7 +1,9 @@
 include:
-  template: SAST.gitlab-ci.yml
-include:
-  template: Dependency-Scanning.gitlab-ci.yml
+  - template: SAST.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml
+
+variables:
+  DS_DISABLE_REMOTE_CHECKS: "true"
 
 stages:
   - test
@@ -35,7 +37,6 @@ docker-image:
   services:
     - docker:stable-dind
   script:
-    - echo $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE:dev || true
     - docker build --cache-from $CI_REGISTRY_IMAGE:dev --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:dev .
