@@ -52,7 +52,7 @@ class BubblesAdminSite(admin.AdminSite):
         regulator_service_set = get_next_service_set(Regulator)
         extra_context['rental_requests'] = rental_requests
         extra_context['rental_returns'] = rental_returns
-        extra_context['need_servicing'] = bcd_service_set + cylinder_service_set + regulator_service_set
+        extra_context['need_servicing'] = cylinder_service_set + regulator_service_set
         message = request.COOKIES.get('message')
         if message:
             extra_context['messages'] = [message,]
