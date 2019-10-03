@@ -18,11 +18,11 @@ import datetime
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
-from django.db.models import DateField
+from django.db.models import DateField, Q
 from django.forms.widgets import Select
 
 from .forms import CalendarWidget
-from bubbles.inventory.models import BCD, Cylinder, Regulator
+from bubbles.inventory.models import BCD, Cylinder, Regulator, Item
 from bubbles.rentals.models import Rental
 
 BUBBLES_FORMFIELD_OVERRIDES = {
@@ -31,7 +31,8 @@ BUBBLES_FORMFIELD_OVERRIDES = {
 
 def get_next_service_set(item_type):
     current_date = datetime.date.today()
-    items = [x for x in item_type.objects.all() if x.next_service < current_date]
+    state = Q(state=Item.AVAILABLE) | Q(state=Item.IN_USE)
+    items = [x for x in item_type.objects.filter(state) if x.next_service < current_date]
     return items
 
 class BubblesAdminSite(admin.AdminSite):
@@ -47,7 +48,6 @@ class BubblesAdminSite(admin.AdminSite):
         extra_context = extra_context or {}
         rental_requests = Rental.objects.filter(state__exact=Rental.REQUESTED)
         rental_returns = Rental.objects.filter(state__exact=Rental.RENTED)
-        bcd_service_set = get_next_service_set(BCD)
         cylinder_service_set = get_next_service_set(Cylinder)
         regulator_service_set = get_next_service_set(Regulator)
         extra_context['rental_requests'] = rental_requests
