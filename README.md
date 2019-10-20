@@ -1,12 +1,18 @@
 # Bubbles
+Bubbles is a SCUBA equipment management system for dive clubs. It manages
+equipment details and rentals by members.
 
-Bubbles is an equipment management system for the UCT Underwater Club.
+# Features
+- Rentals - members can rent out gear for a period of time
+- Service tracking - staff can easily see equipment that needs servicing
+- Equipment life-cycle - track equipment from purchase to condemnation
+- User management
 
-# Building
+# Installation
+Bubbles is built using Django and Python 3.
 
-## Django
-
-Bubbles is built using Django. A development environment can be set up using:
+## Development
+A development environment can be set up using:
 
 ```
 $ virtualenv -p python3 pyenv
@@ -17,16 +23,14 @@ $ pyenv/bin/python manage.py runserver
 ```
 This will start a development web server on http://127.0.0.1:8000/
 
+## Production
 A more production ready setup can be created by following the
-[ansible role](https://gitlab.com/bubbles/ansible).
+[Ansible role](https://gitlab.com/bubbles/ansible).
 
-## Analysis
+# Contribute
+- Issue Tracker: https://gitlab.com/bubbles/bubbles/issues
+- Source Code: https://gitlab.com/bubbles/bubbles
 
-The analysis documentation can be built using
+# Licence
+This project is licensed under the GNU Public License version 3.
 
-````
-$ cd analysis
-$ make
-````
-
-This requires `pdflatex` and `plantuml` to build.
