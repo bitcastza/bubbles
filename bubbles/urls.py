@@ -34,6 +34,7 @@ from .admin import admin_site
 
 urlpatterns = [
     path('', include('bubbles.rentals.urls')),
+    path('', include('django_prometheus.urls')),
     path('inventory/', include('bubbles.inventory.urls')),
     path('admin/', admin_site.urls),
     path('admin/reporting/', include('bubbles.reporting.urls')),
