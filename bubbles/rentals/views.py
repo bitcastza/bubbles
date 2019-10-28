@@ -113,6 +113,7 @@ def rent_equipment(request, rental_request=None):
         return redirect('rentals:request_equipment')
 
     url = reverse('rentals:rent_equipment')
+    show_save = True
     if request.method == 'POST':
         try:
             rental = Rental.objects.get(id=rental_request)
@@ -175,15 +176,48 @@ def rent_equipment(request, rental_request=None):
                                          'deposit': 0,
                                          'belt_weight': 0,
                                      })
+            show_save = False
+
     context = {
         'form': form,
         'url': url,
         'rental_user': form.user,
         'title': _('Rent Equipment'),
         'show_cost': True,
+        'show_save': show_save,
+        'request_id': rental_request,
     }
 
     return render(request, 'rentals/rent_equipment.html', context)
+
+@login_required
+def save_rental_request(request, rental_request):
+    url = reverse('rentals:rent_equipment', args=(rental_request,))
+    if request.method == 'POST':
+        rental = get_object_or_404(Rental, id=rental_request)
+        form = RequestEquipmentForm(user=rental.user,
+                                    request_id=rental_request,
+                                    rental=rental,
+                                    show_number=True,
+                                    show_cost=True,
+                                    data=request.POST)
+        form.fields['liability'].required = False
+        if form.is_valid():
+            form.cleaned_data['period'].save()
+            rental = form.rental
+            rental.state = Rental.REQUESTED
+            rental.weight = form.cleaned_data['belt_weight']
+            rental.save()
+            RequestItem.objects.filter(rental=rental).delete()
+            for request_item in form.cleaned_data['equipment']:
+                request_item.rental = rental
+                request_item.save()
+            response = redirect('rentals:rent_equipment', rental_request)
+            return response
+        else:
+            print(form.errors)
+            # TODO: Handle errors
+    return
 
 @login_required
 def return_equipment(request, rental):

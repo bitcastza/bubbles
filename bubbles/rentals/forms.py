@@ -35,6 +35,12 @@ def get_initial_period():
     return None
 
 class EquipmentTableWidget(widgets.MultiWidget):
+    index = {
+        'description': 0,
+        'size': 1,
+        'number': 2,
+        'cost': 3,
+    }
     template_name = 'rentals/widgets/equipment_table_widget.html'
 
     def __init__(self, show_number=False, show_cost=False, item_cost=0,
@@ -76,23 +82,22 @@ class EquipmentTableWidget(widgets.MultiWidget):
                 if key not in item_types:
                     continue
                 value = data.getlist(key)
-                range_step = 2
+                print(value)
+                description = value[self.index['description']]
+                size = value[self.index['size']]
+                if size == 'N/A' or size == '':
+                    size = None
+
                 if self.show_number:
-                    range_step += 1
-                if self.show_cost:
-                    range_step += 1
-                for i in range(0, len(value), range_step):
-                    description = value[i]
-                    size = value[i + 1]
-                    if size == 'N/A':
-                        size = None
-                    cost = 0
-                    if self.show_cost:
-                        cost = value[i + 3]
+                    number = value[self.index['number']]
+                else:
                     number = None
-                    if self.show_number:
-                        number = value[i + 2]
-                    self.add_item(description, number, size, cost)
+
+                if self.show_cost:
+                    cost = value[self.index['cost']]
+                else:
+                    cost = 0
+                self.add_item(description, number, size, cost)
         return super().value_from_datadict(data, files, names)
 
     def decompress(self, value):
@@ -113,7 +118,7 @@ class EquipmentTableWidget(widgets.MultiWidget):
     def add_request_items(self, items):
         for request in items:
             self.add_item(request.item_description,
-                          '',
+                          request.item_number,
                           request.item_size,
                           request.cost)
 
@@ -143,7 +148,6 @@ class EquipmentTableWidget(widgets.MultiWidget):
 
 class EquipmentRowWidget(widgets.Widget):
     template_name = 'rentals/widgets/equipment_item_widget.html'
-    show_number = False
 
     def __init__(self, item_description, item_size=None, item_number='',
                  item_cost=0, show_number=False, show_cost=False, **kwargs):
@@ -170,7 +174,7 @@ class EquipmentRowWidget(widgets.Widget):
         context['widget']['item_cost'] = self.item_cost
         return context
 
-class EquipmentListField(fields.Field):
+class RequestEquipmentListField(fields.Field):
     widget = EquipmentTableWidget
 
     def __init__(self, show_number=False, show_cost=False,
@@ -179,6 +183,57 @@ class EquipmentListField(fields.Field):
         self.widget.show_number = show_number
         self.widget.show_cost = show_cost
         self.widget.item_cost = item_cost
+
+    def set_show_number(self, value):
+        self.widget.show_number = value
+
+    def set_show_cost(self, value):
+        self.widget.show_cost = value
+
+    def set_item_cost(self, value):
+        self.widget.item_cost = value
+
+    def clean(self, value):
+        if value in self.empty_values:
+            return None
+        request_items = []
+        errors = []
+        for i, widget in enumerate(self.widget.widgets):
+            args = {
+                'item_description': widget.item_description,
+                'item_size': widget.item_size,
+            }
+
+            if self.widget.show_number:
+                args['item_number'] = widget.item_number
+            if self.widget.show_cost:
+                args['cost'] = widget.item_cost
+            request_item = RequestItem(**args)
+
+            if request_item not in request_items:
+                request_items.append(request_item)
+        if len(errors) > 0:
+            raise forms.ValidationError(errors)
+        return request_items
+
+class RentalEquipmentListField(fields.Field):
+    widget = EquipmentTableWidget
+
+    def __init__(self, show_cost=False,
+                 item_cost=0, **kwargs):
+        super().__init__(**kwargs)
+        self.widget.show_number = True
+        self.widget.show_cost = show_cost
+        self.widget.item_cost = item_cost
+
+    def set_show_number(self, value):
+        self.widget.show_number = value
+
+    def set_show_cost(self, value):
+        self.widget.show_cost = value
+
+    def set_item_cost(self, value):
+        self.widget.item_cost = value
 
     def clean(self, value):
         if value in self.empty_values:
@@ -191,20 +246,13 @@ class EquipmentListField(fields.Field):
                                         description=widget.item_description,
                                         hidden=False)
             except ObjectDoesNotExist:
-                if widget.item_number == None or widget.item_number == '':
-                    # Rental request
-                    request_item = RequestItem(item_description=widget.item_description,
-                                               item_size=widget.item_size)
-                    if request_item not in rental_items:
-                        rental_items.append(request_item)
-                else:
-                    errors.append(forms.ValidationError(
-                        _('%(type)s number %(num)s not found'),
-                        code='invalid',
-                        params={
-                            'type': widget.item_description,
-                            'num': widget.item_number,
-                        }))
+                errors.append(forms.ValidationError(
+                    _('%(type)s number %(num)s not found'),
+                    code='invalid',
+                    params={
+                        'type': widget.item_description,
+                        'num': widget.item_number,
+                    }))
                 continue
             except Item.MultipleObjectsReturned:
                     errors.append(forms.ValidationError(
@@ -218,7 +266,7 @@ class EquipmentListField(fields.Field):
             try:
                 rental_item = RentalItem.objects.get(item=item, returned=False)
             except ObjectDoesNotExist:
-                rental_item = RentalItem(item=item,cost=int(widget.item_cost))
+                rental_item = RentalItem(item=item, cost=int(widget.item_cost))
             rental_items.append(rental_item)
         if len(errors) > 0:
             raise forms.ValidationError(errors)
@@ -311,14 +359,19 @@ class EquipmentForm(forms.Form):
         return self.cleaned_data
 
 class RequestEquipmentForm(EquipmentForm):
-    equipment = EquipmentListField()
+    equipment = RequestEquipmentListField()
     liability = forms.BooleanField(
         label=mark_safe(_("I have read and understand the <a href=/docs/terms>terms of rental</a>")),
         widget=widgets.CheckboxInput(attrs={'class': 'form-check-input'}))
     period_state_filter = Rental.REQUESTED
 
+    def __init__(self, show_number=False, show_cost=False, **kwargs):
+        super().__init__(**kwargs)
+        self.fields['equipment'].set_show_number(show_number)
+        self.fields['equipment'].set_show_cost(show_cost)
+
 class RentEquipmentForm(EquipmentForm):
-    equipment = EquipmentListField(show_number=True, show_cost=True)
+    equipment = RentalEquipmentListField(show_cost=True)
     deposit = forms.IntegerField(
         widget=widgets.NumberInput(attrs={'class': 'form-control'}))
     period_state_filter = Rental.RENTED
@@ -326,7 +379,7 @@ class RentEquipmentForm(EquipmentForm):
     def __init__(self, user, rental=None, **kwargs):
         super().__init__(user, rental, **kwargs)
         if rental:
-            self.fields['equipment'].widget.item_cost = rental.rental_period.default_cost_per_item
+            self.fields['equipment'].set_item_cost(rental.rental_period.default_cost_per_item)
 
     def clean(self):
         super().clean()
@@ -379,7 +432,7 @@ class ReturnEquipmentForm(forms.Form):
                                 max_value=15,
                                 initial=0,
                                 widget=widgets.NumberInput(attrs={'class': 'form-control'}))
-    equipment = EquipmentListField(show_number=True)
+    equipment = RentalEquipmentListField()
     deposit = forms.IntegerField(
         widget=widgets.NumberInput(attrs={'class': 'form-control',
                                           'readonly': True}))

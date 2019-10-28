@@ -22,7 +22,7 @@ from django.http.request import QueryDict
 
 from bubbles.inventory.models import BCD, Item
 from bubbles.rentals import forms
-from bubbles.rentals.forms import EquipmentTableWidget, EquipmentListField
+from bubbles.rentals.forms import EquipmentTableWidget, RentalEquipmentListField
 from bubbles.rentals.models import RentalPeriod, RentalItem, RequestItem, Rental
 
 class StaticFunctionTest(TestCase):
@@ -155,7 +155,7 @@ class EquipmentTableWidgetTest(TestCase):
         self.assertEqual(self.table.widgets[0].item_description,
                          self.item.description)
 
-class EquipmentListFieldTest(TestCase):
+class RentalEquipmentListFieldTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.item = BCD(number='1',
@@ -206,7 +206,7 @@ class EquipmentListFieldTest(TestCase):
                                           returned=True)
         returned_rental_item.save()
 
-        form = EquipmentListField(show_number=True)
+        form = RentalEquipmentListField()
         data = {
             'equipment': [self.rental_item],
         }
@@ -222,7 +222,7 @@ class EquipmentListFieldTest(TestCase):
                        last_service=datetime.date(year=2016, month=3, day=1),
                        description='BCD')
         dup_item.save()
-        form = EquipmentListField(show_number=True)
+        form = RentalEquipmentListField()
         data = {
             'equipment': [self.rental_item],
         }

@@ -92,8 +92,10 @@ class RentalItem(models.Model):
 class RequestItem(models.Model):
     rental = models.ForeignKey(Rental, on_delete=models.CASCADE, null=True)
     item_description = models.CharField(_('Type'), max_length=255)
-    item_size = models.CharField(_('Size'), max_length=2, null=True, blank=True)
+    item_size = models.CharField(_('Size'), max_length=3, null=True, blank=True)
     cost = models.IntegerField(_('Cost'), default=0)
+    item_number = models.CharField(_('Number'), max_length=5, null=True,
+                                   blank=True)
 
     def __str__(self):
         if self.rental:
