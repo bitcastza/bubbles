@@ -13,19 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
-"""
-WSGI config for bubbles project.
 
-It exposes the WSGI callable as a module-level variable named ``application``.
+from .common import *
 
-For more information on this file, see
-https://docs.djangoproject.com/en/2.0/howto/deployment/wsgi/
-"""
-
-import os
-
-from django.core.wsgi import get_wsgi_application
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "bubbles.settings.dev")
-
-application = get_wsgi_application()
+SECRET_KEY = '7y^h_(azywkes)xlx4obs(^9_vzfv3+-*f^1wth3$1k%8kac7r'
+DEBUG = True

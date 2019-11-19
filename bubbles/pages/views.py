@@ -21,7 +21,7 @@ from markdown.inlinepatterns import InlineProcessor
 from markdown.util import etree
 from django.http import Http404
 from django.shortcuts import render
-from bubbles.settings import MEDIA_ROOT
+from django.conf import settings
 
 PAGE_ROOT = 'pages'
 
@@ -43,7 +43,7 @@ class EscapeHtml(Extension):
         md.inlinePatterns.register(img_pattern, 'img_pattern', 175)
 
 def page(request, page_name):
-    filename = os.path.join(MEDIA_ROOT, PAGE_ROOT, page_name) + '.md'
+    filename = os.path.join(settings.MEDIA_ROOT, PAGE_ROOT, page_name) + '.md'
     try:
         input_file = codecs.open(filename, mode="r", encoding="utf-8")
     except FileNotFoundError:

@@ -1,23 +1,24 @@
 FROM python:3
 
-RUN apt-get update
-RUN apt-get install -y -qq nginx
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-RUN rm /etc/nginx/sites-enabled/default
+RUN apt-get update -qq && apt-get upgrade -y -qq
+RUN apt-get install netcat-openbsd
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY requirements.txt ./
+
+RUN pip3 install -U pip
 RUN pip3 install uwsgi
 RUN pip3 install --no-cache-dir -r requirements.txt
 
+VOLUME /app/staticfiles
+VOLUME /srv/media
+
 COPY docker/uwsgi.ini /etc/uwsgi/bubbles.ini
-COPY docker/nginx.conf /etc/nginx/sites-enabled/bubbles.conf
-COPY scripts/start.sh /start.sh
+COPY ./ /app
 
-COPY --chown=www-data:www-data . .
-
-RUN python manage.py migrate
-
-EXPOSE 80
-CMD ["/start.sh"]
+EXPOSE 50000
+CMD ["/app/scripts/docker-entrypoint.sh"]

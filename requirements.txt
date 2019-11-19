@@ -4,3 +4,4 @@ markdown>3.0
 reportlab
 django-widget-tweaks
 django-prometheus
+psycopg2

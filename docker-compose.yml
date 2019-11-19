@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  db:
+    #restart: always
+    image: postgres:11
+    environment:
+      POSTGRES_DB: bubbles
+      POSTGRES_USER: bubbles
+      POSTGRES_PASSWORD: bubbles_dev
+
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  app:
+    #restart: always
+    build: ./
+    command: ./scripts/docker-entrypoint.dev.sh
+    volumes:
+      - ./:/app:rw
+    depends_on:
+      - db
+    env_file:
+      - docker/env-dev.env
+    ports:
+      - "5000:5000"
+
+volumes:
+  postgres:

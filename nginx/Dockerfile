@@ -1,0 +1,7 @@
+FROM nginx
+
+RUN rm /et/nginx/conf.d/default.conf
+COPY default.conf /etc/nginx/conf.d
+
+VOLUME /app/staticfiles
+VOLUME /srv/media
