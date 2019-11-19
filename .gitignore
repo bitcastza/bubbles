@@ -3,6 +3,6 @@
 __pycache__/
 *.pyc
 *.sqlite3
-bubbles/local_settings.py
+bubbles/settings/local.py
 /logs/
 *.pdf

@@ -33,7 +33,6 @@ INSTALLED_APPS = [
     'bubbles.registration',
     'bubbles.reporting',
     'bubbles.pages',
-    'sakaiauthenticator',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -119,7 +118,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'sakaiauthenticator.sakaiauthenticator.SakaiAuthenticatorBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -136,10 +134,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-SAKAI_URL = 'https://vula.uct.ac.za'
-USE_SAKAI_SITE = True
-SAKAI_SITE_ID = '9def63ae-af28-42c3-8f56-0055fbf8ad74'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/

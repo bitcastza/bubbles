@@ -14,11 +14,8 @@ RUN pip3 install -U pip
 RUN pip3 install uwsgi
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-VOLUME /app/staticfiles
-VOLUME /srv/media
-
 COPY docker/uwsgi.ini /etc/uwsgi/bubbles.ini
 COPY ./ /app
 
-EXPOSE 50000
+EXPOSE 5000
 CMD ["/app/scripts/docker-entrypoint.sh"]

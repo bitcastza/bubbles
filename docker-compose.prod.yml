@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  bubbles:
+    restart: always
+    build: ./
+    env_file:
+      - docker/env-prod.env
+    volumes:
+      - static_volume:/app/staticfiles
+      - /src/media:/app/media:rw
+    expose:
+      - 5000
+  nginx:
+    restart: always
+    build: ./nginx
+    volumes:
+      - static_volume:/app/staticfiles
+      - /srv/media:/srv/media:rw
+    ports:
+      - 5000:5000
+    depends_on:
+      - bubbles
+
+volumes:
+  static_volume:
