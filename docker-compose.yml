@@ -21,7 +21,7 @@ services:
     env_file:
       - docker/env-dev.env
     ports:
-      - "5000:5000"
+      - "8000:8000"
 
 volumes:
   postgres:

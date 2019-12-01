@@ -18,3 +18,4 @@ from .common import *
 
 SECRET_KEY = '7y^h_(azywkes)xlx4obs(^9_vzfv3+-*f^1wth3$1k%8kac7r'
 DEBUG = True
+ALLOWED_HOSTS = ['*']
