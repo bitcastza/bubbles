@@ -27,7 +27,6 @@ PAGE_ROOT = 'pages'
 
 class ImageClass(InlineProcessor):
     def handleMatch(self, m, data):
-        print(m)
         img = etree.Element('img')
         img.attrib['class'] = 'img-fluid rounded'
         img.attrib['alt'] = m.group(1)

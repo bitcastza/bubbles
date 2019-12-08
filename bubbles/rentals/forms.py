@@ -82,7 +82,6 @@ class EquipmentTableWidget(widgets.MultiWidget):
                 if key not in item_types:
                     continue
                 value = data.getlist(key)
-                print(value)
                 description = value[self.index['description']]
                 size = value[self.index['size']]
                 if size == 'N/A' or size == '':
