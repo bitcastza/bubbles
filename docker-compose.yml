@@ -13,13 +13,13 @@ services:
   app:
     restart: always
     build: ./
-    command: ./scripts/docker-entrypoint.dev.sh
+    command: ./docker/docker-entrypoint.dev.sh
     volumes:
       - ./:/app:rw
     depends_on:
       - db
     env_file:
-      - docker/env-dev.env
+      - docker/dev.env
     ports:
       - "8000:8000"
 

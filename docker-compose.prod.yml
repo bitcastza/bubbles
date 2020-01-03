@@ -6,7 +6,7 @@ services:
     build: ./
     command: [/app/docker/docker-entrypoint.prod.sh]
     env_file:
-      - docker/env-prod.env
+      - docker/prod.env
     volumes:
       - static_volume:/app/staticfiles
       - /srv/media:/app/bubbles/media:rw
