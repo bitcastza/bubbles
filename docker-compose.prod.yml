@@ -4,13 +4,14 @@ services:
   bubbles:
     restart: always
     build: ./
+    command: [/app/docker/docker-entrypoint.prod.sh]
     env_file:
       - docker/env-prod.env
     volumes:
       - static_volume:/app/staticfiles
-      - /src/media:/app/media:rw
+      - /srv/media:/app/bubbles/media:rw
     expose:
-      - 5000
+      - 8000
   nginx:
     restart: always
     build: ./nginx

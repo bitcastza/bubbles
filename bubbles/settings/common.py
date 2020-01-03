@@ -137,12 +137,12 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-MEDIA_ROOT = os.path.join(project_root, 'bubbles/media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'bubbles', 'media')
 
 # Redirect to home URL after login
 LOGIN_REDIRECT_URL = '/'
