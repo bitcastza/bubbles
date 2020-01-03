@@ -18,4 +18,7 @@ import os
 from .common import *
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = os.environ.get('DJANOG_DEBUG', False)
+if os.environ.get('DJANGO_DEBUG'):
+    DEBUG = True
+else:
+    DEBUG = False
