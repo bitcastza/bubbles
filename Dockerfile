@@ -18,3 +18,4 @@ COPY docker/uwsgi.ini /etc/uwsgi/bubbles.ini
 COPY ./ /app
 
 EXPOSE 8000
+CMD [/app/docker/docker-entrypoint.prod.sh]

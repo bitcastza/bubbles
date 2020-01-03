@@ -13,7 +13,7 @@ services:
   app:
     restart: always
     build: ./
-    command: ./docker/docker-entrypoint.dev.sh
+    command: [./docker/docker-entrypoint.dev.sh]
     volumes:
       - ./:/app:rw
     depends_on:
