@@ -49,6 +49,7 @@ docker-nginx-image:
   services:
     - docker:stable-dind
   script:
+    - cd nginx
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $CI_REGISTRY_NGINX_IMAGE:dev || true
     - docker build --cache-from $CI_REGISTRY_NGINX_IMAGE:dev --tag $CI_REGISTRY_NGINX_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_NGINX_IMAGE:dev .
