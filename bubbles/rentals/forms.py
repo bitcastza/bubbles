@@ -266,6 +266,10 @@ class RentalEquipmentListField(fields.Field):
                 rental_item = RentalItem.objects.get(item=item, returned=False)
             except ObjectDoesNotExist:
                 rental_item = RentalItem(item=item, cost=int(widget.item_cost))
+            except RentalItem.MultipleObjectsReturned:
+                # Do not crash, just take the first. The view should remove duplicates
+                # before creating the form
+                rental_item = RentalItem.objects.filter(item=item, returned=False)[0]
             rental_items.append(rental_item)
         if len(errors) > 0:
             raise forms.ValidationError(errors)

@@ -89,6 +89,14 @@ class RentalItem(models.Model):
             return "{} to {}".format(self.item, self.rental.user)
         return "{} to unknown".format(self.item)
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.pk == other.pk and self.returned == other.returned
+        return False
+
+    def __hash__(self):
+        return self.pk ^ self.returned
+
 class RequestItem(models.Model):
     rental = models.ForeignKey(Rental, on_delete=models.CASCADE, null=True)
     item_description = models.CharField(_('Type'), max_length=255)

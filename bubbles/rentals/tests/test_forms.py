@@ -229,6 +229,19 @@ class RentalEquipmentListFieldTest(TestCase):
         form.widget.value_from_datadict(data, None, 'equipment')
         self.assertRaises(ValidationError, form.clean, 'Test')
 
+    def test_multple_rental_item_error(self):
+        dup_item = RentalItem(item=self.item,
+                             rental=self.rental,
+                             cost=0)
+        dup_item.save()
+        form = RentalEquipmentListField()
+        data = {
+            'equipment': [self.rental_item],
+        }
+        form.widget.value_from_datadict(data, None, 'equipment')
+        r = form.clean(value='equipment')
+        self.assertIn(r[0], [self.rental_item, dup_item])
+
 class EquipmentFormTest(TestCase):
     @classmethod
     def setUpTestData(cls):

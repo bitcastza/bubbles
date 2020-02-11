@@ -270,6 +270,16 @@ def return_equipment(request, rental):
     else:
         rental = Rental.objects.get(id=rental)
         url = reverse('rentals:return_equipment', args=(rental.id,))
+        # Check for duplicates
+        rental_items = rental.rentalitem_set.filter(returned=False)
+        duplicates = {}
+        for i in rental_items:
+            others = rental_items.exclude(pk=i.pk)
+            dups = others.filter(item=i.item)
+            if i.item not in duplicates.keys() and dups.count() > 0:
+                duplicates[i.item] = dups
+        for dup in duplicates.values():
+            dup.delete()
         form = ReturnEquipmentForm(user=rental.user,
                                    rental=rental,
                                    data={
