@@ -7,6 +7,19 @@
 <script src="{% static 'js/save_button.js' %}"></script>
 {% endblock %}
 
+{% block pre_content %}
+{% block messages %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-success altert-dismissible">
+  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+  {{ message|capfirst }}
+</div>
+{% endfor %}
+{% endif %}
+{% endblock messages %}
+{% endblock %}
+
 {% block content %}
 <div class="row">
   <div class="col-sm-10">

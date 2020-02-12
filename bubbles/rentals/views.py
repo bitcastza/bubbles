@@ -186,7 +186,13 @@ def rent_equipment(request, rental_request=None):
         'request_id': rental_request,
     }
 
-    return render(request, 'rentals/rent_equipment.html', context)
+    message = request.COOKIES.get('message')
+    if message:
+        context['messages'] = [message,]
+    response = render(request, 'rentals/rent_equipment.html', context)
+    if message:
+        response.delete_cookie('message')
+    return response
 
 @login_required
 def save_rental_request(request, rental_request):
@@ -211,6 +217,7 @@ def save_rental_request(request, rental_request):
                 request_item.rental = rental
                 request_item.save()
             response = redirect('rentals:rent_equipment', rental_request)
+            response.set_cookie('message', _('Rental details saved!'))
             return response
         else:
             print(form.errors)
