@@ -113,7 +113,6 @@ def rent_equipment(request, rental_request=None):
         return redirect('rentals:request_equipment')
 
     url = reverse('rentals:rent_equipment')
-    show_save = True
     if request.method == 'POST':
         try:
             rental = Rental.objects.get(id=rental_request)
@@ -176,7 +175,6 @@ def rent_equipment(request, rental_request=None):
                                          'deposit': 0,
                                          'belt_weight': 0,
                                      })
-            show_save = False
 
     context = {
         'form': form,
@@ -184,7 +182,7 @@ def rent_equipment(request, rental_request=None):
         'rental_user': form.user,
         'title': _('Rent Equipment'),
         'show_cost': True,
-        'show_save': show_save,
+        'show_save': rental_request is not None,
         'request_id': rental_request,
     }
 
