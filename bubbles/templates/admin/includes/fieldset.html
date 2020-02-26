@@ -6,7 +6,7 @@
   {% if fieldset.description %}
   <div class="description">{{ fieldset.description|safe }}</div>
   {% endif %}
-  <div class="{{fieldset.classes }}" id="{{ fieldset.name|slugify }}-fields">
+  <div class="{{fieldset.classes }}{% if fieldset.name %} collapse{% endif %}" id="{{ fieldset.name|slugify }}-fields">
     {% for line in fieldset %}
     <div class="form-row{% if line.fields|length_is:'1' and line.errors %} has-error{% endif %}{% if not line.has_visible_field %} hidden{% endif %}{% for field in line %}{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% endfor %}">
       {% if line.fields|length_is:'1' %}{{ line.errors }}{% endif %}
