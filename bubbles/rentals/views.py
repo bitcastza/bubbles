@@ -35,15 +35,22 @@ def index(request):
 
     context = {}
     message = request.COOKIES.get('message')
+    message_class = request.COOKIES.get('messageclass')
     if (rental_set.count() != 0):
         context['rentals'] = rental_set
     if (requests.count() != 0):
         context['requests'] = requests
     if message:
         context['messages'] = [message,]
+        if message_class:
+            context['message_class'] = message_class
+        else:
+            context['message_class'] = 'success'
     response = render(request, 'rentals/index.html', context)
     if message:
         response.delete_cookie('message')
+    if message_class:
+        response.delete_cookie('messageclass')
     return response
 
 @login_required
@@ -109,8 +116,16 @@ def get_existing_rentals(user):
 
 @login_required
 def rent_equipment(request, rental_request=None):
-    if not request.user.is_staff:
-        return redirect('rentals:request_equipment')
+    if not request.user.has_perm('rental.free_rental'):
+        if not request.user.is_staff: # Normal users should request gear
+            return redirect('rentals:request_equipment')
+        if rental_request == None: # May not rent for themselves (empty form)
+            return redirect('rentals:request_equipment')
+
+        rental = Rental.objects.get(id=rental_request)
+        if rental.user == request.user:
+            return redirect('rentals:request_equipment', rental_request)
+
 
     url = reverse('rentals:rent_equipment')
     if request.method == 'POST':
@@ -225,13 +240,20 @@ def save_rental_request(request, rental_request):
     return
 
 @login_required
-def return_equipment(request, rental):
-    if not request.user.is_staff:
-        return redirect('rentals:request_equipment')
+def return_equipment(request, rental_id):
+    if not request.user.has_perm('rental.free_rental'):
+        if not request.user.is_staff:
+            return redirect('rentals:request_equipment')
+        rental = Rental.objects.get(id=rental_id)
+        if rental.user == request.user:
+            response = redirect('admin:index')
+            response.set_cookie('message', _('You do not have permission to do that'))
+            response.set_cookie('messageclass', 'danger')
+            return response
 
     url = reverse('rentals:rent_equipment')
     if request.method == 'POST':
-        rental = Rental.objects.get(id=rental)
+        rental = Rental.objects.get(id=rental_id)
         form = ReturnEquipmentForm(user=rental.user, rental=rental, data=request.POST)
         url = reverse('rentals:return_equipment', args=(rental.id,))
         is_valid = False
@@ -273,7 +295,7 @@ def return_equipment(request, rental):
             response.set_cookie('message', _('Equipment returned!'))
             return response
     else:
-        rental = Rental.objects.get(id=rental)
+        rental = Rental.objects.get(id=rental_id)
         url = reverse('rentals:return_equipment', args=(rental.id,))
         # Check for duplicates
         rental_items = rental.rentalitem_set.filter(returned=False)

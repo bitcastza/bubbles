@@ -288,8 +288,8 @@ class EquipmentForm(forms.Form):
         self.user = user
         self.rental = rental
         self.request_id = request_id
-        if user.is_staff:
-            # Staff should not select a period
+        if user.has_perm('rental.free_rental'):
+            # Free rentals should not select a period
             period_query_set = RentalPeriod.objects.filter(start_date=None)
         else:
             date = datetime.date.today()
@@ -305,7 +305,7 @@ class EquipmentForm(forms.Form):
 
     def clean_period(self):
         if self.cleaned_data['period'] == None:
-            if not self.user.is_staff:
+            if not self.user.has_perm('rental.free_rental'):
                 raise forms.ValidationError(_('This field is required'), code='invalid')
             else:
                 current_rentals = Rental.objects.filter(user=self.user,

@@ -30,10 +30,10 @@ class RentalPeriod(models.Model):
 
     def __str__(self):
         if self.end_date:
-            return "{} ({} - {})".format(self.name,
+            return '{} ({} - {})'.format(self.name,
                                           self.start_date,
                                           self.end_date)
-        return "{} ({} -)".format(self.name, self.start_date)
+        return '{} ({} -)'.format(self.name, self.start_date)
 
 class Rental(models.Model):
     REQUESTED = 'REQ'
@@ -61,6 +61,11 @@ class Rental(models.Model):
     rental_period = models.ForeignKey(RentalPeriod, on_delete=models.CASCADE)
     weight = models.IntegerField(_('Weight'), null=True, blank=True)
 
+    class Meta:
+        permissions = [
+            ('free_rental', 'Can rent gear without paying'),
+        ]
+
     def is_overdue(self):
         today = datetime.date.today()
         if self.rental_period.end_date:
@@ -76,7 +81,7 @@ class Rental(models.Model):
             return False
 
     def __str__(self):
-        return "Rental by {} for {}".format(self.user, self.rental_period)
+        return 'Rental by {} for {}'.format(self.user, self.rental_period)
 
 class RentalItem(models.Model):
     rental = models.ForeignKey(Rental, on_delete=models.CASCADE, null=True)
@@ -86,8 +91,8 @@ class RentalItem(models.Model):
 
     def __str__(self):
         if self.rental:
-            return "{} to {}".format(self.item, self.rental.user)
-        return "{} to unknown".format(self.item)
+            return '{} to {}'.format(self.item, self.rental.user)
+        return '{} to unknown'.format(self.item)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -107,5 +112,5 @@ class RequestItem(models.Model):
 
     def __str__(self):
         if self.rental:
-            return "{} to {}".format(self.item_description, self.rental.user)
-        return "{} to unknown".format(self.item_description)
+            return '{} to {}'.format(self.item_description, self.rental.user)
+        return '{} to unknown'.format(self.item_description)
