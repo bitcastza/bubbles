@@ -17,8 +17,19 @@ from datetime import timedelta
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
+
+class ItemManager(models.Manager):
+    def get_queryset(self):
+        q_filter = ~Q(description__exact='BCD') & \
+                ~Q(description__exact='Booties') & \
+                ~Q(description__exact='Cylinder') & \
+                ~Q(description__exact='Fins') & \
+                ~Q(description__exact='Regulator') & \
+                ~Q(description__exact='Wetsuit')
+        return super().get_queryset().filter(q_filter)
 
 class Item(models.Model):
     """
@@ -72,6 +83,9 @@ class Item(models.Model):
     description = models.CharField(_('Type'), max_length=255)
     hidden = models.BooleanField(_("Hidden"), blank=True, default=False)
     free = models.BooleanField(_("Free"), blank=True, default=False)
+
+    item_objects = ItemManager()
+    objects = models.Manager()
 
     def get_change_url(self):
         # Promote to subtype

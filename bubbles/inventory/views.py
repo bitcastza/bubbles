@@ -127,7 +127,10 @@ def do_inventory_check(request, item_type):
             counter = 0
             for form in formset:
                 current_state = Item.STATE_CHOICES[counter][0]
-                items = list(item_type_class.objects.filter(state=current_state).order_by('number'))
+                manager = item_type_class.objects
+                if item_type_class == Item:
+                    manager = item_type_class.item_objects
+                items = list(manager.filter(state=current_state).order_by('number'))
                 for item in items:
                     try:
                         data = form[item.id].data
