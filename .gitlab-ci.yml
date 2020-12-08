@@ -14,17 +14,6 @@ unit-3:
     - python3 -m django --version
     - python3 ./manage.py test --parallel 5
 
-uct:
-  stage: deploy
-  script:
-    - apt-get update && apt-get install -y -qq ansible git
-    - ./scripts/deploy.sh
-  environment:
-    name: uct
-    url: https://bubbles.paddatrapper.com
-  only:
-    - uct
-
 docker-image:
   stage: deploy
   image: docker:stable
