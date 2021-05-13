@@ -37,11 +37,6 @@
       {% else %}
       <div class="form-group">
         {% endif %}
-        {% for error in field.errors %}
-        <div class="alert alert-danger" role="alert">
-          {{ error }}
-        </div>
-        {% endfor %}
         {% if field.field.widget.input_type == "checkbox" %}
         {{ field }}
         <label class="control-label form-check-label" for="{{ field.id_for_label }}">{{ field.label }}:</label>
@@ -49,6 +44,11 @@
         <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}:</label>
         {{ field }}
         {% endif %}
+        {% for error in field.errors %}
+        <div class="alert alert-danger" role="alert">
+          {{ error }}
+        </div>
+        {% endfor %}
       </div>
       {% endfor %}
       <div class="form-group btn-group">

@@ -22,6 +22,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
+from django.views.decorators.http import require_http_methods
 
 from bubbles.inventory.models import Item, BCD, Booties, Cylinder, Fins, Wetsuit, Weight
 from .models import Rental, RequestItem, RentalPeriod, RentalItem
@@ -126,7 +127,6 @@ def rent_equipment(request, rental_request=None):
         if rental.user == request.user:
             return redirect('rentals:request_equipment', rental_request)
 
-
     url = reverse('rentals:rent_equipment')
     if request.method == 'POST':
         try:
@@ -209,35 +209,43 @@ def rent_equipment(request, rental_request=None):
         response.delete_cookie('message')
     return response
 
+@require_http_methods(['POST'])
 @login_required
 def save_rental_request(request, rental_request):
     url = reverse('rentals:rent_equipment', args=(rental_request,))
-    if request.method == 'POST':
-        rental = get_object_or_404(Rental, id=rental_request)
-        form = RequestEquipmentForm(user=rental.user,
-                                    request_id=rental_request,
-                                    rental=rental,
-                                    show_number=True,
-                                    show_cost=True,
-                                    data=request.POST)
-        form.fields['liability'].required = False
-        if form.is_valid():
-            form.cleaned_data['period'].save()
-            rental = form.rental
-            rental.state = Rental.REQUESTED
-            rental.weight = form.cleaned_data['belt_weight']
-            rental.save()
-            RequestItem.objects.filter(rental=rental).delete()
-            for request_item in form.cleaned_data['equipment']:
-                request_item.rental = rental
-                request_item.save()
-            response = redirect('rentals:rent_equipment', rental_request)
-            response.set_cookie('message', _('Rental details saved!'))
-            return response
-        else:
-            print(form.errors)
-            # TODO: Handle errors
-    return
+    rental = get_object_or_404(Rental, id=rental_request)
+    form = RequestEquipmentForm(user=rental.user,
+                                request_id=rental_request,
+                                rental=rental,
+                                show_number=True,
+                                show_cost=True,
+                                data=request.POST)
+    form.fields['liability'].required = False
+    if form.is_valid():
+        form.cleaned_data['period'].save()
+        rental = form.rental
+        rental.state = Rental.REQUESTED
+        rental.weight = form.cleaned_data['belt_weight']
+        rental.save()
+        RequestItem.objects.filter(rental=rental).delete()
+        for request_item in form.cleaned_data['equipment']:
+            request_item.rental = rental
+            request_item.save()
+        response = redirect('rentals:rent_equipment', rental_request)
+        response.set_cookie('message', _('Rental details saved!'))
+        return response
+
+    context = {
+        'form': form,
+        'url': url,
+        'rental_user': form.user,
+        'title': _('Rent Equipment'),
+        'show_cost': True,
+        'show_save': rental_request is not None,
+        'request_id': rental_request,
+    }
+
+    return render(request, 'rentals/rent_equipment.html', context)
 
 @login_required
 def return_equipment(request, rental_id):
@@ -256,7 +264,6 @@ def return_equipment(request, rental_id):
         rental = Rental.objects.get(id=rental_id)
         form = ReturnEquipmentForm(user=rental.user, rental=rental, data=request.POST)
         url = reverse('rentals:return_equipment', args=(rental.id,))
-        is_valid = False
         if form.is_valid():
             rental = form.rental
             for rental_item in form.cleaned_data['equipment']:
