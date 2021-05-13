@@ -5,6 +5,9 @@ stages:
   - test
   - deploy
 
+variables:
+  SAST_EXCLUDED_PATHS: "bubbles/static/vendor, spec, test, tests, tmp"
+
 unit-3:
   stage: test
   script:
