@@ -33,13 +33,14 @@ def handle_delete_rental(sender, instance, using, **kwargs):
 def handle_edit_rentalitem(sender, instance, created, raw, using, **kwargs):
     if not raw:
         rental = instance.rental
-        # Update rental if all rental items are returned
-        if not rental.rentalitem_set.filter(returned=False).exists():
-            rental.state = Rental.RETURNED
-            rental.save()
-        else:
-            rental.state = Rental.RENTED
-            rental.save()
+        if rental != None:
+            # Update rental if all rental items are returned
+            if not rental.rentalitem_set.filter(returned=False).exists():
+                rental.state = Rental.RETURNED
+                rental.save()
+            else:
+                rental.state = Rental.RENTED
+                rental.save()
 
         # Update item if rental item changes
         if instance.returned:
