@@ -24,7 +24,6 @@ from django.utils.translation import gettext as _
 from django.forms import formset_factory
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table
-from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.rl_config import defaultPageSize
 from reportlab.lib.units import cm
 
@@ -56,11 +55,9 @@ def later_pages(canvas, doc):
 
 @staff_member_required
 def insurance_report(request):
-    styles = getSampleStyleSheet()
     path = 'stock_' + datetime.date.today().strftime('%Y-%M-%d') + '.pdf'
     doc = SimpleDocTemplate(path)
     story = [Spacer(1, 2 * cm)]
-    style = styles['Normal']
 
     item_set = Item.objects.exclude(state=Item.MISSING).exclude(state=Item.CONDEMNED).values('description').annotate(num=Count('description'))
     value_set = ItemValue.objects.all()
