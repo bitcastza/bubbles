@@ -4,7 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update -qq && apt-get upgrade -y -qq
-RUN apt-get install netcat-openbsd
+RUN apt-get install -y -qq netcat-openbsd
 
 WORKDIR /app
 
