@@ -131,7 +131,7 @@ def do_inventory_check(request, item_type):
                 for item in items:
                     try:
                         data = form[item.id].data
-                    except KeyError:
+                    except (KeyError, TypeError):
                         # Handle the case when the item is unselected, and not
                         # in the form
                         data = False
