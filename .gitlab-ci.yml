@@ -19,11 +19,11 @@ unit-3:
 
 docker-image:
   stage: deploy
-  image: docker:stable
+  image: docker:19
   variables:
     DOCKER_DRIVER: overlay2
   services:
-    - docker:stable-dind
+    - docker:19-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:dev .
