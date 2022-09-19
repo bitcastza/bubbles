@@ -127,7 +127,7 @@ AUTHENTICATION_BACKENDS = [
 
 LANGUAGE_CODE = 'en-za'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Johannesburg'
 
 USE_I18N = True
 
