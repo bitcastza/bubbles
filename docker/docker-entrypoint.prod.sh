@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-rm -fr /app/staticfiles
-
 python3 manage.py collectstatic --noinput
 python3 manage.py migrate --noinput
 
