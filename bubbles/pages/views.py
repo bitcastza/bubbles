@@ -18,7 +18,7 @@ import os
 
 from markdown import markdown, Extension
 from markdown.inlinepatterns import InlineProcessor
-from markdown.util import etree
+from xml.etree import ElementTree
 from django.http import Http404
 from django.shortcuts import render
 from django.conf import settings
@@ -27,7 +27,7 @@ PAGE_ROOT = 'pages'
 
 class ImageClass(InlineProcessor):
     def handleMatch(self, m, data):
-        img = etree.Element('img')
+        img = ElementTree.Element('img')
         img.attrib['class'] = 'img-fluid rounded'
         img.attrib['alt'] = m.group(1)
         img.attrib['src'] = m.group(2)
