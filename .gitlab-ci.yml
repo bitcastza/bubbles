@@ -30,7 +30,7 @@ docker-image:
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     - docker push $CI_REGISTRY_IMAGE:dev
   only:
-    - master
+    - main
 
 docker-nginx-image:
   stage: deploy
@@ -47,4 +47,4 @@ docker-nginx-image:
     - docker push $CI_REGISTRY_NGINX_IMAGE:$CI_COMMIT_SHA
     - docker push $CI_REGISTRY_NGINX_IMAGE:dev
   only:
-    - master
+    - main
