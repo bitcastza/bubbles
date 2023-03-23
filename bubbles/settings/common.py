@@ -146,3 +146,17 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'bubbles', 'media')
 
 # Redirect to home URL after login
 LOGIN_REDIRECT_URL = '/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+}
