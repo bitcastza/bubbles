@@ -15,7 +15,6 @@
 ###########################################################################
 import datetime
 import decimal
-import sys
 
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
@@ -193,8 +192,6 @@ class RequestEquipmentListField(fields.Field):
         self.widget.item_cost = value
 
     def clean(self, value):
-        if value in self.empty_values:
-            return None
         request_items = []
         errors = []
         for i, widget in enumerate(self.widget.widgets):
@@ -277,11 +274,16 @@ class RentalEquipmentListField(fields.Field):
 
 class EquipmentForm(forms.Form):
     period_state_filter = Rental.REQUESTED
+    period = forms.ModelChoiceField(queryset=None,
+                                    required=False,
+                                    widget=widgets.Select(
+                                        attrs={'class': 'form-control'}),
+                                    initial=get_initial_period)
     belt_weight = forms.IntegerField(min_value=0,
-                                max_value=15,
-                                initial=0,
-                                widget=widgets.NumberInput(attrs={
-                                    'class': 'form-control'}))
+                                     max_value=15,
+                                     initial=0,
+                                     widget=widgets.NumberInput(attrs={
+                                         'class': 'form-control'}))
 
     def __init__(self, user, rental=None, request_id=None, **kwargs):
         super().__init__(**kwargs)
@@ -295,70 +297,72 @@ class EquipmentForm(forms.Form):
             date = datetime.date.today()
             period_query_set = RentalPeriod.objects.filter(end_date__gt=date,
                                                            hidden=False)
-        self.fields['period'] = forms.ModelChoiceField(queryset=period_query_set,
-                                    required=False,
-                                    widget=widgets.Select(
-                                        attrs={'class': 'form-control'}),
-                                    initial=get_initial_period)
-        # Move period to beginning of the form
-        self.fields.move_to_end('period', last=False)
+        self.fields['period'].queryset = period_query_set
 
     def clean_period(self):
-        if self.cleaned_data['period'] == None:
+        data = self.cleaned_data['period']
+        if data is None:
             if not self.user.has_perm('rental.free_rental'):
                 raise forms.ValidationError(_('This field is required'), code='invalid')
+
+            current_rentals = Rental.objects.filter(user=self.user,
+                                                    state=Rental.RENTED)
+            if current_rentals.count() > 0:
+                return current_rentals.first().rental_period
             else:
-                current_rentals = Rental.objects.filter(user=self.user,
-                                                        state=Rental.RENTED)
-                if current_rentals.count() > 0:
-                    return current_rentals.first().rental_period
-                else:
-                    return RentalPeriod(start_date=datetime.date.today(),
-                                        default_deposit=0,
-                                        default_cost_per_item=0,
-                                        hidden=True)
-        current_period = self.cleaned_data['period']
+                return RentalPeriod(start_date=datetime.date.today(),
+                                    default_deposit=0,
+                                    default_cost_per_item=0,
+                                    hidden=True)
+
         existing_periods = Rental.objects.filter(user=self.user,
-                                                 rental_period=current_period,
+                                                 rental_period=data,
                                                  state=self.period_state_filter)
-        if existing_periods.count() and self.request_id == None:
-            raise forms.ValidationError(_('You already have a request submitted for '
-            'this period'), code='invalid')
-        return self.cleaned_data['period']
+        if existing_periods.count() and self.request_id is None:
+            raise forms.ValidationError(_('You already have a request submitted '
+                                          'for this period'), code='invalid')
+        return data
 
     def clean_belt_weight(self):
-        if self.cleaned_data['belt_weight'] == None:
+        data = self.cleaned_data['belt_weight']
+        if data is None:
             raise forms.ValidationError(_('This field is required'), code='invalid')
         total_weight = Weight.objects.first()
-        if total_weight == None:
-            raise forms.ValidationError(_('No total weight specified by staff, unable to continue.' +
-            'Please send this error to your system administrator.'), code='invalid')
-        return self.cleaned_data['belt_weight']
+        if total_weight is None and data > 0:
+            raise forms.ValidationError(_('No total weight specified by staff, ' +
+                                          'unable to continue. Please send this ' +
+                                          'error to your system administrator.'),
+                                        code='invalid')
+        return data
 
 
     def clean(self):
-        if not self.has_error('period'):
-            if self.rental == None:
-                state = Rental.REQUESTED
-                period = self.cleaned_data['period']
-                deposit = period.default_deposit
-                self.rental = Rental(user=self.user,
-                                     state=state,
-                                     deposit=deposit,
-                                     rental_period=period)
-            try:
-                free_items = Item.objects.filter(state__exact=Item.AVAILABLE,
-                                                 free=True).values('description').distinct()
-                free_items = [x['description'] for x in free_items]
-                for rental_item in self.cleaned_data['equipment']:
-                    rental_item.rental = self.rental
-                    try:
-                        if rental_item.item_description not in free_items:
-                            rental_item.cost = self.rental.rental_period.default_cost_per_item
-                    except AttributeError:
-                        pass # Only Request Items have item_description
-            except (KeyError, TypeError):
-                pass
+        super().clean()
+        try:
+            period = self.cleaned_data['period']
+        except KeyError:
+            raise forms.ValidationError(_('Period is required'), code='invalid')
+
+        if self.rental is None:
+            state = Rental.REQUESTED
+            deposit = period.default_deposit
+            self.rental = Rental(user=self.user,
+                                 state=state,
+                                 deposit=deposit,
+                                 rental_period=period)
+        try:
+            free_items = Item.objects.filter(state__exact=Item.AVAILABLE,
+                                             free=True).values('description').distinct()
+            free_items = [x['description'] for x in free_items]
+            for rental_item in self.cleaned_data['equipment']:
+                rental_item.rental = self.rental
+                try:
+                    if rental_item.item_description not in free_items:
+                        rental_item.cost = self.rental.rental_period.default_cost_per_item
+                except AttributeError:
+                    pass # Only Request Items have item_description
+        except (KeyError, TypeError):
+            pass
         return self.cleaned_data
 
 class RequestEquipmentForm(EquipmentForm):

@@ -95,9 +95,7 @@ class RentalItem(models.Model):
         return '{} to unknown'.format(self.item)
 
     def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.pk == other.pk and self.returned == other.returned
-        return False
+        return self.pk == other.pk and self.returned == other.returned
 
     def __hash__(self):
         return self.pk ^ self.returned

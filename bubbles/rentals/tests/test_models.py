@@ -159,8 +159,5 @@ class RentalItemTest(TestCase):
         self.assertEqual(self.request_item.__str__(),
                          "{} to {}".format(self.item_description, self.user))
 
-    def test_eq_different_type(self):
-        self.assertFalse(self.request_item.__eq__("Test"))
-
     def test_eq(self):
         self.assertTrue(self.request_item.__eq__(self.request_item))

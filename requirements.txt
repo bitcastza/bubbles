@@ -1,7 +1,7 @@
-django~=2.2
+django~=3.0
 sakaiauthenticator>1.0.1
 markdown>3.0
 reportlab
 django-widget-tweaks
 django-prometheus
-psycopg2<2.9
+psycopg2

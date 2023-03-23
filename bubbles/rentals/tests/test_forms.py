@@ -261,17 +261,13 @@ class EquipmentFormTest(TestCase):
                                      name='Test',
                                      hidden=False)
         cls.rental_period.save()
-        cls.user = User.objects.create_user(username='jacob')
-        cls.rental = Rental(rental_period=cls.rental_period,
-                        user=cls.user,
-                        state=Rental.REQUESTED,
-                        deposit=0)
-        cls.rental.save()
 
     def test_request_hood(self):
-        string = 'period={period}&belt_weight=0&{key}={key}&{key}=N/A&liability=on'.format(period=self.rental_period, key=self.request_item.item_description)
+        user = User.objects.create_user(username='hood_renter')
+        string = 'period={period}&belt_weight=0&{key}={key}&{key}=N/A&liability=on'.format(period=self.rental_period.pk, key=self.request_item.item_description)
         data = QueryDict(string)
-        form = forms.RequestEquipmentForm(user=self.user,
+        form = forms.RequestEquipmentForm(user=user,
                                           data=data)
-        form.clean()
+        is_valid = form.is_valid()
+        self.assertTrue(is_valid)
         self.assertIsNotNone(form.cleaned_data['equipment'])
