@@ -122,6 +122,8 @@ class BCD(Item):
     last_service = models.DateField(_('Last service'))
     size = models.CharField(_('Size'), max_length=3, choices=SIZE_CHOICES)
 
+    item_objects = models.Manager()
+
     @property
     def next_service(self):
         return self.last_service + timedelta(weeks=52)
@@ -148,6 +150,8 @@ class Booties(Item):
 
     size = models.CharField(_('Size'), max_length=2, choices=SIZE_CHOICES)
 
+    item_objects = models.Manager()
+
     def clean(self):
         self.description = "Booties"
 
@@ -162,6 +166,8 @@ class Cylinder(Item):
     last_hydro = models.DateField(_('Last hydro-static inspection'))
     viz_period = models.DurationField(_('Visual inspection validity period'), default=timedelta(weeks=52))
     hydro_period = models.DurationField(_('Hydro-static test validity period'), default=timedelta(weeks=208))
+
+    item_objects = models.Manager()
 
     @property
     def next_service(self):
@@ -196,6 +202,8 @@ class Fins(Item):
 
     size = models.CharField(_('Size'), max_length=2, choices=SIZE_CHOICES)
 
+    item_objects = models.Manager()
+
     def clean(self):
         self.description = "Fins"
 
@@ -205,6 +213,8 @@ class Fins(Item):
 class Regulator(Item):
     serial_num = models.CharField(_('Serial number'), max_length=255)
     last_service = models.DateField(_('Last service'))
+
+    item_objects = models.Manager()
 
     @property
     def next_service(self):
@@ -251,6 +261,8 @@ class Wetsuit(Item):
     )
 
     size = models.CharField(_('Size'), max_length=2, choices=SIZE_CHOICES)
+
+    item_objects = models.Manager()
 
     def clean(self):
         self.description = "Wetsuit"
