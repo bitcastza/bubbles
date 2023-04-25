@@ -8,8 +8,8 @@ repos:
       - id: check-executables-have-shebangs
       - id: check-shebang-scripts-are-executable
       - id: check-symlinks
+        exclude: bubbles/static/vendor
       - id: destroyed-symlinks
-        exclude: ^(bubbles/static/vendor)$
       - id: check-json
       - id: check-yaml
       - id: check-xml
