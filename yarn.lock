@@ -609,10 +609,10 @@ fs.realpath@^1.0.0:
   resolved "https://registry.yarnpkg.com/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
   integrity sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==
 
-gijgo@1.9.13:
-  version "1.9.13"
-  resolved "https://registry.yarnpkg.com/gijgo/-/gijgo-1.9.13.tgz#22c6186252369de3a618e1e6369a923849128b6e"
-  integrity sha512-VxUzueysKaSRpjNM6jiMdoTJuUEWiPJNir5PCVKat6uA1R6vH7crKyFnR/Ey1k2r0i1yvYeJ3QKsPFkTB7aZxg==
+gijgo@1.9.14:
+  version "1.9.14"
+  resolved "https://registry.yarnpkg.com/gijgo/-/gijgo-1.9.14.tgz#377c3173fcfdddffaaa759d8b8218b6fe05f55b4"
+  integrity sha512-OtMnmJlcMr9dmjOzMCMVxrEmnQZf5zl3DoWFvFIa99742RY7hXRKnoPgLBCFNGqick6YfoPvfzmqP+1tFoMiWw==
   dependencies:
     jquery "^3.2.1"
 
