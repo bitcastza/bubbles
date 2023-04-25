@@ -17,8 +17,13 @@
     <input type="text" class="form-control item_size" id="{{ item.item_description }}-size" name="{{ widget.name }}-{{ forloop.counter0 }}" value="N/A" readonly>
   </td>
   {% endif %}
-  <td class="item-number" {% if not widget.show_number %}hidden{% endif %}>
+  {% if widget.show_number %}
+  <td class="item-number">
+    <input type="text" class="form-control" name="{{ widget.name }}-{{ forloop.counter0 }}" value="{{ item.item.number|default:"" }}" id="{{item.item_description }}-number"/>
+  {% else %}
+  <td class="item-number" hidden>
     <input type="text" class="form-control" name="{{ widget.name }}-{{ forloop.counter0 }}" value="{{ item.item.number|default:"N/A" }}" id="{{item.item_description }}-number"/>
+  {% endif %}
   </td>
   <td class="item-cost" {% if not widget.show_cost %}hidden{% endif %}>
     <input type="number" class="form-control item-cost-value" name="{{ widget.name }}-{{ forloop.counter0 }}" value="{{ item.cost }}" id="{{item.item_description }}-cost" min="0"/>

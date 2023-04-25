@@ -25,7 +25,7 @@ from model_bakery import baker
 
 from bubbles.rentals.models import Rental, RentalPeriod, RentalItem, RequestItem
 from bubbles.rentals.views import index, rent_equipment, request_equipment
-from bubbles.inventory.models import Item, BCD
+from bubbles.inventory.models import Item, BCD, Weight
 
 
 class IndexViewTests(TestCase):
@@ -207,38 +207,49 @@ class RentEquipmentViewTests(TestCase):
         response = rent_equipment(self.request, rental.id)
         for item in request_items:
             self.assertContains(response, item.item_description)
-        self.assertNotContains(
+        self.assertContains(
             response,
-            f'<input type="text" class="form-control" name="equipment-0" value="N/A" id="description[0]-number">',
+            f'<input type="text" class="form-control" name="equipment-0" value="" id="{description[0]}-number">',
             html=True,
         )
 
     def test_rent_equipment_post(self):
-        rental = baker.make(Rental, state=Rental.REQUESTED)
+        Weight.objects.create(total_weight=50, available_weight=50)
+        start_date = datetime.date.today()
+        rental_period = baker.make(
+            RentalPeriod,
+            start_date=start_date,
+            end_date=start_date + datetime.timedelta(days=5),
+            hidden=False,
+        )
+        rental = baker.make(Rental, state=Rental.REQUESTED, rental_period=rental_period)
 
-        bcd = baker.make(BCD, number="1")
-        item = baker.make(Item, number="2")
+        bcd = baker.make(BCD, description="BCD", number="1", state=Item.AVAILABLE)
+        item = baker.make(Item, number="2", state=Item.AVAILABLE)
         request_data = {
             "period": rental.rental_period.id,
-            "belt_weight": 0,
+            "belt_weight": 5,
             "equipment-0": [
                 bcd.description,
                 bcd.size,
                 bcd.number,
-                30,
+                "30",
             ],
             "equipment-1": [
                 item.description,
                 "N/A",
-                bcd.number,
-                -1,
+                item.number,
+                "0",
             ],
-            "liability": "on",
+            "deposit": "100",
         }
         request = self.factory.post(self.path, request_data)
         request.user = self.user
         response = rent_equipment(request, rental.id)
-        self.assertEqual(response.status_code, 200)
+        rental.refresh_from_db()
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(len(rental.rentalitem_set.all()), 2)
-        self.assertEqual(len(rental.requestitem.all()), 0)
+        self.assertEqual(len(rental.requestitem_set.all()), 0)
         self.assertEqual(rental.state, Rental.RENTED)
+        weight = Weight.objects.first()
+        self.assertEqual(weight.total_weight - weight.available_weight, 5)

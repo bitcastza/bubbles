@@ -72,6 +72,17 @@ class EquipmentTableWidget(widgets.Widget):
         context["widget"]["show_cost"] = self.show_cost
         return context
 
+    class Media:
+        css = {
+            "screen": ("css/equipment_table.css",),
+        }
+        js = (
+            "vendor/gijgo/js/gijgo.min.js",
+            "js/equipment_table.js",
+        )
+
+
+class RentalEquipmentTableWidget(EquipmentTableWidget):
     def value_from_datadict(self, data, files, name):
         if name in data:
             # Handle the case where equipment is created from a list of
@@ -81,12 +92,52 @@ class EquipmentTableWidget(widgets.Widget):
         i = 0
         while True:
             value = data.getlist(f"{name}-{i}")
+            i += 1
             if len(value) == 0:
                 break
             if len(value) == 1:
                 # Equipment item is a single class already
                 result.append(value[0])
-                i += 1
+                continue
+            item_dict = {
+                "item_description": value[0],
+                "item_size": value[1],
+                "item_number": value[2],
+                "cost": value[3],
+            }
+            item = Item(
+                number=item_dict["item_number"],
+                description=item_dict["item_description"],
+                hidden=False,
+            )
+            try:
+                rental_item = RentalItem.objects.get(item=item, returned=False)
+            except ObjectDoesNotExist:
+                rental_item = RentalItem(item=item, cost=int(item_dict["cost"]))
+            except RentalItem.MultipleObjectsReturned:
+                # Do not crash, just take the first. The view should remove
+                # duplicates before creating the form
+                rental_item = RentalItem.objects.filter(item=item, returned=False)[0]
+            result.append(rental_item)
+        return result
+
+
+class RequestEquipmentTableWidget(EquipmentTableWidget):
+    def value_from_datadict(self, data, files, name):
+        if name in data:
+            # Handle the case where equipment is created from a list of
+            # Request/RentalItems
+            return data[name]
+        result = []
+        i = 0
+        while True:
+            value = data.getlist(f"{name}-{i}")
+            i += 1
+            if len(value) == 0:
+                break
+            if len(value) == 1:
+                # Equipment item is a single class already
+                result.append(value[0])
                 continue
             item = {
                 "item_description": value[0],
@@ -99,21 +150,11 @@ class EquipmentTableWidget(widgets.Widget):
             request_item = RequestItem(**item)
             if request_item not in result:
                 result.append(request_item)
-            i += 1
         return result
-
-    class Media:
-        css = {
-            "screen": ("css/equipment_table.css",),
-        }
-        js = (
-            "vendor/gijgo/js/gijgo.min.js",
-            "js/equipment_table.js",
-        )
 
 
 class RequestEquipmentListField(fields.Field):
-    widget = EquipmentTableWidget
+    widget = RequestEquipmentTableWidget
 
     def __init__(
         self, *args, show_number=False, show_cost=False, item_cost=0, **kwargs
@@ -139,7 +180,7 @@ class RequestEquipmentListField(fields.Field):
 
 
 class RentalEquipmentListField(fields.Field):
-    widget = EquipmentTableWidget
+    widget = RentalEquipmentTableWidget
 
     def __init__(self, *args, show_cost=False, item_cost=0, **kwargs):
         super().__init__(*args, **kwargs)
@@ -346,65 +387,66 @@ class RentEquipmentForm(EquipmentForm):
     def clean(self):
         super().clean()
         rented_equipment = self.cleaned_data.get("equipment")
-        if rented_equipment:
-            for item in rented_equipment:
-                try:
-                    item = item.item
-                    if item.state == Item.IN_USE:
-                        rental_item = item.rentalitem_set.filter(returned=False).first()
-                        if rental_item is None:
-                            # Rental item has been returned or state is
-                            # incorrect.
-                            item.state = Item.AVAILABLE
-                            item.save()
-                            continue
-                        user = rental_item.rental.user
-                        user_str = "{first:s} {last:s} ({account:s})".format(
-                            first=user.first_name,
-                            last=user.last_name,
-                            account=user.username,
-                        )
-                        self.add_error(
-                            "equipment",
-                            forms.ValidationError(
-                                _(
-                                    "%(type)s number %(num)s not available. It is currently rented to %(user)s"
-                                ),
-                                code="invalid",
-                                params={
-                                    "type": item.description,
-                                    "num": item.number,
-                                    "user": user_str,
-                                },
-                            ),
-                        )
-
-                    elif item.state != Item.AVAILABLE:
-                        self.add_error(
-                            "equipment",
-                            forms.ValidationError(
-                                _(
-                                    "%(type)s number %(num)s not available. It is currently %(state)s"
-                                ),
-                                code="invalid",
-                                params={
-                                    "type": item.description,
-                                    "num": item.number,
-                                    "state": Item.STATE_MAP[item.state].lower(),
-                                },
-                            ),
-                        )
-                except AttributeError:
+        if rented_equipment is None:
+            return
+        for item in rented_equipment:
+            try:
+                item = item.item
+                if item.state == Item.IN_USE:
+                    rental_item = item.rentalitem_set.filter(returned=False).first()
+                    if rental_item is None:
+                        # Rental item has been returned or state is
+                        # incorrect.
+                        item.state = Item.AVAILABLE
+                        item.save()
+                        continue
+                    user = rental_item.rental.user
+                    user_str = "{first:s} {last:s} ({account:s})".format(
+                        first=user.first_name,
+                        last=user.last_name,
+                        account=user.username,
+                    )
                     self.add_error(
                         "equipment",
                         forms.ValidationError(
-                            _("%(type)s number not valid"),
+                            _(
+                                "%(type)s number %(num)s not available. It is currently rented to %(user)s"
+                            ),
                             code="invalid",
                             params={
-                                "type": item.item_description,
+                                "type": item.description,
+                                "num": item.number,
+                                "user": user_str,
                             },
                         ),
                     )
+
+                elif item.state != Item.AVAILABLE:
+                    self.add_error(
+                        "equipment",
+                        forms.ValidationError(
+                            _(
+                                "%(type)s number %(num)s not available. It is currently %(state)s"
+                            ),
+                            code="invalid",
+                            params={
+                                "type": item.description,
+                                "num": item.number,
+                                "state": item.state[1].lower(),
+                            },
+                        ),
+                    )
+            except AttributeError:
+                self.add_error(
+                    "equipment",
+                    forms.ValidationError(
+                        _("%(type)s number not valid"),
+                        code="invalid",
+                        params={
+                            "type": item.item_description,
+                        },
+                    ),
+                )
 
 
 class ReturnEquipmentForm(forms.Form):

@@ -14,7 +14,6 @@
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
 import datetime
-import pprint
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.admin.models import LogEntry, CHANGE
