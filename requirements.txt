@@ -6,3 +6,4 @@ model_bakery==1.5.0
 psycopg2
 reportlab
 sakaiauthenticator>1.0.1
+fontawesomefree==6.1.1
