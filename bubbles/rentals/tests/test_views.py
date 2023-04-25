@@ -21,9 +21,11 @@ from django.http import Http404
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
+from model_bakery import baker
+
 from bubbles.rentals.models import Rental, RentalPeriod, RentalItem, RequestItem
 from bubbles.rentals.views import index, rent_equipment, request_equipment
-from bubbles.inventory.models import Item
+from bubbles.inventory.models import Item, BCD
 
 class IndexViewTests(TestCase):
     @classmethod
@@ -76,9 +78,9 @@ class IndexViewTests(TestCase):
                                        state=Rental.REQUESTED,
                                        rental_period=rental_period,
                                        deposit=0)
-        rental_item = RentalItem.objects.create(rental=rental,
-                                                item=item,
-                                                cost=25)
+        RentalItem.objects.create(rental=rental,
+                                  item=item,
+                                  cost=25)
         response = index(self.request)
         self.assertContains(response, "rental-table")
 
@@ -99,10 +101,10 @@ class RequestEquipmentViewTests(TestCase):
         self.request.user = self.user
 
         self.assertRaisesMessage(Http404,
-                                '',
-                                request_equipment,
-                                request=self.request,
-                                request_id=1)
+                                 '',
+                                 request_equipment,
+                                 request=self.request,
+                                 request_id=1)
 
     def test_logged_in_not_own(self):
         self.request.user = self.user
@@ -118,10 +120,50 @@ class RequestEquipmentViewTests(TestCase):
                                        deposit=0)
 
         self.assertRaisesMessage(PermissionDenied,
-                                '',
-                                request_equipment,
-                                request=self.request,
-                                request_id=rental.id)
+                                 '',
+                                 request_equipment,
+                                 request=self.request,
+                                 request_id=rental.id)
+
+    def test_request_equipment_post(self):
+        start_date = datetime.date.today()
+        rental_period = baker.make(RentalPeriod,
+                                   start_date=start_date,
+                                   end_date=start_date + datetime.timedelta(days=5),
+                                   hidden=False)
+
+        bcd = baker.make(BCD, number="1")
+        item = baker.make(Item, number="2")
+        request_data = {
+            'period': rental_period.id,
+            'belt_weight': 0,
+            'equipment-0': [
+                bcd.description,
+                bcd.size,
+                'N/A',
+                30,
+            ],
+            'equipment-1': [
+                item.description,
+                'N/A',
+                'N/A',
+                -1,
+            ],
+            'liability': 'on',
+        }
+        request = self.factory.post(self.path, request_data)
+        request.user = self.user
+        response = request_equipment(request)
+        self.assertEqual(response.status_code, 302)
+        rental_request = Rental.objects.get(user=self.user,
+                                            rental_period=rental_period)
+        request_items = rental_request.requestitem_set
+        self.assertEqual(len(request_items.all()), 2)
+        bcd_request = request_items.get(item_description=bcd.description)
+        self.assertEqual(bcd_request.cost, rental_period.default_cost_per_item)
+        item_request = request_items.get(item_description=bcd.description)
+        self.assertEqual(item_request.cost, rental_period.default_cost_per_item)
+
 
 class RentEquipmentViewTests(TestCase):
     @classmethod
@@ -142,3 +184,45 @@ class RentEquipmentViewTests(TestCase):
 
         response = rent_equipment(self.request)
         self.assertEqual(response.status_code, 302)
+
+    def test_get_rental_form_with_rental_request(self):
+        self.request.user = self.user
+        rental = baker.make(Rental)
+        description = ['Regulator', 'Cylinder', 'Hood']
+        request_items = [baker.make(RequestItem, rental=rental, item_description=description[i]) for i in range(3)]
+        response = rent_equipment(self.request, rental.id)
+        for item in request_items:
+            self.assertContains(response, item.item_description)
+        self.assertNotContains(response,
+                               f'<input type="text" class="form-control" name="equipment-0" value="N/A" id="description[0]-number">',
+                               html=True)
+
+    def test_rent_equipment_post(self):
+        rental = baker.make(Rental, state=Rental.REQUESTED)
+
+        bcd = baker.make(BCD, number="1")
+        item = baker.make(Item, number="2")
+        request_data = {
+            'period': rental.rental_period.id,
+            'belt_weight': 0,
+            'equipment-0': [
+                bcd.description,
+                bcd.size,
+                bcd.number,
+                30,
+            ],
+            'equipment-1': [
+                item.description,
+                'N/A',
+                bcd.number,
+                -1,
+            ],
+            'liability': 'on',
+        }
+        request = self.factory.post(self.path, request_data)
+        request.user = self.user
+        response = rent_equipment(request, rental.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(rental.rentalitem_set.all()), 2)
+        self.assertEqual(len(rental.requestitem.all()), 0)
+        self.assertEqual(rental.state, Rental.RENTED)

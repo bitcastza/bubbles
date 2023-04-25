@@ -9,7 +9,7 @@
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- *
+ const
  * You should have received a copy of the GNU General Public License
  * along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -52,13 +52,16 @@ $(document).ready(function() {
     $('#id_deposit').on('input', setTotalCost);
     $('#id_belt_weight').on('input', setTotalCost);
     $('#add-dropdown a').on('click', function() {
-        var currentItem = this;
-        var description = $(currentItem).text();
+        const currentItem = this;
+        const description = $(currentItem).text();
+        const fieldName = $(".equipment-table")[0].id;
+        const currentNumber = $("#" + fieldName + " tbody tr").length;
+        const namePrefix = fieldName + "-" + currentNumber;
         var sizeOptions = $(document.createElement('input'))
             .attr({
                 'type': 'text',
                 'id': description + '-size',
-                'name': description,
+                'name': namePrefix,
                 'value': 'N/A',
                 'readonly': true
             })
@@ -72,12 +75,12 @@ $(document).ready(function() {
                     .addClass('form-control')
                     .addClass('disabled')
                     .attr({'id': description + '-size',
-                           'name': description});
+                           'name': namePrefix});
             } else {
                 sizeOptions = $(document.createElement('select'))
                     .addClass('form-control')
                     .attr({'id': description + '-size',
-                           'name': description});
+                           'name': namePrefix});
                 $('#' + this.id + ' .sizes li').each(function() {
                     var option = $(document.createElement('option'))
                         .append($(this).text());
@@ -85,7 +88,6 @@ $(document).ready(function() {
                 });
             }
         });
-        var description = $(this).text();
         var showNumber = $('#show-number').text() == "True";
         var itemDescription = $(document.createElement('td'))
             .addClass('item-description');
@@ -93,7 +95,7 @@ $(document).ready(function() {
             .addClass('form-control')
             .attr({
                 'type': 'text',
-                'name': description,
+                'name': namePrefix,
                 'value': description,
                 'id': description + '-description',
                 'readonly': '',
@@ -105,37 +107,49 @@ $(document).ready(function() {
             .append(itemDescription)
             .append(itemSize);
 
-        if (showNumber) {
-            cost = +$('#item-cost').text();
-            if (document.getElementById('free-' + description.replace(/ /gi, '')) != null) {
-                cost = 0;
-            }
-            var itemNumber = $(document.createElement('td'))
-                .addClass('item-number');
-            itemNumber.append($(document.createElement('input'))
+        var itemNumber = $(document.createElement('td'))
+            .addClass('item-number');
+        var itemNumberInput = $(document.createElement('input'))
+            .addClass('form-control')
+            .attr({
+                'type': 'text',
+                'name': namePrefix,
+                'id': description + '-number',
+            });
+
+        var itemCost = $(document.createElement('td'))
+            .addClass('item-cost');
+        var itemCostInput = $(document.createElement('input'))
+                .addClass('item-cost-value')
                 .addClass('form-control')
                 .attr({
-                    'type': 'text',
-                    'name': description,
-                    'id': description + '-number',
-                    'value': ''
-                }));
-            row.append(itemNumber);
-            var itemCost = $(document.createElement('td'))
-                .addClass('item-cost');
-            itemCost.append(
-                $(document.createElement('input'))
-                    .addClass('item-cost-value')
-                    .addClass('form-control')
-                    .attr({
-                        'type': 'number',
-                        'name': description,
-                        'id': description + '-cost',
-                        'value': cost,
-                        'min': 0
-                    }));
-            row.append(itemCost);
+                    'type': 'number',
+                    'name': namePrefix,
+                    'id': description + '-cost',
+                    'value': cost,
+                });
+
+        if (showNumber) {
+          var cost = +$('#item-cost').text();
+          if (document.getElementById('free-' + description.replace(/ /gi, '')) != null) {
+              cost = 0;
+          }
+          itemNumberInput.attr('value', '');
+          itemCostInput.attr('value', cost);
+          itemCostInput.attr('min', 0);
+        } else {
+          itemNumberInput.attr('value', 'N/A');
+          itemNumber.hide();
+          itemCostInput.attr('min', -1);
+          itemCostInput.attr('value', '-1');
+          itemCost.hide();
         }
+
+        itemNumber.append(itemNumberInput);
+        row.append(itemNumber);
+        itemCost.append(itemCostInput);
+        row.append(itemCost);
+
         var itemEntry = $(document.createElement('td'))
             .addClass('item-entry');
         itemEntry.append($(document.createElement('a'))
@@ -144,11 +158,11 @@ $(document).ready(function() {
                 .addClass('fa-trash')
                 .addClass('item-remove')));
         row.append(itemEntry);
-        $('#equipment-table > tbody:last-child').append(row);
+        $('#equipment > tbody:last-child').append(row);
         $('#submit-btn').show();
         $('.item-cost-value').on('input', setTotalCost);
         setTotalCost();
-        if (! showNumber) {
+        if (!showNumber) {
             $('#' + description + '-dropdown').hide();
         }
         addItemRemoveListener();

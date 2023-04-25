@@ -20,6 +20,8 @@ from django.forms import ValidationError
 from django.test import TestCase
 from django.http.request import QueryDict
 
+from model_bakery import baker
+
 from bubbles.inventory.models import BCD, Item
 from bubbles.rentals import forms
 from bubbles.rentals.forms import EquipmentTableWidget, RentalEquipmentListField
@@ -29,13 +31,9 @@ class StaticFunctionTest(TestCase):
     def test_get_initial_period_exists(self):
         start_date = datetime.date.today()
         end_date = start_date + datetime.timedelta(days=5)
-        rental_period = RentalPeriod(start_date=start_date,
+        rental_period = baker.make(RentalPeriod, start_date=start_date,
                                      end_date=end_date,
-                                     default_deposit=100,
-                                     default_cost_per_item=25,
-                                     name='Test',
                                      hidden=False)
-        rental_period.save()
         self.assertEqual(forms.get_initial_period(), rental_period)
 
     def test_get_initial_period_none(self):
@@ -44,24 +42,14 @@ class StaticFunctionTest(TestCase):
 class EquipmentTableWidgetTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        date_of_purchase = datetime.date(year=2018, month=7, day=2)
-        cls.item = BCD(number='1',
-                   manufacturer='test',
-                   date_of_purchase=date_of_purchase,
-                   state = BCD.AVAILABLE,
-                   size = BCD.LARGE,
-                   last_service=date_of_purchase,
-                   description='BCD')
-        cls.item.save()
+        cls.item = baker.make(BCD, number='1', state=BCD.AVAILABLE, description='BCD')
         start_date = datetime.date.today()
         end_date = start_date + datetime.timedelta(days=5)
-        rental_period = RentalPeriod(start_date=start_date,
-                                     end_date=end_date,
-                                     default_deposit=100,
-                                     default_cost_per_item=25,
-                                     name='Test',
-                                     hidden=False)
-        user = User.objects.create_user(username='jacob')
+        rental_period = baker.make(RentalPeriod,
+                                   start_date=start_date,
+                                   end_date=end_date,
+                                   hidden=False)
+        user = User.objects.create_user(username='user')
         cls.rental = Rental(rental_period=rental_period,
                             user=user,
                             state=Rental.REQUESTED,
@@ -82,78 +70,23 @@ class EquipmentTableWidgetTest(TestCase):
         self.assertIn(self.item.description, item_types)
 
     def test_get_context_hidden(self):
-        hidden_item = Item(number='3',
-                           manufacturer='Reef',
-                           date_of_purchase=datetime.date(year=2015,
-                                                          month=1,
-                                                          day=1),
-                           state = Item.AVAILABLE,
-                           description='Hood',
-                           hidden=True)
-        hidden_item.save()
+        hidden_item = baker.make(Item,
+                                 state = Item.AVAILABLE,
+                                 hidden=True)
         context = self.table.get_context('Equipment table', None, None)
         context = context['widget']
         item_types = [x['description'] for x in context['item_types']]
         self.assertNotIn(hidden_item.description, item_types)
 
     def test_get_context_free(self):
-        free_item = Item(number='3',
-                           manufacturer='Reef',
-                           date_of_purchase=datetime.date(year=2015,
-                                                          month=1,
-                                                          day=1),
-                           state = Item.AVAILABLE,
-                           description='Hood',
-                           free=True)
-        free_item.save()
+        free_item = baker.make(Item,
+                               state = Item.AVAILABLE,
+                               free=True)
         context = self.table.get_context('Equipment table', None, None)
         context = context['widget']
         free_items = [x['description'] for x in context['free_items']]
         self.assertIn(free_item.description, free_items)
 
-    def test_value_from_datadict_rental_items(self):
-        item = RentalItem(item=self.item,
-                          rental=self.rental,
-                          cost=0)
-        data = {'equipment': [item,]}
-        self.table.value_from_datadict(data, None, 'equipment')
-        self.assertEqual(len(self.table.widgets), 1)
-        self.assertEqual(self.table.widgets[0].item_description, self.item.description)
-
-    def test_value_from_datadict_request_item(self):
-        item = RequestItem(rental=self.rental,
-                           item_description=self.item.description,
-                           item_size=self.item.size,
-                           cost=self.rental.rental_period.default_cost_per_item)
-        data = {'equipment': [item,]}
-        self.table.value_from_datadict(data, None, 'equipment')
-        self.assertEqual(len(self.table.widgets), 1)
-        self.assertEqual(self.table.widgets[0].item_description,
-                         item.item_description)
-
-    def test_value_from_datadict_rental_post_cost(self):
-        string = 'r=test&r=two&{key}={key}&{key}={size}&{key}={number}&{key}=0'.format(
-            key=self.item.description,
-            size=self.item.size,
-            number=self.item.number)
-        data = QueryDict(string)
-        self.table.show_number = True
-        self.table.show_cost = True
-        self.table.value_from_datadict(data, None, 'equipment')
-        self.assertEqual(len(self.table.widgets), 1)
-        self.assertEqual(self.table.widgets[0].item_description,
-                         self.item.description)
-
-    def test_value_from_datadict_rental_post(self):
-        string = 'r=test&r=two&{key}={key}&{key}={size}'.format(
-            key=self.item.description,
-            size=self.item.size)
-        data = QueryDict(string)
-        self.table.show_number = False
-        self.table.value_from_datadict(data, None, 'equipment')
-        self.assertEqual(len(self.table.widgets), 1)
-        self.assertEqual(self.table.widgets[0].item_description,
-                         self.item.description)
 
 class RentalEquipmentListFieldTest(TestCase):
     @classmethod
@@ -207,11 +140,10 @@ class RentalEquipmentListFieldTest(TestCase):
         returned_rental_item.save()
 
         form = RentalEquipmentListField()
-        data = {
-            'equipment': [self.rental_item],
-        }
-        form.widget.value_from_datadict(data, None, 'equipment')
-        self.assertIsNotNone(form.clean("Test"))
+        data = QueryDict(mutable=True)
+        data.update({'equipment-0': self.rental_item})
+        value = form.widget.value_from_datadict(data, None, 'equipment')
+        self.assertIsNotNone(form.clean(value))
 
     def test_multiple_item_number_error(self):
         dup_item = BCD(number='1',
@@ -223,11 +155,7 @@ class RentalEquipmentListFieldTest(TestCase):
                        description='BCD')
         dup_item.save()
         form = RentalEquipmentListField()
-        data = {
-            'equipment': [self.rental_item],
-        }
-        form.widget.value_from_datadict(data, None, 'equipment')
-        self.assertRaises(ValidationError, form.clean, 'Test')
+        self.assertRaises(ValidationError, form.clean, [self.rental_item])
 
     def test_multple_rental_item_error(self):
         dup_item = RentalItem(item=self.item,
@@ -235,11 +163,7 @@ class RentalEquipmentListFieldTest(TestCase):
                              cost=0)
         dup_item.save()
         form = RentalEquipmentListField()
-        data = {
-            'equipment': [self.rental_item],
-        }
-        form.widget.value_from_datadict(data, None, 'equipment')
-        r = form.clean(value='equipment')
+        r = form.clean(value=[self.rental_item])
         self.assertIn(r[0], [self.rental_item, dup_item])
 
 class EquipmentFormTest(TestCase):
@@ -264,7 +188,8 @@ class EquipmentFormTest(TestCase):
 
     def test_request_hood(self):
         user = User.objects.create_user(username='hood_renter')
-        string = 'period={period}&belt_weight=0&{key}={key}&{key}=N/A&liability=on'.format(period=self.rental_period.pk, key=self.request_item.item_description)
+        string = 'period={period}&belt_weight=0&{key}={description}&{key}=N/A&{key}=N/A&{key}={cost}&liability=on'.format(period=self.rental_period.pk, key='equipment-0', description=self.request_item.item_description, cost=self.request_item.cost)
+
         data = QueryDict(string)
         form = forms.RequestEquipmentForm(user=user,
                                           data=data)

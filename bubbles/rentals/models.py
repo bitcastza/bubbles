@@ -17,7 +17,7 @@ import datetime
 
 from django.conf import settings
 from django.db import models
-from bubbles.inventory.models import *
+from bubbles.inventory.models import Item, Weight
 from django.utils.translation import gettext_lazy as _
 
 class RentalPeriod(models.Model):
@@ -95,7 +95,10 @@ class RentalItem(models.Model):
         return '{} to unknown'.format(self.item)
 
     def __eq__(self, other):
-        return self.pk == other.pk and self.returned == other.returned
+        try:
+            return self.pk == other.pk and self.returned == other.returned
+        except AttributeError:
+            return False
 
     def __hash__(self):
         return self.pk ^ self.returned

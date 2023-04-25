@@ -14,6 +14,7 @@
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
 import datetime
+import pprint
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.admin.models import LogEntry, CHANGE
@@ -82,7 +83,7 @@ def request_equipment(request, request_id=None):
             rental_period = rental.rental_period
             response.set_cookie('message', _('Equipment requested! Please collect your gear on {date}').format(date=rental_period.start_date))
             return response
-    elif request_id != None: # Edit
+    elif request_id is not None:  # Edit
         rental_request = get_object_or_404(Rental, id=request_id)
         url = reverse('rentals:request_equipment', args=(request_id,))
         if rental_request.user != request.user:
@@ -105,7 +106,6 @@ def request_equipment(request, request_id=None):
         'title': _('Request Equipment'),
         'show_cost': False,
     }
-
     return render(request, 'rentals/rent_equipment.html', context)
 
 def get_existing_rentals(user):
@@ -118,9 +118,9 @@ def get_existing_rentals(user):
 @login_required
 def rent_equipment(request, rental_request=None):
     if not request.user.has_perm('rental.free_rental'):
-        if not request.user.is_staff: # Normal users should request gear
+        if not request.user.is_staff:  # Normal users should request gear
             return redirect('rentals:request_equipment')
-        if rental_request == None: # May not rent for themselves (empty form)
+        if rental_request is None:  # May not rent for themselves (empty form)
             return redirect('rentals:request_equipment')
 
         rental = Rental.objects.get(id=rental_request)
@@ -175,7 +175,7 @@ def rent_equipment(request, rental_request=None):
             url = reverse('rentals:rent_equipment', args=(rental_request,))
             form = RentEquipmentForm(user=rental.user,
                                      rental=rental,
-                                     data={
+                                     initial={
                                          'equipment': rental.requestitem_set.all(),
                                          'period': rental.rental_period,
                                          'deposit': rental.deposit,
@@ -185,7 +185,7 @@ def rent_equipment(request, rental_request=None):
             # Staff member renting for themselves
             rental = get_existing_rentals(request.user)
             form = RentEquipmentForm(user=request.user, rental=rental,
-                                     data={
+                                     initial={
                                          'period': None,
                                          'deposit': 0,
                                          'belt_weight': 0,
@@ -288,7 +288,7 @@ def return_equipment(request, rental_id):
             if all_returned:
                 rental.state = Rental.RETURNED
                 rental.save()
-                if rental.rental_period.end_date == None:
+                if rental.rental_period.end_date is None:
                     rental.rental_period.end_date = datetime.date.today()
                     rental.rental_period.save()
             content_type = ContentType.objects.get(app_label='rentals',

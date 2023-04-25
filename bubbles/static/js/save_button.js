@@ -14,17 +14,17 @@
  * along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
  */
 $(document).ready(function() {
-    var form = document.getElementById('rental-form')
+    var form = $('#rental-form')
     var defaultAction = form.action;
 
-    document.getElementById('submit-btn').onclick = function() {
+    $('#submit-btn').on('click', function() {
         form.action = defaultAction;
         form.submit();
-    };
+    });
 
-    document.getElementById('save-btn').onclick = function() {
+    $('#save-btn').on('click', function() {
         var action = $('#save-target').text();
         form.action = action;
         form.submit();
-    };
+    });
 });
