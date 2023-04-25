@@ -9,19 +9,15 @@ repos:
       - id: check-shebang-scripts-are-executable
       - id: check-symlinks
       - id: destroyed-symlinks
-
       - id: check-json
       - id: check-yaml
-        exclude: ^(docker/mumbleice.yml)$
       - id: check-xml
       - id: check-toml
-
       - id: check-merge-conflict
       - id: end-of-file-fixer
       - id: mixed-line-ending
         args: [--fix=lf]
       - id: trailing-whitespace
-
       - id: requirements-txt-fixer
       - id: name-tests-test
 
@@ -37,7 +33,7 @@ repos:
       - id: pyupgrade
         args: [--py39-plus]
 
- - repo: https://github.com/adamchainz/django-upgrade
+  - repo: https://github.com/adamchainz/django-upgrade
     rev: 1.13.0
     hooks:
       - id: django-upgrade
@@ -53,5 +49,5 @@ repos:
     hooks:
       - id: codespell
         args:
-          - --ignore-words=.codespellignore
+          #- --ignore-words=.codespellignore
           - --builtin=clear,rare,informal
