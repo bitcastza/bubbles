@@ -96,7 +96,7 @@ class RentalTest(TestCase):
     def test_str(self):
         self.assertEqual(
             self.rental.__str__(),
-            "Rental by {} for {}".format(self.user, self.rental_period),
+            f"Rental by {self.user} for {self.rental_period}",
         )
 
 

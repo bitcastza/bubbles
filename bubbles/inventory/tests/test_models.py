@@ -42,7 +42,7 @@ class RegulatorTests(TestCase):
     def test_get_change_url(self):
         content_type = ContentType.objects.get_for_model(Regulator)
         url = reverse(
-            "admin:{}_{}_change".format(content_type.app_label, content_type.model),
+            f"admin:{content_type.app_label}_{content_type.model}_change",
             args=(self.regulator.id,),
         )
         self.assertEqual(self.regulator.get_change_url(), url)
@@ -110,7 +110,7 @@ class CylinderTests(TestCase):
     def test_get_change_url(self):
         content_type = ContentType.objects.get_for_model(Cylinder)
         url = reverse(
-            "admin:{}_{}_change".format(content_type.app_label, content_type.model),
+            f"admin:{content_type.app_label}_{content_type.model}_change",
             args=(self.cylinder.serial_num,),
         )
         self.assertEqual(self.cylinder.get_change_url(), url)

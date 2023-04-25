@@ -31,7 +31,7 @@ class RentalPeriod(models.Model):
 
     def __str__(self):
         if self.end_date:
-            return "{} ({} - {})".format(self.name, self.start_date, self.end_date)
+            return f"{self.name} ({self.start_date} - {self.end_date})"
         return f"{self.name} ({self.start_date} -)"
 
 

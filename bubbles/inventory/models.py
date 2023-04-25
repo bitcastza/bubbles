@@ -103,7 +103,7 @@ class Item(models.Model):
         else:
             id_number = item.id
         return reverse(
-            "admin:{}_{}_change".format(content_type.app_label, content_type.model),
+            f"admin:{content_type.app_label}_{content_type.model}_change",
             args=(id_number,),
         )
 
