@@ -28,7 +28,7 @@ class Command(BaseCommand):
             "--email", default="admin@example.com", help="The email of the user."
         )
         parser.add_argument(
-            "--password", default="admin", help="The password fo the user."
+            "--password", default="admin", help="The password of the user."
         )
         parser.add_argument(
             "--type",

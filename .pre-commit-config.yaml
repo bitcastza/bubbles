@@ -9,6 +9,7 @@ repos:
       - id: check-shebang-scripts-are-executable
       - id: check-symlinks
       - id: destroyed-symlinks
+        exclude: ^(bubbles/static/vendor)$
       - id: check-json
       - id: check-yaml
       - id: check-xml

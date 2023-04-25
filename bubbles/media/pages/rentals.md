@@ -5,7 +5,7 @@ equipment that Bubbles manages. A rental has a life-cycle of three stages:
 
 1.  The rental is _requested_ by a member
 1.  The rental is then _rented_ once equipment is assigned to the member and
-    they have taken posession of it.
+    they have taken possession of it.
 1.  Once the member returns the equipment, the rental is considered _returned_.
 
 Typically, a member [requests equipment](request_equipment) for their own
