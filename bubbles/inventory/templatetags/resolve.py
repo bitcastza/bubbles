@@ -18,10 +18,12 @@ from django import template
 
 register = template.Library()
 
+
 def resolve(key, value_map):
     """
     Returns the value at a key in a map
     """
     return value_map[key]
 
-register.filter('resolve', resolve)
+
+register.filter("resolve", resolve)

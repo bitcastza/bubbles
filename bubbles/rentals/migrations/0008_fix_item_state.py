@@ -2,19 +2,23 @@
 
 from django.db import migrations
 
+
 def fix_item_state(apps, schema_editor):
-    RentalItem = apps.get_model('rentals', 'RentalItem')
-    Item = apps.get_model('inventory', 'Item')
+    RentalItem = apps.get_model("rentals", "RentalItem")
+    Item = apps.get_model("inventory", "Item")
     for rental_item in RentalItem.objects.filter(returned=True):
-        current_rentals = RentalItem.objects.filter(item=rental_item.item, returned=False)
-        if rental_item.item.state == 'U' and current_rentals.count() == 0:
-            rental_item.item.state = 'A'
+        current_rentals = RentalItem.objects.filter(
+            item=rental_item.item, returned=False
+        )
+        if rental_item.item.state == "U" and current_rentals.count() == 0:
+            rental_item.item.state = "A"
             rental_item.item.save()
+
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('rentals', '0007_rentalitem_returned'),
+        ("rentals", "0007_rentalitem_returned"),
     ]
 
     operations = [

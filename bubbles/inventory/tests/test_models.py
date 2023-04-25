@@ -21,16 +21,19 @@ from django.urls import reverse
 
 from bubbles.inventory.models import Item, BCD, Cylinder, Regulator
 
+
 class RegulatorTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         last_service = datetime.date(year=2018, month=7, day=2)
-        cls.regulator = Regulator.objects.create(number='1',
-                                 manufacturer='test',
-                                 date_of_purchase=last_service,
-                                 state=Item.AVAILABLE,
-                                 description='Regulator',
-                                 last_service=last_service)
+        cls.regulator = Regulator.objects.create(
+            number="1",
+            manufacturer="test",
+            date_of_purchase=last_service,
+            state=Item.AVAILABLE,
+            description="Regulator",
+            last_service=last_service,
+        )
 
     def test_next_service(self):
         next_service = datetime.date(year=2019, month=7, day=1)
@@ -38,39 +41,46 @@ class RegulatorTests(TestCase):
 
     def test_get_change_url(self):
         content_type = ContentType.objects.get_for_model(Regulator)
-        url = reverse("admin:{}_{}_change".format(content_type.app_label,
-                                                  content_type.model),
-                      args=(self.regulator.id,))
+        url = reverse(
+            "admin:{}_{}_change".format(content_type.app_label, content_type.model),
+            args=(self.regulator.id,),
+        )
         self.assertEqual(self.regulator.get_change_url(), url)
+
 
 class BCDTests(TestCase):
     def test_next_service(self):
         last_service = datetime.date(year=2018, month=7, day=2)
         next_service = datetime.date(year=2019, month=7, day=1)
-        bcd = BCD.objects.create(number='1',
-                                 manufacturer='test',
-                                 date_of_purchase=last_service,
-                                 state=Item.AVAILABLE,
-                                 description='BCD',
-                                 last_service=last_service,
-                                 size=BCD.SMALL)
+        bcd = BCD.objects.create(
+            number="1",
+            manufacturer="test",
+            date_of_purchase=last_service,
+            state=Item.AVAILABLE,
+            description="BCD",
+            last_service=last_service,
+            size=BCD.SMALL,
+        )
         self.assertEqual(bcd.next_service, next_service)
+
 
 class CylinderTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         last_viz = datetime.date(year=2018, month=7, day=2)
         cls.next_service = datetime.date(year=2019, month=7, day=1)
-        cls.cylinder = Cylinder.objects.create(number='1',
-                                 manufacturer='test',
-                                 date_of_purchase=last_viz,
-                                 state=Item.AVAILABLE,
-                                 description='Cylinder',
-                                 serial_num='123',
-                                 material='steel',
-                                 size=12,
-                                 last_viz=last_viz,
-                                 last_hydro=last_viz)
+        cls.cylinder = Cylinder.objects.create(
+            number="1",
+            manufacturer="test",
+            date_of_purchase=last_viz,
+            state=Item.AVAILABLE,
+            description="Cylinder",
+            serial_num="123",
+            material="steel",
+            size=12,
+            last_viz=last_viz,
+            last_hydro=last_viz,
+        )
 
     def setUp(self):
         self.cylinder.refresh_from_db()
@@ -83,8 +93,9 @@ class CylinderTests(TestCase):
         self.cylinder.last_hydro = last_service
         self.cylinder.hydro_period = datetime.timedelta(weeks=1)
 
-        self.assertEqual(self.cylinder.next_service,
-                         last_service + self.cylinder.hydro_period)
+        self.assertEqual(
+            self.cylinder.next_service, last_service + self.cylinder.hydro_period
+        )
 
     def test_last_service_hydro(self):
         last_service = datetime.date(year=2018, month=8, day=1)
@@ -98,7 +109,8 @@ class CylinderTests(TestCase):
 
     def test_get_change_url(self):
         content_type = ContentType.objects.get_for_model(Cylinder)
-        url = reverse("admin:{}_{}_change".format(content_type.app_label,
-                                                  content_type.model),
-                      args=(self.cylinder.serial_num,))
+        url = reverse(
+            "admin:{}_{}_change".format(content_type.app_label, content_type.model),
+            args=(self.cylinder.serial_num,),
+        )
         self.assertEqual(self.cylinder.get_change_url(), url)

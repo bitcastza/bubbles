@@ -11,48 +11,117 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('inventory', '0003_item_description'),
+        ("inventory", "0003_item_description"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Rental',
+            name="Rental",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('state', models.CharField(choices=[('REQ', 'Requested'), ('REN', 'Rented'), ('RET', 'Returned')], default='REQ', max_length=3, verbose_name='State')),
-                ('deposit', models.IntegerField(verbose_name='Deposit')),
-                ('notes', models.TextField(blank=True, null=True, verbose_name='Notes')),
-                ('deposit_returned', models.BooleanField(default=True, verbose_name='Deposit returned')),
-                ('approved_by', models.ForeignKey(blank=True, limit_choices_to={'is_staff': True}, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='approved_rentals_set', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "state",
+                    models.CharField(
+                        choices=[
+                            ("REQ", "Requested"),
+                            ("REN", "Rented"),
+                            ("RET", "Returned"),
+                        ],
+                        default="REQ",
+                        max_length=3,
+                        verbose_name="State",
+                    ),
+                ),
+                ("deposit", models.IntegerField(verbose_name="Deposit")),
+                (
+                    "notes",
+                    models.TextField(blank=True, null=True, verbose_name="Notes"),
+                ),
+                (
+                    "deposit_returned",
+                    models.BooleanField(default=True, verbose_name="Deposit returned"),
+                ),
+                (
+                    "approved_by",
+                    models.ForeignKey(
+                        blank=True,
+                        limit_choices_to={"is_staff": True},
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="approved_rentals_set",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='RentalItem',
+            name="RentalItem",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('cost', models.IntegerField(default=0, verbose_name='Cost')),
-                ('item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='inventory.Item')),
-                ('rental', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='rentals.Rental')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("cost", models.IntegerField(default=0, verbose_name="Cost")),
+                (
+                    "item",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="inventory.Item"
+                    ),
+                ),
+                (
+                    "rental",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="rentals.Rental"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='RentalPeriod',
+            name="RentalPeriod",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('start_date', models.DateField(verbose_name='Start date')),
-                ('period', models.DurationField(verbose_name='Rental duration')),
-                ('default_deposit', models.IntegerField(verbose_name='Deposit')),
-                ('default_cost_per_item', models.IntegerField(verbose_name='Cost per item')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("start_date", models.DateField(verbose_name="Start date")),
+                ("period", models.DurationField(verbose_name="Rental duration")),
+                ("default_deposit", models.IntegerField(verbose_name="Deposit")),
+                (
+                    "default_cost_per_item",
+                    models.IntegerField(verbose_name="Cost per item"),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='rental',
-            name='rental_period',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='rentals.RentalPeriod'),
+            model_name="rental",
+            name="rental_period",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="rentals.RentalPeriod"
+            ),
         ),
         migrations.AddField(
-            model_name='rental',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="rental",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

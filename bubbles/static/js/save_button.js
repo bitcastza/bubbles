@@ -13,18 +13,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
  */
-$(document).ready(function() {
-    var form = $('#rental-form')
-    var defaultAction = form.action;
+$(document).ready(function () {
+  var form = $("#rental-form");
+  var defaultAction = form.action;
 
-    $('#submit-btn').on('click', function() {
-        form.action = defaultAction;
-        form.submit();
-    });
+  $("#submit-btn").on("click", function () {
+    form.action = defaultAction;
+    form.submit();
+  });
 
-    $('#save-btn').on('click', function() {
-        var action = $('#save-target').text();
-        form.action = action;
-        form.submit();
-    });
+  $("#save-btn").on("click", function () {
+    var action = $("#save-target").text();
+    form.action = action;
+    form.submit();
+  });
 });

@@ -26,19 +26,23 @@ from bubbles.inventory.models import BCD, Cylinder, Regulator, Item
 from bubbles.rentals.models import Rental
 
 BUBBLES_FORMFIELD_OVERRIDES = {
-    DateField: {'widget': CalendarWidget},
+    DateField: {"widget": CalendarWidget},
 }
+
 
 def get_next_service_set(item_type):
     current_date = datetime.date.today()
     state = Q(state=Item.AVAILABLE) | Q(state=Item.IN_USE)
-    items = [x for x in item_type.objects.filter(state) if x.next_service < current_date]
+    items = [
+        x for x in item_type.objects.filter(state) if x.next_service < current_date
+    ]
     return items
+
 
 class BubblesAdminSite(admin.AdminSite):
     index_title = None
-    index_template = 'admin/bubbles/index.html'
-    app_index_template = 'admin/bubbles/index.html'
+    index_template = "admin/bubbles/index.html"
+    app_index_template = "admin/bubbles/index.html"
 
     def index(self, request, extra_context=None):
         """
@@ -50,29 +54,32 @@ class BubblesAdminSite(admin.AdminSite):
         rental_returns = Rental.objects.filter(state__exact=Rental.RENTED)
         cylinder_service_set = get_next_service_set(Cylinder)
         regulator_service_set = get_next_service_set(Regulator)
-        extra_context['rental_requests'] = rental_requests
-        extra_context['rental_returns'] = rental_returns
-        extra_context['need_servicing'] = cylinder_service_set + regulator_service_set
-        message = request.COOKIES.get('message')
-        message_class = request.COOKIES.get('messageclass')
+        extra_context["rental_requests"] = rental_requests
+        extra_context["rental_returns"] = rental_returns
+        extra_context["need_servicing"] = cylinder_service_set + regulator_service_set
+        message = request.COOKIES.get("message")
+        message_class = request.COOKIES.get("messageclass")
         if message:
-            extra_context['messages'] = [message,]
+            extra_context["messages"] = [
+                message,
+            ]
             if message_class:
-                extra_context['message_class'] = message_class
+                extra_context["message_class"] = message_class
             else:
-                extra_context['message_class'] = 'success'
-        response = super(BubblesAdminSite, self).index(request, extra_context=extra_context)
+                extra_context["message_class"] = "success"
+        response = super().index(request, extra_context=extra_context)
         if message:
-            response.delete_cookie('message')
+            response.delete_cookie("message")
         if message_class:
-            response.delete_cookie('messageclass')
+            response.delete_cookie("messageclass")
         return response
 
     def each_context(self, request):
-        context = super(BubblesAdminSite, self).each_context(request)
-        context['apps_length'] = len(self.get_app_list(request))
+        context = super().each_context(request)
+        context["apps_length"] = len(self.get_app_list(request))
         return context
 
-admin_site = BubblesAdminSite(name='Bubbles Administration')
+
+admin_site = BubblesAdminSite(name="Bubbles Administration")
 admin_site.register(Group, GroupAdmin)
 admin_site.register(User, UserAdmin)

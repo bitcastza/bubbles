@@ -18,4 +18,4 @@ from django.apps import AppConfig
 
 
 class PagesConfig(AppConfig):
-    name = 'bubbles.pages'
+    name = "bubbles.pages"

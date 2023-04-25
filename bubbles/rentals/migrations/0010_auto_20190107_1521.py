@@ -6,20 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('rentals', '0009_weightrequestitem'),
+        ("rentals", "0009_weightrequestitem"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='weightrequestitem',
-            name='rental',
+            model_name="weightrequestitem",
+            name="rental",
         ),
         migrations.AddField(
-            model_name='rental',
-            name='weight',
-            field=models.IntegerField(blank=True, null=True, verbose_name='Weight'),
+            model_name="rental",
+            name="weight",
+            field=models.IntegerField(blank=True, null=True, verbose_name="Weight"),
         ),
         migrations.DeleteModel(
-            name='WeightRequestItem',
+            name="WeightRequestItem",
         ),
     ]

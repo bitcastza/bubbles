@@ -19,11 +19,11 @@ from django.http import JsonResponse
 from bubbles.inventory import get_size_breakdown
 from bubbles.inventory.models import Item
 
+
 def equipment_size(request, item_type):
     state_filter = ~Q(state=Item.CONDEMNED)
     size_count = get_size_breakdown(item_type, state_filter)
     result = []
-    for k,v in size_count.items():
-        result.append({'name': k, 'value': v})
-    return JsonResponse({'sizeCount': result})
-
+    for k, v in size_count.items():
+        result.append({"name": k, "value": v})
+    return JsonResponse({"sizeCount": result})

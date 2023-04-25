@@ -7,13 +7,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('inventory', '0012_item_free'),
+        ("inventory", "0012_item_free"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='cylinder',
-            name='hydro_period',
-            field=models.DurationField(default=datetime.timedelta(days=1456), verbose_name='Hydro-static test validity period'),
+            model_name="cylinder",
+            name="hydro_period",
+            field=models.DurationField(
+                default=datetime.timedelta(days=1456),
+                verbose_name="Hydro-static test validity period",
+            ),
         ),
     ]

@@ -19,6 +19,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .models import Item
 
+
 class InventoryCheckForm(forms.Form):
     def __init__(self, item_type, state, **kwargs):
         super().__init__(**kwargs)
@@ -29,22 +30,22 @@ class InventoryCheckForm(forms.Form):
         else:
             show_description = False
 
-        items = manager.filter(state=state).order_by('description', 'number')
+        items = manager.filter(state=state).order_by("description", "number")
         self.item_state = Item.STATE_MAP[state]
         for item in items:
             label = ""
             if show_description:
-                label += item.description + ': '
-            label += item.number + ' (' + item.manufacturer + ')'
+                label += item.description + ": "
+            label += item.number + " (" + item.manufacturer + ")"
             self.fields[item.id] = forms.BooleanField(
                 label=_(label),
                 required=False,
-                widget=widgets.CheckboxInput(attrs={
-                    'class': 'form-check-input'
-                }))
+                widget=widgets.CheckboxInput(attrs={"class": "form-check-input"}),
+            )
+
 
 class BaseInventoryCheckFormSet(forms.BaseFormSet):
     def get_form_kwargs(self, index):
         kwargs = super().get_form_kwargs(index)
-        kwargs['state'] = Item.STATE_CHOICES[index][0]
+        kwargs["state"] = Item.STATE_CHOICES[index][0]
         return kwargs

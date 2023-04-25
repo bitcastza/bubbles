@@ -17,4 +17,4 @@ from django.apps import AppConfig
 
 
 class RegistrationConfig(AppConfig):
-    name = 'bubbles.registration'
+    name = "bubbles.registration"

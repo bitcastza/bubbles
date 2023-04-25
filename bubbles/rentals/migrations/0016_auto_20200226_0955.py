@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('rentals', '0015_auto_20191119_1642'),
+        ("rentals", "0015_auto_20191119_1642"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='rental',
-            options={'permissions': [('free_rental', 'Can rent gear without paying')]},
+            name="rental",
+            options={"permissions": [("free_rental", "Can rent gear without paying")]},
         ),
     ]

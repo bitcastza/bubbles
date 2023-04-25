@@ -7,18 +7,20 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('rentals', '0001_initial'),
+        ("rentals", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='rentalperiod',
-            name='period',
+            model_name="rentalperiod",
+            name="period",
         ),
         migrations.AddField(
-            model_name='rentalperiod',
-            name='end_date',
-            field=models.DateField(default=django.utils.timezone.now, verbose_name='End date'),
+            model_name="rentalperiod",
+            name="end_date",
+            field=models.DateField(
+                default=django.utils.timezone.now, verbose_name="End date"
+            ),
             preserve_default=False,
         ),
     ]

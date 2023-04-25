@@ -23,33 +23,35 @@ from django.http import Http404
 from django.shortcuts import render
 from django.conf import settings
 
-PAGE_ROOT = 'pages'
+PAGE_ROOT = "pages"
+
 
 class ImageClass(InlineProcessor):
     def handleMatch(self, m, data):
-        img = ElementTree.Element('img')
-        img.attrib['class'] = 'img-fluid rounded'
-        img.attrib['alt'] = m.group(1)
-        img.attrib['src'] = m.group(2)
-        img.attrib['title'] = m.group(3)
+        img = ElementTree.Element("img")
+        img.attrib["class"] = "img-fluid rounded"
+        img.attrib["alt"] = m.group(1)
+        img.attrib["src"] = m.group(2)
+        img.attrib["title"] = m.group(3)
         return img, m.start(0), m.end(0)
+
 
 class EscapeHtml(Extension):
     def extendMarkdown(self, md):
-        md.preprocessors.deregister('html_block')
-        md.inlinePatterns.deregister('html')
+        md.preprocessors.deregister("html_block")
+        md.inlinePatterns.deregister("html")
         img_pattern = ImageClass(r'!\[(.+)]\((.+) "(.+)"\)')
-        md.inlinePatterns.register(img_pattern, 'img_pattern', 175)
+        md.inlinePatterns.register(img_pattern, "img_pattern", 175)
+
 
 def page(request, page_name):
-    filename = os.path.join(settings.MEDIA_ROOT, PAGE_ROOT, page_name) + '.md'
+    filename = os.path.join(settings.MEDIA_ROOT, PAGE_ROOT, page_name) + ".md"
     try:
         input_file = codecs.open(filename, mode="r", encoding="utf-8")
     except FileNotFoundError:
-        raise Http404('Page not found')
+        raise Http404("Page not found")
 
     text = input_file.read()
-    html = markdown(text, extensions=[EscapeHtml(),
-                                      'markdown.extensions.attr_list'])
-    context = {'body': html}
-    return render(request, 'pages/page.html', context)
+    html = markdown(text, extensions=[EscapeHtml(), "markdown.extensions.attr_list"])
+    context = {"body": html}
+    return render(request, "pages/page.html", context)
