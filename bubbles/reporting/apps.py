@@ -17,4 +17,4 @@ from django.apps import AppConfig
 
 
 class ReportingConfig(AppConfig):
-    name = 'bubbles.reporting'
+    name = "bubbles.reporting"

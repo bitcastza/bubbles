@@ -2,24 +2,26 @@
 
 from django.db import migrations, models
 
+
 def set_returned(apps, schema_editor):
-    Rental = apps.get_model('rentals', 'Rental')
-    RentalItem = apps.get_model('rentals', 'RentalItem')
+    Rental = apps.get_model("rentals", "Rental")
+    RentalItem = apps.get_model("rentals", "RentalItem")
     for item in RentalItem.objects.all():
-        item.returned = item.rental.state == 'RET'
+        item.returned = item.rental.state == "RET"
         item.save()
+
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('rentals', '0006_requestitem_cost'),
+        ("rentals", "0006_requestitem_cost"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='rentalitem',
-            name='returned',
-            field=models.BooleanField(default=False, verbose_name='Returned'),
+            model_name="rentalitem",
+            name="returned",
+            field=models.BooleanField(default=False, verbose_name="Returned"),
         ),
         migrations.RunPython(set_returned),
     ]

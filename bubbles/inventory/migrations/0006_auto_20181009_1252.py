@@ -6,35 +6,70 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('inventory', '0005_auto_20180711_1334'),
+        ("inventory", "0005_auto_20180711_1334"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bcd',
-            name='serial_num',
-            field=models.CharField(default='', max_length=255, verbose_name='Serial number'),
+            model_name="bcd",
+            name="serial_num",
+            field=models.CharField(
+                default="", max_length=255, verbose_name="Serial number"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='regulator',
-            name='serial_num',
-            field=models.CharField(default='', max_length=255, verbose_name='Serial number'),
+            model_name="regulator",
+            name="serial_num",
+            field=models.CharField(
+                default="", max_length=255, verbose_name="Serial number"
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='bcd',
-            name='size',
-            field=models.CharField(choices=[('XS', 'Extra small'), ('S', 'Small'), ('M', 'Medium'), ('ML', 'Medium large'), ('L', 'Large')], max_length=2, verbose_name='Size'),
+            model_name="bcd",
+            name="size",
+            field=models.CharField(
+                choices=[
+                    ("XS", "Extra small"),
+                    ("S", "Small"),
+                    ("M", "Medium"),
+                    ("ML", "Medium large"),
+                    ("L", "Large"),
+                ],
+                max_length=2,
+                verbose_name="Size",
+            ),
         ),
         migrations.AlterField(
-            model_name='booties',
-            name='size',
-            field=models.CharField(choices=[('XS', 'Extra small'), ('S', 'Small'), ('M', 'Medium'), ('L', 'Large'), ('XL', 'Extra large')], max_length=2, verbose_name='Size'),
+            model_name="booties",
+            name="size",
+            field=models.CharField(
+                choices=[
+                    ("XS", "Extra small"),
+                    ("S", "Small"),
+                    ("M", "Medium"),
+                    ("L", "Large"),
+                    ("XL", "Extra large"),
+                ],
+                max_length=2,
+                verbose_name="Size",
+            ),
         ),
         migrations.AlterField(
-            model_name='wetsuit',
-            name='size',
-            field=models.CharField(choices=[('XS', 'Extra small'), ('S', 'Small'), ('M', 'Medium'), ('ML', 'Medium large'), ('L', 'Large'), ('XL', 'Extra large')], max_length=2, verbose_name='Size'),
+            model_name="wetsuit",
+            name="size",
+            field=models.CharField(
+                choices=[
+                    ("XS", "Extra small"),
+                    ("S", "Small"),
+                    ("M", "Medium"),
+                    ("ML", "Medium large"),
+                    ("L", "Large"),
+                    ("XL", "Extra large"),
+                ],
+                max_length=2,
+                verbose_name="Size",
+            ),
         ),
     ]

@@ -6,23 +6,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('inventory', '0003_item_description'),
+        ("inventory", "0003_item_description"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='cylinder',
-            name='hydro_period',
-            field=models.DurationField(default=2, verbose_name='Hydro-static test validity period'),
+            model_name="cylinder",
+            name="hydro_period",
+            field=models.DurationField(
+                default=2, verbose_name="Hydro-static test validity period"
+            ),
         ),
         migrations.AlterField(
-            model_name='cylinder',
-            name='viz_period',
-            field=models.DurationField(default=1, verbose_name='Visual inspection validity period'),
+            model_name="cylinder",
+            name="viz_period",
+            field=models.DurationField(
+                default=1, verbose_name="Visual inspection validity period"
+            ),
         ),
         migrations.AlterField(
-            model_name='item',
-            name='description',
-            field=models.CharField(max_length=255, verbose_name='Type'),
+            model_name="item",
+            name="description",
+            field=models.CharField(max_length=255, verbose_name="Type"),
         ),
     ]

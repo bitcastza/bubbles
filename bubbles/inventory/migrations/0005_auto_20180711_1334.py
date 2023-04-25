@@ -8,23 +8,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('inventory', '0004_auto_20180704_2133'),
+        ("inventory", "0004_auto_20180704_2133"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='cylinder',
-            name='hydro_period',
-            field=models.DurationField(default=datetime.timedelta(728), verbose_name='Hydro-static test validity period'),
+            model_name="cylinder",
+            name="hydro_period",
+            field=models.DurationField(
+                default=datetime.timedelta(728),
+                verbose_name="Hydro-static test validity period",
+            ),
         ),
         migrations.AlterField(
-            model_name='cylinder',
-            name='viz_period',
-            field=models.DurationField(default=datetime.timedelta(364), verbose_name='Visual inspection validity period'),
+            model_name="cylinder",
+            name="viz_period",
+            field=models.DurationField(
+                default=datetime.timedelta(364),
+                verbose_name="Visual inspection validity period",
+            ),
         ),
         migrations.AlterField(
-            model_name='item',
-            name='number',
-            field=models.CharField(default=bubbles.inventory.models.Item.get_next_number, max_length=5, verbose_name='Number'),
+            model_name="item",
+            name="number",
+            field=models.CharField(
+                default=bubbles.inventory.models.Item.get_next_number,
+                max_length=5,
+                verbose_name="Number",
+            ),
         ),
     ]

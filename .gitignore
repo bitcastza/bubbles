@@ -7,3 +7,4 @@ bubbles/settings/local.py
 /logs/
 *.pdf
 docker/env-prod.env
+node_modules/

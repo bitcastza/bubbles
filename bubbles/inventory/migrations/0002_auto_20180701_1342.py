@@ -6,25 +6,36 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('inventory', '0001_initial'),
+        ("inventory", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='bcd',
-            options={'verbose_name': 'BCD'},
+            name="bcd",
+            options={"verbose_name": "BCD"},
         ),
         migrations.AlterModelOptions(
-            name='booties',
-            options={'verbose_name_plural': 'Booties'},
+            name="booties",
+            options={"verbose_name_plural": "Booties"},
         ),
         migrations.AlterModelOptions(
-            name='fins',
-            options={'verbose_name_plural': 'Fins'},
+            name="fins",
+            options={"verbose_name_plural": "Fins"},
         ),
         migrations.AlterField(
-            model_name='item',
-            name='state',
-            field=models.CharField(choices=[('A', 'Available'), ('U', 'In use'), ('B', 'Broken'), ('R', 'Repair'), ('C', 'Condemned')], default=('A', 'Available'), max_length=1, verbose_name='State'),
+            model_name="item",
+            name="state",
+            field=models.CharField(
+                choices=[
+                    ("A", "Available"),
+                    ("U", "In use"),
+                    ("B", "Broken"),
+                    ("R", "Repair"),
+                    ("C", "Condemned"),
+                ],
+                default=("A", "Available"),
+                max_length=1,
+                verbose_name="State",
+            ),
         ),
     ]

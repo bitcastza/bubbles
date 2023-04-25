@@ -14,11 +14,11 @@
  * along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
  */
 $(document).ready(function () {
-    $('.date-input').each(function() {
-        $(this).datepicker({
-            uiLibrary: 'bootstrap4',
-            format: 'yyyy-mm-dd',
-            iconsLibrary: 'fontawesome'
-        })
+  $(".date-input").each(function () {
+    $(this).datepicker({
+      uiLibrary: "bootstrap4",
+      format: "yyyy-mm-dd",
+      iconsLibrary: "fontawesome",
     });
+  });
 });

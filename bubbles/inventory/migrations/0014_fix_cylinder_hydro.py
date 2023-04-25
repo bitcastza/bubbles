@@ -3,18 +3,18 @@ import datetime
 
 from django.db import migrations
 
+
 def fix_cylinder_hydro(apps, schema_editor):
-    Cylinder = apps.get_model('inventory', 'Cylinder')
+    Cylinder = apps.get_model("inventory", "Cylinder")
     for cylinder in Cylinder.objects.filter(capacity__lt=40.0):
         cylinder.hydro_period = datetime.timedelta(weeks=208)
         cylinder.save()
 
 
-
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('inventory', '0013_auto_20190812_2000'),
+        ("inventory", "0013_auto_20190812_2000"),
     ]
 
     operations = [

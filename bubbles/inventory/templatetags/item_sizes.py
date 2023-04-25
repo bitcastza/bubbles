@@ -13,8 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
 ###########################################################################
-from django.apps import AppConfig
+from django import template
+
+from .. import get_sizes
+from .. import models
+
+register = template.Library()
 
 
-class RegistrationConfig(AppConfig):
-    name = "bubbles.registration"
+@register.simple_tag
+def item_sizes(item):
+    try:
+        item_type = getattr(models, item)
+        return get_sizes(item_type)
+    except AttributeError:
+        return ""

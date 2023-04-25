@@ -1,20 +1,16 @@
 <div class="table-responsive">
-<table class="equipment-table table table-striped" id="{{ widget.name }}-table">
+<table class="equipment-table table table-striped" id="{{ widget.name }}">
   <thead>
     <tr>
       <th scope="col">Item</th>
       <th scope="col">Size</th>
-      {% if widget.show_number %}
-      <th scope="col">Number</th>
-      {% endif %}
-      {% if widget.show_cost %}
-      <th scope="col">Cost</th>
-      {% endif %}
+      <th scope="col" {% if not widget.show_number %}hidden{% endif %}>Number</th>
+      <th scope="col" {% if not widget.show_cost %}hidden{% endif %}>Cost</th>
       <th scope="col">Remove</th>
     </tr>
   </thead>
   <tbody>
-    {% for widget in widget.subwidgets %}
+    {% for item in widget.equipment %}
     {% include "rentals/widgets/equipment_item_widget.html" %}
     {% endfor %}
   </tbody>

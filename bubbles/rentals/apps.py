@@ -17,7 +17,8 @@ from django.apps import AppConfig
 
 
 class RentalsConfig(AppConfig):
-    name = 'bubbles.rentals'
+    name = "bubbles.rentals"
+    default_auto_field = "django.db.models.BigAutoField"
 
     def ready(self):
         from . import signals

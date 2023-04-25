@@ -19,16 +19,19 @@ from django.test import TestCase
 from bubbles.inventory import get_item_size_map, get_sizes
 from bubbles.inventory.models import BCD, Item
 
+
 class StaticFunctionTest(TestCase):
     def test_get_sizes_available(self):
         date_of_purchase = datetime.date(year=2018, month=7, day=2)
-        item = BCD(number='1',
-                   manufacturer='test',
-                   date_of_purchase=date_of_purchase,
-                   state = BCD.AVAILABLE,
-                   size = BCD.LARGE,
-                   last_service=date_of_purchase,
-                   description='BCD')
+        item = BCD(
+            number="1",
+            manufacturer="test",
+            date_of_purchase=date_of_purchase,
+            state=BCD.AVAILABLE,
+            size=BCD.LARGE,
+            last_service=date_of_purchase,
+            description="BCD",
+        )
         item.save()
         results = get_sizes(BCD)
         self.assertEqual(len(results), 1)
@@ -40,14 +43,16 @@ class StaticFunctionTest(TestCase):
 
     def test_get_item_size_map(self):
         date_of_purchase = datetime.date(year=2018, month=7, day=2)
-        item = BCD(number='1',
-                   manufacturer='test',
-                   date_of_purchase=date_of_purchase,
-                   state = BCD.AVAILABLE,
-                   size = BCD.LARGE,
-                   last_service=date_of_purchase,
-                   description='BCD')
+        item = BCD(
+            number="1",
+            manufacturer="test",
+            date_of_purchase=date_of_purchase,
+            state=BCD.AVAILABLE,
+            size=BCD.LARGE,
+            last_service=date_of_purchase,
+            description="BCD",
+        )
         item.save()
         item_size_map = get_item_size_map()
-        self.assertEqual(len(item_size_map['BCD']), 1)
-        self.assertEqual(len(item_size_map['Booties']), 0)
+        self.assertEqual(len(item_size_map["BCD"]), 1)
+        self.assertEqual(len(item_size_map["Booties"]), 0)

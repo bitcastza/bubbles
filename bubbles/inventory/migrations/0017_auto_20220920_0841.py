@@ -7,50 +7,50 @@ import django.db.models.manager
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('inventory', '0016_auto_20191119_1649'),
+        ("inventory", "0016_auto_20191119_1649"),
     ]
 
     operations = [
         migrations.AlterModelManagers(
-            name='bcd',
+            name="bcd",
             managers=[
-                ('item_objects', django.db.models.manager.Manager()),
+                ("item_objects", django.db.models.manager.Manager()),
             ],
         ),
         migrations.AlterModelManagers(
-            name='booties',
+            name="booties",
             managers=[
-                ('item_objects', django.db.models.manager.Manager()),
+                ("item_objects", django.db.models.manager.Manager()),
             ],
         ),
         migrations.AlterModelManagers(
-            name='cylinder',
+            name="cylinder",
             managers=[
-                ('item_objects', django.db.models.manager.Manager()),
+                ("item_objects", django.db.models.manager.Manager()),
             ],
         ),
         migrations.AlterModelManagers(
-            name='fins',
+            name="fins",
             managers=[
-                ('item_objects', django.db.models.manager.Manager()),
+                ("item_objects", django.db.models.manager.Manager()),
             ],
         ),
         migrations.AlterModelManagers(
-            name='item',
+            name="item",
             managers=[
-                ('item_objects', django.db.models.manager.Manager()),
+                ("item_objects", django.db.models.manager.Manager()),
             ],
         ),
         migrations.AlterModelManagers(
-            name='regulator',
+            name="regulator",
             managers=[
-                ('item_objects', django.db.models.manager.Manager()),
+                ("item_objects", django.db.models.manager.Manager()),
             ],
         ),
         migrations.AlterModelManagers(
-            name='wetsuit',
+            name="wetsuit",
             managers=[
-                ('item_objects', django.db.models.manager.Manager()),
+                ("item_objects", django.db.models.manager.Manager()),
             ],
         ),
     ]

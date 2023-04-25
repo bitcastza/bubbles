@@ -7,18 +7,22 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('rentals', '0002_auto_20180705_1241'),
+        ("rentals", "0002_auto_20180705_1241"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='rentalperiod',
-            name='hidden',
+            model_name="rentalperiod",
+            name="hidden",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='rentalitem',
-            name='rental',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='rentals.Rental'),
+            model_name="rentalitem",
+            name="rental",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="rentals.Rental",
+            ),
         ),
     ]

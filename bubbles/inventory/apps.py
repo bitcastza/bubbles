@@ -17,4 +17,5 @@ from django.apps import AppConfig
 
 
 class InventoryConfig(AppConfig):
-    name = 'bubbles.inventory'
+    name = "bubbles.inventory"
+    default_auto_field = "django.db.models.SmallAutoField"

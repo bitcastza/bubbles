@@ -6,14 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('inventory', '0002_auto_20180701_1342'),
+        ("inventory", "0002_auto_20180701_1342"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='item',
-            name='description',
-            field=models.CharField(default='Item', max_length=255, verbose_name='Description'),
+            model_name="item",
+            name="description",
+            field=models.CharField(
+                default="Item", max_length=255, verbose_name="Description"
+            ),
             preserve_default=False,
         ),
     ]

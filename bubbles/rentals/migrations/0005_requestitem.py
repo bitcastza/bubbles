@@ -7,17 +7,40 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('rentals', '0004_auto_20180727_1653'),
+        ("rentals", "0004_auto_20180727_1653"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='RequestItem',
+            name="RequestItem",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('item_description', models.CharField(max_length=255, verbose_name='Type')),
-                ('item_size', models.CharField(blank=True, max_length=2, null=True, verbose_name='Size')),
-                ('rental', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='rentals.Rental')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "item_description",
+                    models.CharField(max_length=255, verbose_name="Type"),
+                ),
+                (
+                    "item_size",
+                    models.CharField(
+                        blank=True, max_length=2, null=True, verbose_name="Size"
+                    ),
+                ),
+                (
+                    "rental",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="rentals.Rental",
+                    ),
+                ),
             ],
         ),
     ]

@@ -1,30 +1,33 @@
+{% load item_sizes %}
 <tr>
-  <td class="item-description">
-    <input type="text" class="form-control" name="{{ widget.item_description }}" value="{{ widget.item_description }}" id="{{ widget.item_description }}-description" readonly/>
+  <td class="item_description">
+    <input type="text" class="form-control" name="{{ widget.name }}-{{ forloop.counter0 }}" value="{{ item.item_description }}" id="{{ item.item_description }}-description" readonly/>
   </td>
-  {% if widget.item_size %}
-  <td class="item-size">
-    <select class="form-control" id="{{ widget.item_description }}-size" name="{{ widget.item_description }}">
-      {% for size in widget.item_sizes %}
-      <option{% if size == widget.item_size %} selected{% endif %}>{{ size }}</option>
+  {% if item.item_size %}
+  <td class="item_size">
+    <select class="form-control" id="{{ item.item_description }}-size" name="{{ widget.name }}-{{ forloop.counter0 }}">
+      {% item_sizes item.item_description as sizes %}
+      {% for size in sizes %}
+      <option{% if size == item.item_size %} selected{% endif %}>{{ size }}</option>
       {% endfor %}
     </select>
   </td>
   {% else %}
   <td>
-    <input type="text" class="form-control item-size" id="{{ widget.item_description }}-size" name="{{ widget.item_description }}" value="N/A" readonly>
+    <input type="text" class="form-control item_size" id="{{ item.item_description }}-size" name="{{ widget.name }}-{{ forloop.counter0 }}" value="N/A" readonly>
   </td>
   {% endif %}
   {% if widget.show_number %}
   <td class="item-number">
-    <input type="text" class="form-control" name="{{ widget.item_description }}" value="{{ widget.item_number }}" id="{{widget.item_description }}-number"/>
-  </td>
+    <input type="text" class="form-control" name="{{ widget.name }}-{{ forloop.counter0 }}" value="{{ item.item.number|default:"" }}" id="{{item.item_description }}-number"/>
+  {% else %}
+  <td class="item-number" hidden>
+    <input type="text" class="form-control" name="{{ widget.name }}-{{ forloop.counter0 }}" value="{{ item.item.number|default:"N/A" }}" id="{{item.item_description }}-number"/>
   {% endif %}
-  {% if widget.show_cost %}
-  <td class="item-cost">
-    <input type="number" class="form-control item-cost-value" name="{{ widget.item_description }}" value="{{ widget.item_cost }}" id="{{widget.item_description }}-cost" min="0"/>
   </td>
-  {% endif %}
+  <td class="item-cost" {% if not widget.show_cost %}hidden{% endif %}>
+    <input type="number" class="form-control item-cost-value" name="{{ widget.name }}-{{ forloop.counter0 }}" value="{{ item.cost }}" id="{{item.item_description }}-cost" min="0"/>
+  </td>
   <td class="item-entry">
     <a href="#"><i class="fas fa-trash item-remove"></i></a>
   </td>
