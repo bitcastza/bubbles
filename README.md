@@ -29,15 +29,10 @@ $ pyenv/bin/python manage.py runserver
 
 This will start a development web server on http://127.0.0.1:8000/
 
-## Production
-
-A more production ready setup can be created by following the
-[Ansible role](https://gitlab.com/bubbles/ansible).
-
 # Contribute
 
-- Issue Tracker: https://gitlab.com/bubbles/bubbles/issues
-- Source Code: https://gitlab.com/bubbles/bubbles
+- Issue Tracker: https://github.com/bitcastza/bubbles/issues
+- Source Code: https://github.com/bitcastza/bubbles
 
 # Licence
 
