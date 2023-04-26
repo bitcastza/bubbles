@@ -3,7 +3,7 @@ version: "3"
 services:
   db:
     restart: always
-    image: postgres:11
+    image: postgres:15
     environment:
       POSTGRES_DB: bubbles
       POSTGRES_USER: bubbles
