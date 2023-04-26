@@ -19,11 +19,11 @@ unit-3:
 
 docker-image:
   stage: deploy
-  image: docker:19
+  image: docker:23
   variables:
     DOCKER_DRIVER: overlay2
   services:
-    - docker:19-dind
+    - docker:23-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - export DATE_TAG=$(date +'%Y-%m-%dT%H-%M')
