@@ -6,5 +6,6 @@ __pycache__/
 bubbles/settings/local.py
 /logs/
 *.pdf
+*.log
 docker/env-prod.env
 node_modules/
