@@ -335,7 +335,7 @@ def return_equipment(request, rental_id):
         form = ReturnEquipmentForm(
             user=rental.user,
             rental=rental,
-            data={
+            initial={
                 "equipment": rental.rentalitem_set.filter(returned=False),
                 "deposit": rental.deposit,
                 "belt_weight": rental.weight,

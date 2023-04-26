@@ -11,7 +11,11 @@
   </thead>
   <tbody>
     {% for item in widget.equipment %}
-    {% include "rentals/widgets/equipment_item_widget.html" %}
+    {% if item.item %}
+    {% include "rentals/widgets/equipment_rental_item_widget.html" %}
+    {% else %}
+    {% include "rentals/widgets/equipment_request_item_widget.html" %}
+    {% endif %}
     {% endfor %}
   </tbody>
 </table>
