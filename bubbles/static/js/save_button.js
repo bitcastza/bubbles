@@ -14,11 +14,9 @@
  * along with Bubbles. If not, see <http://www.gnu.org/licenses/>.
  */
 $(document).ready(function () {
-  var form = $("#rental-form");
-  var defaultAction = form.action;
+  var form = $("#rental-form")[0];
 
   $("#submit-btn").on("click", function () {
-    form.action = defaultAction;
     form.submit();
   });
 

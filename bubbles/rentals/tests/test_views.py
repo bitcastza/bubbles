@@ -24,7 +24,13 @@ from django.urls import reverse
 from model_bakery import baker
 
 from bubbles.rentals.models import Rental, RentalPeriod, RentalItem, RequestItem
-from bubbles.rentals.views import index, rent_equipment, request_equipment
+from bubbles.rentals.views import (
+    index,
+    rent_equipment,
+    request_equipment,
+    save_rental_request,
+    return_equipment,
+)
 from bubbles.inventory.models import Item, BCD, Weight
 
 
@@ -144,7 +150,7 @@ class RequestEquipmentViewTests(TestCase):
             hidden=False,
         )
 
-        bcd = baker.make(BCD, number="1")
+        bcd = baker.make(BCD, number="1", size=BCD.MEDIUM)
         item = baker.make(Item, number="2")
         request_data = {
             "period": rental_period.id,
@@ -172,8 +178,54 @@ class RequestEquipmentViewTests(TestCase):
         self.assertEqual(len(request_items.all()), 2)
         bcd_request = request_items.get(item_description=bcd.description)
         self.assertEqual(bcd_request.cost, rental_period.default_cost_per_item)
-        item_request = request_items.get(item_description=bcd.description)
+        self.assertEqual(bcd_request.item_size, bcd.size)
+        item_request = request_items.get(item_description=item.description)
         self.assertEqual(item_request.cost, rental_period.default_cost_per_item)
+        self.assertIsNone(item_request.item_size)
+
+    def test_save_request_equipment_post(self):
+        start_date = datetime.date.today()
+        rental_period = baker.make(
+            RentalPeriod,
+            start_date=start_date,
+            end_date=start_date + datetime.timedelta(days=5),
+            hidden=False,
+        )
+        rental = baker.make(Rental, state=Rental.REQUESTED, rental_period=rental_period)
+
+        bcd = baker.make(BCD, number="1")
+        item = baker.make(Item, number="2")
+        request_data = {
+            "period": rental_period.id,
+            "belt_weight": 0,
+            "equipment-0": [
+                bcd.description,
+                bcd.size,
+                bcd.number,
+                30,
+            ],
+            "equipment-1": [
+                item.description,
+                "N/A",
+                item.number,
+                -1,
+            ],
+        }
+        path = reverse("rentals:save_rental_request", args=(rental.id,))
+        request = self.factory.post(path, request_data)
+        request.user = self.user
+        response = save_rental_request(request, rental.id)
+        self.assertEqual(response.status_code, 302)
+        request_items = rental.requestitem_set
+        self.assertEqual(len(request_items.all()), 2)
+        bcd_request = request_items.get(item_description=bcd.description)
+        self.assertEqual(bcd.number, bcd_request.item_number)
+        self.assertEqual(bcd_request.cost, rental_period.default_cost_per_item)
+        self.assertEqual(bcd_request.item_size, bcd.size)
+        item_request = request_items.get(item_description=item.description)
+        self.assertEqual(item.number, item_request.item_number)
+        self.assertEqual(item_request.cost, rental_period.default_cost_per_item)
+        self.assertIsNone(item_request.item_size)
 
 
 class RentEquipmentViewTests(TestCase):
@@ -204,12 +256,19 @@ class RentEquipmentViewTests(TestCase):
             baker.make(RequestItem, rental=rental, item_description=description[i])
             for i in range(3)
         ]
+        request_items[1].item_number = "1"
+        request_items[1].save()
         response = rent_equipment(self.request, rental.id)
         for item in request_items:
             self.assertContains(response, item.item_description)
         self.assertContains(
             response,
-            f'<input type="text" class="form-control" name="equipment-0" value="" id="{description[0]}-number">',
+            f'<input type="text" class="form-control" name="equipment-0" value="" id="{description[0]}-number"/>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            f'<input type="text" class="form-control" name="equipment-1" value="1" id="{description[1]}-number"/>',
             html=True,
         )
 
@@ -253,3 +312,82 @@ class RentEquipmentViewTests(TestCase):
         self.assertEqual(rental.state, Rental.RENTED)
         weight = Weight.objects.first()
         self.assertEqual(weight.total_weight - weight.available_weight, 5)
+
+    def test_get_return_form_with_rental_request(self):
+        self.request.user = self.user
+        start_date = datetime.date.today()
+        rental_period = baker.make(
+            RentalPeriod,
+            start_date=start_date,
+            end_date=start_date + datetime.timedelta(days=5),
+            hidden=False,
+        )
+        rental = baker.make(Rental, rental_period=rental_period)
+        bcd = baker.make(BCD, description="BCD", number="1", state=Item.IN_USE)
+        baker.make(RentalItem, item=bcd, rental=rental)
+        item = baker.make(Item, number="2", state=Item.IN_USE)
+        baker.make(RentalItem, item=item, rental=rental)
+        response = return_equipment(self.request, rental.id)
+        self.assertContains(response, bcd.description)
+        self.assertContains(response, item.description)
+        self.assertContains(
+            response,
+            f'<input type="text" class="form-control" name="equipment-0" value="{bcd.description}" id="{bcd.description}-description" readonly/>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            f'<input type="text" class="form-control" name="equipment-1" value="{item.number}" id="{item.description}-number"/>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            f'<select class="form-control" id="{bcd.description}-size" name="equipment-0">',
+            html=True,
+        )
+
+    def test_return_equipment_post(self):
+        Weight.objects.create(total_weight=50, available_weight=45)
+        start_date = datetime.date.today()
+        rental_period = baker.make(
+            RentalPeriod,
+            start_date=start_date,
+            end_date=start_date + datetime.timedelta(days=5),
+            hidden=False,
+        )
+        rental = baker.make(Rental, state=Rental.RENTED, rental_period=rental_period)
+
+        bcd = baker.make(BCD, description="BCD", number="1", state=Item.IN_USE)
+        baker.make(RentalItem, item=bcd, rental=rental)
+        item = baker.make(Item, number="2", state=Item.IN_USE)
+        baker.make(RentalItem, item=item, rental=rental)
+        request_data = {
+            "period": rental.rental_period.id,
+            "belt_weight": 5,
+            "equipment-0": [
+                bcd.description,
+                bcd.size,
+                bcd.number,
+                "",
+            ],
+            "equipment-1": [
+                item.description,
+                "N/A",
+                item.number,
+                "",
+            ],
+            "deposit": "100",
+        }
+        path = reverse("rentals:return_equipment", args=(rental.id,))
+        request = self.factory.post(path, request_data)
+        request.user = self.user
+        response = return_equipment(request, rental.id)
+        rental.refresh_from_db()
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(rental.rentalitem_set.all()), 2)
+        for item in rental.rentalitem_set.all():
+            self.assertEqual(item.item.state, Item.AVAILABLE)
+        self.assertEqual(len(rental.requestitem_set.all()), 0)
+        self.assertEqual(rental.state, Rental.RETURNED)
+        weight = Weight.objects.first()
+        self.assertEqual(weight.total_weight - weight.available_weight, 0)

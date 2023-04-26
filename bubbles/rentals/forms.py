@@ -113,7 +113,9 @@ class RentalEquipmentTableWidget(EquipmentTableWidget):
             try:
                 rental_item = RentalItem.objects.get(item=item, returned=False)
             except ObjectDoesNotExist:
-                rental_item = RentalItem(item=item, cost=int(item_dict["cost"]))
+                rental_item = RentalItem(item=item)
+                if item_dict["cost"].isnumeric():
+                    rental_item.cost = int(item_dict["cost"])
             except RentalItem.MultipleObjectsReturned:
                 # Do not crash, just take the first. The view should remove
                 # duplicates before creating the form
@@ -141,8 +143,9 @@ class RequestEquipmentTableWidget(EquipmentTableWidget):
                 continue
             item = {
                 "item_description": value[0],
-                "item_size": value[1],
             }
+            if value[1] != "N/A":
+                item["item_size"] = value[1]
             if value[2] != "N/A":
                 item["item_number"] = value[2]
             if value[3] != "-1":

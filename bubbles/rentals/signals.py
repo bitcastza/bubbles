@@ -15,8 +15,8 @@
 ###########################################################################
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
-from .models import RentalItem, Rental, Weight
-from bubbles.inventory.models import Item
+from .models import RentalItem, Rental
+from bubbles.inventory.models import Item, Weight
 
 
 @receiver(pre_delete, sender=RentalItem)

@@ -17,7 +17,7 @@ import datetime
 
 from django.conf import settings
 from django.db import models
-from bubbles.inventory.models import Item, Weight
+from bubbles.inventory.models import Item
 from django.utils.translation import gettext_lazy as _
 
 
