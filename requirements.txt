@@ -1,4 +1,4 @@
-django~=3.2
+django~=4.2
 django-prometheus
 django-widget-tweaks
 fontawesomefree==6.4.0
