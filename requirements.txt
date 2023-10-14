@@ -3,7 +3,7 @@ django-prometheus
 django-widget-tweaks
 fontawesomefree==6.4.2
 markdown>3.0
-model_bakery==1.15.0
+model_bakery==1.16.0
 psycopg2
 reportlab
 sakaiauthenticator>1.0.1
