@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "bootstrap": "4.6.2",
+    "bootstrap": "5.3.3",
     "d3": "5.16.0",
     "gijgo": "1.9.14",
     "jquery": "^3.2.1",
